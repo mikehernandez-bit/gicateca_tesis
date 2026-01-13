@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{ title or "Formatoteca" }}</title>
+
+  <!-- Tailwind CDN (cascarón) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <link rel="stylesheet" href="/static/css/extra.css">
+</head>
+
+<body class="flex h-screen overflow-hidden text-gray-800 bg-gray-50/50">
+
+  {% include "components/sidebar.html" %}
+
+  <main class="flex-1 flex flex-col min-w-0 bg-gray-50/50">
+    {% include "components/header.html" %}
+
+    <div id="main-content" class="flex-1 overflow-auto p-8 relative scroll-smooth">
+      <div class="fade-in">
+        {% block content %}{% endblock %}
+      </div>
+      <div class="h-12"></div>
+    </div>
+  </main>
+
+  <script>window.__ACTIVE_NAV__ = "{{ active_nav or "" }}";</script>
+  <script src="/static/js/navigation.js"></script>
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>

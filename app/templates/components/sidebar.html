@@ -1,0 +1,57 @@
+<aside class="w-64 bg-white border-r border-gray-200 flex flex-col z-20 shadow-sm">
+  <!-- Logo -->
+  <div class="h-16 flex items-center px-6 border-b border-gray-100">
+    <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white mr-3">
+      <i data-lucide="library" class="w-5 h-5"></i>
+    </div>
+    <span class="font-bold text-lg tracking-tight text-gray-900">Formatoteca</span>
+  </div>
+
+  <!-- Menu -->
+  <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
+    <p class="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Principal</p>
+
+    <a href="/" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors"
+       data-nav="home">
+      <i data-lucide="home" class="w-5 h-5"></i>
+      Inicio
+    </a>
+
+    <a href="/catalog" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors"
+       data-nav="catalog">
+      <i data-lucide="grid" class="w-5 h-5"></i>
+      Catálogo
+    </a>
+
+    <a href="/alerts" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors"
+       data-nav="alerts">
+      <div class="relative">
+        <i data-lucide="bell" class="w-5 h-5"></i>
+        <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+      </div>
+      Notificaciones
+    </a>
+
+    <p class="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mt-6 mb-2">Admin</p>
+
+    <a href="/admin" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors"
+       data-nav="admin">
+      <i data-lucide="settings" class="w-5 h-5"></i>
+      Panel
+    </a>
+  </nav>
+
+  <!-- Perfil -->
+  <div class="p-4 border-t border-gray-100">
+    <button class="flex items-center gap-3 w-full p-2 hover:bg-gray-50 rounded-lg transition-colors">
+      <div class="w-9 h-9 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
+        <i data-lucide="user" class="w-5 h-5 text-gray-500"></i>
+      </div>
+      <div class="text-left">
+        <p class="text-sm font-medium text-gray-900">Admin User</p>
+        <p class="text-xs text-gray-500">admin@demo.pe</p>
+      </div>
+      <i data-lucide="chevron-up" class="w-4 h-4 text-gray-400 ml-auto"></i>
+    </button>
+  </div>
+</aside>

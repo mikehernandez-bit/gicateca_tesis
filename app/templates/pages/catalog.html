@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-6xl mx-auto">
+
+  <div class="flex justify-between items-end mb-8">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Catálogo de Formatos</h1>
+      <p class="text-gray-500 mt-1">Placeholder leyendo <code class="bg-gray-100 px-1 rounded">data/seed/formatos.sample.json</code></p>
+    </div>
+
+    <div class="hidden md:flex bg-white rounded-lg shadow-sm border border-gray-200 p-1">
+      <button class="px-4 py-1.5 text-sm font-medium bg-gray-100 text-gray-900 rounded-md">Todos</button>
+      <button class="px-4 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-md">Tesis</button>
+      <button class="px-4 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-md">Inv. Formativa</button>
+      <button class="px-4 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-md">Suficiencia</button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for f in formatos %}
+    <a href="/formatos/{{ f.id }}" class="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow cursor-pointer flex flex-col h-full">
+      <div class="p-5 flex-1">
+        <div class="flex justify-between items-start mb-3">
+          <span class="text-xs font-bold px-2 py-1 rounded uppercase tracking-wider
+            {% if f.uni == 'UNAC' %} bg-blue-100 text-blue-700 {% else %} bg-red-100 text-red-700 {% endif %}">
+            {{ f.uni }}
+          </span>
+
+          <span class="flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full border
+            {% if f.estado == 'VIGENTE' %} bg-green-50 text-green-700 border-green-100 {% else %} bg-orange-50 text-orange-700 border-orange-100 {% endif %}">
+            <span class="w-2 h-2 rounded-full {% if f.estado == 'VIGENTE' %} bg-green-500 {% else %} bg-orange-500 {% endif %}"></span>
+            {{ f.estado }}
+          </span>
+        </div>
+
+        <h3 class="font-bold text-lg text-gray-900 mb-2 leading-tight">{{ f.titulo }}</h3>
+        <p class="text-sm text-gray-500">{{ f.facultad }} — {{ f.escuela }}</p>
+      </div>
+
+      <div class="px-5 py-4 border-t border-gray-50 bg-gray-50/50 rounded-b-xl flex items-center justify-between">
+        <span class="text-xs font-medium text-gray-500 flex items-center gap-1">
+          <i data-lucide="history" class="w-3 h-3"></i> v{{ f.version }} ({{ f.fecha }})
+        </span>
+        <span class="text-blue-600 text-sm font-medium hover:underline">Ver detalles</span>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+
+</div>
+{% endblock %}

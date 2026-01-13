@@ -1,0 +1,14 @@
+[
+  {
+    "id": "uni-civil-suficiencia",
+    "uni": "UNI",
+    "titulo": "Formato Informe de Suficiencia",
+    "facultad": "Ingeniería Civil",
+    "escuela": "Modalidad profesional",
+    "estado": "VIGENTE",
+    "version": "1.1",
+    "fecha": "2024-01-10",
+    "resumen": "Formato para titulación.",
+    "historial": []
+  }
+]

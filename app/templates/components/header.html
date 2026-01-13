@@ -1,0 +1,19 @@
+<header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 shadow-sm z-10">
+  <div class="flex items-center gap-2 text-sm text-gray-500">
+    <span class="font-medium text-gray-900">Formatoteca</span>
+    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+    <span>{{ breadcrumb or "Inicio" }}</span>
+  </div>
+
+  <div class="flex items-center gap-4">
+    <div class="relative w-96 hidden md:block">
+      <i data-lucide="search" class="absolute left-3 top-2.5 w-4 h-4 text-gray-400"></i>
+      <input type="text"
+             placeholder="Buscar formato, tesis, facultad..."
+             class="w-full bg-gray-100 border-none rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all">
+    </div>
+    <button class="p-2 text-gray-500 hover:bg-gray-100 rounded-lg">
+      <i data-lucide="help-circle" class="w-5 h-5"></i>
+    </button>
+  </div>
+</header>

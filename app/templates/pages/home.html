@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-6xl mx-auto">
+
+  <!-- HERO -->
+  <div class="flex flex-col md:flex-row gap-6 mb-8">
+    <!-- Bienvenida -->
+    <div class="flex-1">
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">Bienvenido a la Formatoteca</h1>
+      <p class="text-gray-500">
+        Cascarón base en Python. Selecciona UNI/UNAC y navega sin perder la universidad activa.
+      </p>
+
+      <!-- Selector Universidad (FUNCIONAL con ?uni=...) -->
+      <div class="inline-flex bg-white p-1 rounded-lg border border-gray-200 mt-6 shadow-sm">
+        <a
+          href="/?uni=unac"
+          class="px-6 py-2 text-sm font-medium rounded-md transition-colors
+          {% if active_uni == 'unac' %}
+            bg-blue-50 text-blue-700 shadow-sm border border-blue-100
+          {% else %}
+            text-gray-500 hover:text-gray-700 hover:bg-gray-50
+          {% endif %}">
+          UNAC
+        </a>
+
+        <a
+          href="/?uni=uni"
+          class="px-6 py-2 text-sm font-medium rounded-md transition-colors
+          {% if active_uni == 'uni' %}
+            bg-blue-50 text-blue-700 shadow-sm border border-blue-100
+          {% else %}
+            text-gray-500 hover:text-gray-700 hover:bg-gray-50
+          {% endif %}">
+          UNI
+        </a>
+      </div>
+
+      <!-- Accesos rápidos (ejemplo) -->
+      <div class="mt-6 flex gap-3 flex-wrap">
+        <a
+          href="/catalog?uni={{ active_uni }}"
+          class="inline-flex items-center gap-2 bg-white border border-gray-200 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">
+          <i data-lucide="grid" class="w-4 h-4"></i> Ir al Catálogo
+        </a>
+        <a
+          href="/alerts?uni={{ active_uni }}"
+          class="inline-flex items-center gap-2 bg-white border border-gray-200 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">
+          <i data-lucide="bell" class="w-4 h-4"></i> Ver Alertas
+        </a>
+      </div>
+    </div>
+
+    <!-- Banner -->
+    <a
+      href="/alerts?uni={{ active_uni }}"
+      class="flex-1 bg-gradient-to-br from-blue-700 to-indigo-900 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden flex flex-col justify-center min-h-[160px] hover:shadow-xl transition-shadow">
+      <div class="relative z-10 max-w-sm">
+        <span class="inline-block px-2 py-1 bg-white/20 rounded text-[10px] font-bold uppercase tracking-wider mb-2">
+          Importante
+        </span>
+        <h3 class="font-bold text-xl mb-1">Centro de notificaciones</h3>
+        <p class="text-blue-100 text-sm mb-4">
+          Revisa comunicados, cambios de formatos y actualizaciones ({{ uni_name or 'Universidad' }}).
+        </p>
+        <span class="inline-flex items-center gap-1 text-sm font-medium hover:underline">
+          Ir a notificaciones <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </span>
+      </div>
+      <i data-lucide="book-open" class="absolute right-0 bottom-0 w-40 h-40 text-white/10 transform translate-x-8 translate-y-8"></i>
+    </a>
+  </div>
+
+  <!-- ALERTAS RÁPIDAS -->
+  <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+    <i data-lucide="zap" class="w-5 h-5 text-yellow-500"></i>
+    Alertas rápidas ({{ uni_name or 'Universidad' }})
+  </h2>
+
+  <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+    <div class="divide-y divide-gray-100">
+      {% if alerts and alerts|length > 0 %}
+        {% for a in alerts %}
+        <div class="p-5 flex items-start gap-4 hover:bg-gray-50 transition-colors">
+          <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+            <i data-lucide="bell" class="w-5 h-5"></i>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center justify-between">
+              <p class="font-semibold text-gray-900">{{ a.titulo }}</p>
+              <span class="text-xs text-gray-500">{{ a.cuando }}</span>
+            </div>
+            <p class="text-sm text-gray-600 mt-1">{{ a.cuerpo }}</p>
+
+            {% if a.relacionado_id %}
+              <a href="/formatos/{{ a.relacionado_id }}?uni={{ active_uni }}"
+                 class="mt-2 inline-block text-sm font-medium text-blue-600 hover:text-blue-800">
+                Ver documento relacionado
+              </a>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="p-6 text-sm text-gray-500">
+          No hay alertas registradas aún para {{ uni_name or 'esta universidad' }}.
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}

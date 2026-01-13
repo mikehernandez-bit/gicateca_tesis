@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-5xl mx-auto">
+
+  <a href="/catalog" class="mb-6 flex items-center text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">
+    <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i> Volver al catálogo
+  </a>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+    <div class="lg:col-span-2 space-y-6">
+      <div class="bg-white rounded-xl border border-gray-200 p-8 shadow-sm">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-0.5 rounded">{{ formato.uni }}</span>
+          <span class="text-gray-400 text-sm">•</span>
+          <span class="text-gray-500 text-sm font-medium">{{ formato.facultad }} / {{ formato.escuela }}</span>
+        </div>
+
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ formato.titulo }}</h1>
+        <p class="text-gray-600 mb-6 text-lg">{{ formato.resumen }}</p>
+
+        <div class="flex flex-wrap gap-4">
+          <button class="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-gray-900 text-white px-6 py-3 rounded-lg font-medium shadow hover:bg-gray-800 transition-colors">
+            <i data-lucide="download" class="w-4 h-4"></i>
+            Descargar (placeholder)
+          </button>
+
+          <a href="/formatos/{{ formato.id }}/versions"
+             class="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white text-gray-700 border border-gray-300 px-6 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors">
+            <i data-lucide="git-compare" class="w-4 h-4"></i>
+            Ver historial
+          </a>
+
+          <button class="p-3 text-gray-400 hover:text-blue-600 border border-transparent hover:bg-blue-50 rounded-lg transition-colors ml-auto" title="Compartir">
+            <i data-lucide="share-2" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div class="border-b border-gray-100 px-6 py-4 flex gap-6">
+          <button class="text-sm font-bold text-blue-600 border-b-2 border-blue-600 pb-4 -mb-4.5">Requisitos del Formato</button>
+          <button class="text-sm font-medium text-gray-500 hover:text-gray-700 pb-4 -mb-4.5 transition-colors">Comentarios</button>
+        </div>
+
+        <div class="p-6 space-y-4">
+          <div class="flex items-start gap-4 p-4 rounded-lg bg-gray-50 border border-gray-100">
+            <div class="mt-1 flex-shrink-0">
+              <i data-lucide="check-circle-2" class="w-5 h-5 text-gray-400"></i>
+            </div>
+            <div>
+              <h4 class="font-medium text-gray-900">Checklist (placeholder)</h4>
+              <p class="text-sm text-gray-500 mt-1">Aquí luego va la lista de requisitos, anexos, estructura, etc.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4 p-4 rounded-lg bg-gray-50 border border-gray-100 opacity-70">
+            <div class="mt-1 flex-shrink-0">
+              <i data-lucide="check-circle-2" class="w-5 h-5 text-blue-600"></i>
+            </div>
+            <div>
+              <h4 class="font-medium text-gray-900 line-through">Ejemplo completado</h4>
+              <p class="text-sm text-gray-500 mt-1">Este bloque es solo demostración visual.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-6">
+      <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+        <h3 class="font-bold text-gray-900 mb-4">Información</h3>
+        <div class="space-y-4 text-sm">
+          <div class="flex justify-between py-2 border-b border-gray-100">
+            <span class="text-gray-500">Última actualización</span>
+            <span class="font-medium text-gray-900">{{ formato.fecha }}</span>
+          </div>
+          <div class="flex justify-between py-2 border-b border-gray-100">
+            <span class="text-gray-500">Versión Actual</span>
+            <span class="font-medium text-gray-900">{{ formato.version }}</span>
+          </div>
+          <div class="flex justify-between py-2">
+            <span class="text-gray-500">Estado</span>
+            <span class="font-medium text-gray-900">{{ formato.estado }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-bold text-gray-900">Historial (mini)</h3>
+          <a href="/formatos/{{ formato.id }}/versions" class="text-xs font-bold text-blue-600 hover:underline">Ver todo</a>
+        </div>
+
+        <div class="space-y-3">
+          {% for h in formato.historial[:2] %}
+          <div class="p-3 rounded-lg bg-gray-50 border border-gray-100">
+            <div class="flex items-center justify-between">
+              <p class="text-sm font-bold text-gray-900">v{{ h.version }}</p>
+              <span class="text-xs text-gray-500">{{ h.fecha }}</span>
+            </div>
+            <p class="text-xs text-gray-600 mt-1">{{ h.nota }}</p>
+          </div>
+          {% endfor %}
+        </div>
+
+        <a href="/formatos/{{ formato.id }}/versions" class="w-full mt-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors flex items-center justify-center gap-2">
+          <i data-lucide="git-compare" class="w-4 h-4"></i> Comparar versiones (placeholder)
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

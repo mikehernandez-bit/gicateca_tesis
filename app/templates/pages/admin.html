@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-4xl mx-auto">
+
+  <h1 class="text-2xl font-bold text-gray-900 mb-2">Panel Admin (cascarón)</h1>
+  <p class="text-gray-500 mb-6">Aquí luego irá el CRUD (crear/editar) formatos, alertas, fuentes, etc.</p>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+      <h2 class="font-bold text-gray-900 mb-2">Formato</h2>
+      <p class="text-sm text-gray-600 mb-4">Formulario placeholder.</p>
+      <div class="space-y-3">
+        <input class="w-full bg-gray-100 rounded-lg px-3 py-2 text-sm" placeholder="Título del formato">
+        <input class="w-full bg-gray-100 rounded-lg px-3 py-2 text-sm" placeholder="Universidad (UNAC/UNI)">
+        <button class="w-full bg-gray-900 text-white rounded-lg py-2 text-sm font-medium hover:bg-gray-800">
+          Guardar (placeholder)
+        </button>
+      </div>
+    </div>
+
+    <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+      <h2 class="font-bold text-gray-900 mb-2">Alertas</h2>
+      <p class="text-sm text-gray-600 mb-4">Formulario placeholder.</p>
+      <div class="space-y-3">
+        <input class="w-full bg-gray-100 rounded-lg px-3 py-2 text-sm" placeholder="Título de alerta">
+        <textarea class="w-full bg-gray-100 rounded-lg px-3 py-2 text-sm" rows="3" placeholder="Mensaje"></textarea>
+        <button class="w-full bg-blue-600 text-white rounded-lg py-2 text-sm font-medium hover:bg-blue-700">
+          Publicar (placeholder)
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

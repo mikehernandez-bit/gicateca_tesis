@@ -1,0 +1,60 @@
+[
+  {
+    "id": "unac-fiee-plan-tesis",
+    "uni": "UNAC",
+    "tipo": "Tesis",
+    "titulo": "Estructura Plan de Tesis FIEE",
+    "facultad": "Ingeniería Eléctrica y Electrónica",
+    "escuela": "Ing. Sistemas",
+    "estado": "VIGENTE",
+    "version": "2.4",
+    "fecha": "2024-05-12",
+    "resumen": "Documento oficial que detalla la estructura capitular requerida para el plan de tesis.",
+    "archivos": [
+      {
+        "tipo": "DOCX",
+        "nombre": "plan_tesis_fiee.docx"
+      }
+    ],
+    "historial": [
+      {
+        "version": "2.4",
+        "fecha": "2024-05-12",
+        "estado": "VIGENTE",
+        "nota": "Ajuste de márgenes y logo."
+      },
+      {
+        "version": "2.3",
+        "fecha": "2024-02-10",
+        "estado": "ANTERIOR",
+        "nota": "Corrección ortográfica."
+      }
+    ]
+  },
+  {
+    "id": "uni-civil-suficiencia",
+    "uni": "UNI",
+    "tipo": "Suficiencia",
+    "titulo": "Formato Informe de Suficiencia",
+    "facultad": "Ingeniería Civil",
+    "escuela": "Modalidad profesional",
+    "estado": "VIGENTE",
+    "version": "1.1",
+    "fecha": "2024-01-10",
+    "resumen": "Formato para titulación por modalidad profesional.",
+    "archivos": [
+      {
+        "tipo": "PDF",
+        "nombre": "informe_suficiencia.pdf"
+      }
+    ],
+    "historial": [
+      {
+        "version": "1.1",
+        "fecha": "2024-01-10",
+        "estado": "VIGENTE",
+        "nota": "Ajustes de portada."
+      }
+    ]
+  }
+]

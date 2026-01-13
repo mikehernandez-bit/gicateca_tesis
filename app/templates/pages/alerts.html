@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-3xl mx-auto">
+
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">Centro de Notificaciones</h1>
+    <button class="text-sm text-blue-600 font-medium hover:text-blue-800">Marcar todo como leído (placeholder)</button>
+  </div>
+
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 divide-y divide-gray-100">
+    {% for n in alerts %}
+    <div class="p-6 flex gap-4 hover:bg-gray-50 transition-colors relative">
+      <div class="absolute left-0 top-0 bottom-0 w-1 {% if n.nivel == 'IMPORTANTE' %}bg-blue-500{% else %}bg-gray-200{% endif %} rounded-l-xl"></div>
+
+      <div class="w-12 h-12 rounded-full {% if n.nivel == 'IMPORTANTE' %}bg-blue-100 text-blue-600{% else %}bg-yellow-100 text-yellow-600{% endif %} flex items-center justify-center flex-shrink-0">
+        <i data-lucide="{% if n.nivel == 'IMPORTANTE' %}file-warning{% else %}alert-triangle{% endif %}" class="w-6 h-6"></i>
+      </div>
+
+      <div class="flex-1">
+        <div class="flex justify-between mb-1">
+          <h4 class="font-bold text-gray-900">{{ n.titulo }}</h4>
+          <span class="text-xs text-gray-500">{{ n.cuando }}</span>
+        </div>
+        <p class="text-gray-600 text-sm leading-relaxed mb-2">{{ n.cuerpo }}</p>
+
+        {% if n.relacionado_id %}
+        <a href="/formatos/{{ n.relacionado_id }}" class="text-sm font-medium text-blue-600 hover:text-blue-800">Ver documento relacionado</a>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+</div>
+{% endblock %}
