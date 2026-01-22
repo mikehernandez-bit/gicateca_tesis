@@ -7,7 +7,7 @@ import win32com.client
 from fastapi import APIRouter, Request, HTTPException, BackgroundTasks
 from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
 
-from app.core.loaders import get_data_dir, load_json_file
+from app.core.loaders import find_format_index, load_format_by_id
 from app.core.templates import templates
 from app.modules.formats import service
 
@@ -38,13 +38,6 @@ def _convert_docx_to_pdf(docx_path: str, pdf_path: str) -> None:
         pythoncom.CoUninitialize()
 
 
-def _parse_format_id(format_id: str) -> tuple[str, str]:
-    parts = format_id.split("-")
-    if len(parts) < 3 or parts[0] != "unac":
-        raise ValueError(f"Invalid format ID: {format_id}")
-    return parts[1], parts[2]
-
-
 def _get_cached_pdf_path(format_id: str) -> Path:
     cache_dir = Path(tempfile.gettempdir()) / "formatoteca_unac_pdf_cache"
     cache_dir.mkdir(parents=True, exist_ok=True)
@@ -53,10 +46,11 @@ def _get_cached_pdf_path(format_id: str) -> Path:
 
 
 def _get_source_mtime(format_id: str) -> float:
-    tipo, enfoque = _parse_format_id(format_id)
-    data_dir = get_data_dir()
-    json_path = data_dir / tipo / f"unac_{tipo}_{enfoque}.json"
-    script_name = service.SCRIPTS_CONFIG.get(tipo)
+    item = find_format_index(format_id)
+    if not item:
+        return 0.0
+    json_path = item.path
+    script_name = service.SCRIPTS_CONFIG.get(item.categoria)
     script_path = service.CF_DIR / script_name if script_name else None
     json_mtime = json_path.stat().st_mtime if json_path.exists() else 0.0
     script_mtime = script_path.stat().st_mtime if script_path and script_path.exists() else 0.0
@@ -155,26 +149,13 @@ async def get_format_pdf(format_id: str):
 async def get_format_data_json(format_id: str):
     """
     Devuelve el contenido JSON completo del formato.
-    Usado para hidratar vistas dinámicas.
+    Usado para hidratar vistas dinamicas.
     """
     try:
-        parts = format_id.split("-")
-        if len(parts) < 3:
-            raise ValueError("ID inválido")
-        
-        tipo = parts[1]
-        enfoque = parts[2]
-        
-        data_dir = get_data_dir()
-        json_file = data_dir / tipo / f"unac_{tipo}_{enfoque}.json"
-        
-        if not json_file.exists():
-            raise HTTPException(status_code=404, detail="JSON no encontrado")
-        
-        data = load_json_file(json_file)
+        data = load_format_by_id(format_id)
         return JSONResponse(content=data)
-        
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="JSON no encontrado")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+

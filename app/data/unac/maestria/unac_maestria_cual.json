@@ -1,207 +1,61 @@
 {
-  "schema_version": "unac.docx.v1",
-  "page_setup": {
-    "page_width_cm": 21.0,
-    "page_height_cm": 29.7,
-    "margin_top_cm": 3.0,
-    "margin_bottom_cm": 3.0,
-    "margin_left_cm": 3.5,
-    "margin_right_cm": 2.5
+  "caratula": {
+    "universidad": "UNIVERSIDAD NACIONAL DEL CALLAO",
+    "facultad": "ESCUELA DE POSGRADO",
+    "escuela": "UNIDAD DE POSGRADO DE LA FACULTAD DE [FACULTAD]",
+    "tipo_documento": "TESIS DE MAESTRÍA",
+    "titulo_placeholder": "\"[TÍTULO COMPLETO DEL TRABAJO]\"",
+    "frase_grado": "PARA OPTAR EL GRADO ACADÉMICO DE:",
+    "grado_objetivo": "MAESTRO EN [NOMBRE EXACTO DEL PROGRAMA]",
+    "label_autor": "AUTOR(ES)\n[NOMBRES Y APELLIDOS]",
+    "label_asesor": "ASESOR\n[NOMBRES Y APELLIDOS]",
+    "label_linea": "LÍNEA DE INVESTIGACIÓN: [NOMBRE DE LA LÍNEA]",
+    "fecha": "Callao, [AÑO]",
+    "pais": "PERÚ",
+    "guia": "Contiene: variables, unidad de análisis, ámbito de estudio y temporalidad.\nMáx. 15 palabras; sin conectores ni nombres."
   },
-  "font": {
-    "name": "Arial",
-    "size_pt": 12
-  },
-  "assets": {
-    "logo_path": "/FORMATOTECA_UNAC/gicateca_tesis/app/universities/unac/centro_formatos/assets/LogoUNAC.png"
-  },
-  "cover": {
-    "blocks": [
-      {
-        "type": "text",
-        "text": "UNIVERSIDAD NACIONAL DEL CALLAO",
-        "bold": true,
-        "size_pt": 14
-      },
-      {
-        "type": "spacer",
-        "lines": 1
-      },
-      {
-        "type": "text",
-        "text": "ESCUELA DE POSGRADO",
-        "bold": true,
-        "size_pt": 12
-      },
-      {
-        "type": "spacer",
-        "lines": 1
-      },
-      {
-        "type": "text",
-        "text": "UNIDAD DE POSGRADO DE LA FACULTAD DE [FACULTAD]",
-        "bold": true,
-        "size_pt": 12
-      },
-      {
-        "type": "spacer",
-        "lines": 1
-      },
-      {
-        "type": "logo",
-        "width_cm": 6.0
-      },
-      {
-        "type": "spacer",
-        "lines": 1
-      },
-      {
-        "type": "text",
-        "text": "\"[TÍTULO COMPLETO DEL TRABAJO]\"",
-        "bold": true,
-        "size_pt": 12
-      },
-      {
-        "type": "spacer",
-        "lines": 0
-      },
-      {
-        "type": "text",
-        "text": "TESIS PARA OPTAR EL GRADO ACADÉMICO DE MAESTRO EN [NOMBRE EXACTO DEL PROGRAMA]",
-        "bold": true,
-        "size_pt": 12
-      },
-      {
-        "type": "spacer",
-        "lines": 1
-      },
-      {
-        "type": "text",
-        "text": "AUTOR(ES)",
-        "bold": true,
-        "size_pt": 12
-      },
-      {
-        "type": "text",
-        "text": "[NOMBRES Y APELLIDOS]",
-        "bold": false,
-        "size_pt": 12
-      },
-      {
-        "type": "spacer",
-        "lines": 1
-      },
-      {
-        "type": "text",
-        "text": "ASESOR",
-        "bold": true,
-        "size_pt": 12
-      },
-      {
-        "type": "text",
-        "text": "[NOMBRES Y APELLIDOS]",
-        "bold": false,
-        "size_pt": 12
-      },
-      {
-        "type": "spacer",
-        "lines": 1
-      },
-      {
-        "type": "text",
-        "text": "LÍNEA DE INVESTIGACIÓN: [NOMBRE DE LA LÍNEA]",
-        "bold": true,
-        "size_pt": 11
-      },
-      {
-        "type": "spacer",
-        "lines": 1
-      },
-      {
-        "type": "text",
-        "text": "Callao, [AÑO]",
-        "bold": false,
-        "size_pt": 12
-      },
-      {
-        "type": "text",
-        "text": "PERÚ",
-        "bold": true,
-        "size_pt": 12
-      }
-    ],
-    "guide": "Contiene: variables, unidad de análisis, ámbito de estudio y temporalidad.\nMáx. 15 palabras; sin conectores ni nombres."
-  },
-  "preliminaries": [
-    {
-      "type": "blank_page"
+  "preliminares": {
+    "dedicatoria": {
+      "titulo": "DEDICATORIA",
+      "texto": "[Escriba aquí su dedicatoria…]"
     },
-    {
-      "type": "basic_info",
-      "title": "INFORMACIÓN BÁSICA",
-      "fields": [
+    "agradecimientos": {
+      "titulo": "AGRADECIMIENTO",
+      "texto": "[Escriba aquí su agradecimiento…]"
+    },
+    "abreviaturas": {
+      "titulo": "ÍNDICE DE ABREVIATURAS",
+      "nota": "Colocar el significado de las abreviaturas utilizadas en la investigación.",
+      "ejemplo": "ORGANIZACIÓN MUNDIAL DE LA SALUD (OMS)"
+    },
+    "indices": {
+      "contenido": "ÍNDICE DE CONTENIDO",
+      "tablas": "ÍNDICE DE TABLAS",
+      "figuras": "ÍNDICE DE FIGURAS",
+      "abreviaturas": "ÍNDICE DE ABREVIATURAS",
+      "placeholder": "(Generarlo)"
+    },
+    "hoja_jurado": {
+      "titulo": "HOJA DE REFERENCIA DEL JURADO Y APROBACIÓN",
+      "miembros": [
         {
-          "label": "FACULTAD",
-          "value": "[FACULTAD]"
+          "name": "[Nombre]",
+          "role": "PRESIDENTE"
         },
         {
-          "label": "UNIDAD DE INVESTIGACIÓN",
-          "value": "[Unidad de Investigación]"
+          "name": "[Nombre]",
+          "role": "SECRETARIO"
         },
         {
-          "label": "TÍTULO",
-          "value": "[TÍTULO DE TESIS]"
+          "name": "[Nombre]",
+          "role": "MIEMBRO"
         },
         {
-          "label": "AUTOR(ES) / CÓDIGO ORCID / DNI",
-          "value": "[AUTOR]\nCódigo orcid:[0000-0000-0000-0000]\nDNI:[00000000]"
-        },
-        {
-          "label": "ASESOR / COASESOR / CÓDIGO ORCID / DNI",
-          "value": "[ASESOR]\nCódigo orcid:[0000-0000-0000-0000]\nDNI:[00000000]"
-        },
-        {
-          "label": "LUGAR DE EJECUCIÓN",
-          "value": "[Lugar de ejecución]"
-        },
-        {
-          "label": "UNIDAD DE ANÁLISIS",
-          "value": "[Unidad de análisis]"
-        },
-        {
-          "label": "INVESTIGACIÓN",
-          "value": "TIPO: [Tipo] / ENFOQUE: CUALITATIVO / DISEÑO: [Diseño] / NIVEL: [Nivel]"
-        },
-        {
-          "label": "TEMA OCDE",
-          "value": "[Código y descripción OCDE]"
+          "name": "[Nombre]",
+          "role": "MIEMBRO"
         }
-      ]
-    },
-    {
-      "type": "jury_sheet",
-      "title": "HOJA DE REFERENCIA DEL JURADO Y APROBACIÓN",
-      "jury": {
-        "members": [
-          {
-            "name": "[Nombre]",
-            "role": "PRESIDENTE"
-          },
-          {
-            "name": "[Nombre]",
-            "role": "SECRETARIO"
-          },
-          {
-            "name": "[Nombre]",
-            "role": "MIEMBRO"
-          },
-          {
-            "name": "[Nombre]",
-            "role": "MIEMBRO"
-          }
-        ],
-        "advisor": "[ASESOR]"
-      },
+      ],
+      "asesor": "[ASESOR]",
       "acta": {
         "libro": "[N°]",
         "actas": "[N°]",
@@ -210,381 +64,307 @@
         "resolucion": "[Código]"
       }
     },
+    "introduccion": {
+      "titulo": "INTRODUCCIÓN",
+      "texto": "Manifiesta la importancia y las razones por que realiza la tesis de maestría. Referencie trabajos similares anteriormente publicados (nacionales e internacionales), mencione los objetivos de estudio, la problemática y las soluciones.\n\nAsimismo, presente una descripción de la estructura del documento (máximo 02 páginas)."
+    }
+  },
+  "cuerpo": [
     {
-      "type": "dedication",
-      "title": "DEDICATORIA",
-      "placeholder": "[Escriba aquí su dedicatoria…]"
-    },
-    {
-      "type": "acknowledgements",
-      "title": "AGRADECIMIENTO",
-      "placeholder": "[Escriba aquí su agradecimiento…]"
-    },
-    {
-      "type": "abbreviations",
-      "title": "ÍNDICE DE ABREVIATURAS",
-      "example_line": "ORGANIZACIÓN MUNDIAL DE LA SALUD (OMS)",
-      "guide": "Colocar el significado de las abreviaturas utilizadas en la investigación."
-    },
-    {
-      "type": "toc",
-      "title": "ÍNDICE DE CONTENIDO"
-    },
-    {
-      "type": "index_tables",
-      "title": "ÍNDICE DE TABLAS",
-      "entries": [
+      "titulo": "I. PLANTEAMIENTO DEL PROBLEMA",
+      "contenido": [
         {
-          "text": "Tabla 3.1. Matriz de categorización (ejemplo)",
-          "bookmark": "tab_3_1"
+          "texto": "1.1 Descripción de la realidad problemática",
+          "instruccion_detallada": "Describe, explica y evidencia la realidad problemática en el contexto internacional y/o nacional y, cuando corresponda, en el contexto institucional.\n\nSustente la identificación del problema relevante y evidencie el análisis de la problemática utilizando al menos una herramienta de ingeniería (por ejemplo: Pareto, Ishikawa, Árbol de problemas, Matriz de relevancia, Matriz de priorización, entre otras).\n\nSe debe mencionar la propuesta de solución del problema de investigación.",
+          "imagenes": [
+            {
+              "titulo": "Figura 1.1. Herramienta de ingeniería (ejemplo)",
+              "ruta": "placeholder",
+              "fuente": "Ejemplo de figura. Reemplace por un gráfico/diagrama real (Pareto, Ishikawa, árbol de problemas, etc.) con fuente."
+            }
+          ]
         },
         {
-          "text": "Tabla 4.1. Resultados por categoría (ejemplo)",
-          "bookmark": "tab_4_1"
+          "texto": "1.2 Formulación del problema",
+          "instruccion_detallada": "Formule el problema general y los problemas específicos. Redacte en forma interrogativa, clara y medible."
+        },
+        {
+          "texto": "1.3 Objetivos",
+          "instruccion_detallada": "Redacte un objetivo general y objetivos específicos, coherentes con el problema y medibles."
+        },
+        {
+          "texto": "1.4 Justificación e importancia",
+          "instruccion_detallada": "Sustente la relevancia teórica, práctica, social e institucional. Indique beneficiarios y aportes."
+        },
+        {
+          "texto": "1.5 Limitaciones",
+          "instruccion_detallada": "Indique limitaciones (tiempo, acceso a información, recursos) y cómo se mitigarán."
         }
       ]
     },
     {
-      "type": "index_figures",
-      "title": "ÍNDICE DE FIGURAS",
-      "entries": [
+      "titulo": "II. REVISIÓN DE LA LITERATURA",
+      "contenido": [
         {
-          "text": "Figura 1.1. Herramienta de ingeniería (ejemplo)",
-          "bookmark": "fig_1_1"
+          "texto": "2.1 Antecedentes",
+          "instruccion_detallada": "Los antecedentes de la presente investigación son el reflejo de una búsqueda exhaustiva en bases de datos científicas, repositorios universitarios y fuentes oficiales relacionadas al tema de estudio.\n\nPara cada antecedente, indique: autor(es), año, título, objetivo, metodología (tipo/enfoque/diseño), población/muestra, instrumentos, resultados y la conclusión principal que aporta a su investigación.\n\nOrganice en: antecedentes internacionales y nacionales."
         },
         {
-          "text": "Figura 2.1. Modelo conceptual / esquema (ejemplo)",
-          "bookmark": "fig_2_1"
+          "texto": "2.1.1 Antecedentes internacionales",
+          "instruccion_detallada": "Presente antecedentes internacionales con el formato: autor(año), título, objetivo, metodología, resultados y conclusión."
+        },
+        {
+          "texto": "2.1.2 Antecedentes nacionales",
+          "instruccion_detallada": "Presente antecedentes nacionales con el mismo formato. Relacione explícitamente el aporte al presente estudio."
+        },
+        {
+          "texto": "2.2 Marco conceptual",
+          "instruccion_detallada": "Defina términos clave del estudio. Incluya definiciones operacionales si aplica.",
+          "imagenes": [
+            {
+              "titulo": "Figura 2.1. Modelo conceptual / esquema (ejemplo)",
+              "ruta": "placeholder",
+              "fuente": "Ejemplo de figura para visualizar el formato. Reemplace por un esquema/modelo/diagrama propio con fuente."
+            }
+          ]
+        },
+        {
+          "texto": "2.3 Definición de términos básicos",
+          "instruccion_detallada": "Defina los términos clave que se usarán en la investigación (conceptos técnicos, categorías, actores, etc.). Use definiciones operativas alineadas al contexto del estudio."
+        }
+      ]
+    },
+    {
+      "titulo": "III. METODOLOGÍA DEL PROYECTO",
+      "contenido": [
+        {
+          "texto": "3.1 Categorías, subcategorías y matriz de categorización",
+          "instruccion_detallada": "Defina categorías y subcategorías (si aplica). Explique cómo se observarán/interpretarán.",
+          "tabla": {
+            "headers": [
+              "Categoría",
+              "Subcategoría",
+              "Definición operativa",
+              "Técnica/Instrumento"
+            ],
+            "rows": [
+              [
+                "Gestión del proceso",
+                "Planificación",
+                "Cómo se organiza y planifica la ejecución del proceso en el contexto del estudio.",
+                "Entrevista semiestructurada"
+              ],
+              [
+                "Gestión del proceso",
+                "Ejecución",
+                "Cómo se ejecuta y controla el proceso en la práctica.",
+                "Guía de observación"
+              ],
+              [
+                "Percepción",
+                "Satisfacción",
+                "Percepciones de los participantes sobre el fenómeno estudiado.",
+                "Entrevista / Grupo focal"
+              ]
+            ]
+          },
+          "tabla_titulo": "Tabla 3.1. Matriz de categorización (ejemplo)",
+          "tabla_nota": "Ejemplo de tabla. Reemplace por su matriz de operacionalización completa."
+        },
+        {
+          "texto": "3.2 Escenario de estudio",
+          "instruccion_detallada": "Describa el contexto donde se realizará el estudio: institución/empresa, ubicación, condiciones relevantes y por qué es un escenario pertinente."
+        },
+        {
+          "texto": "3.3 Participantes",
+          "instruccion_detallada": "Describa población, criterios, muestra y técnica de muestreo. Indique tamaño final."
+        },
+        {
+          "texto": "3.4 Técnicas e instrumentos de recolección de datos",
+          "instruccion_detallada": "Detalle técnica(s) e instrumento(s). Incluya validez (juicio de expertos) y confiabilidad (Alfa de Cronbach u otro)."
+        },
+        {
+          "texto": "3.5 Procedimiento",
+          "instruccion_detallada": "Explique el procedimiento paso a paso y el plan de análisis (estadística descriptiva e inferencial)."
+        },
+        {
+          "texto": "3.6 Rigor científico",
+          "instruccion_detallada": "Explique credibilidad, transferibilidad, dependencia y confirmabilidad. Indique técnicas para asegurar rigor."
+        },
+        {
+          "texto": "3.7 Método de análisis de datos",
+          "instruccion_detallada": "Describa el enfoque de análisis (análisis temático, teoría fundamentada, análisis de contenido, etc.), codificación (abierta/axial/selectiva) y uso de software si aplica (NVivo, Atlas.ti)."
+        },
+        {
+          "texto": "3.8 Aspectos Éticos en Investigación",
+          "instruccion_detallada": "Incluya consentimiento informado, confidencialidad, resguardo de datos, y aprobación institucional si corresponde."
+        }
+      ],
+      "nota_capitulo": "Describe el diseño cualitativo y cómo se recolectará y analizará la información. Incluya categorías, escenario, participantes, técnicas, procedimiento, rigor científico y aspectos éticos."
+    },
+    {
+      "titulo": "IV. RESULTADOS",
+      "contenido": [
+        {
+          "texto": "4.1 Presentación de resultados",
+          "instruccion_detallada": "Presente los resultados de manera ordenada según objetivos/hipótesis.\n\nIncluya tablas y figuras numeradas, con títulos claros y fuente cuando corresponda.\n\nEvite interpretación extensa en esta sección; la discusión va en el apartado correspondiente.",
+          "tabla": {
+            "headers": [
+              "Categoría",
+              "Evidencia (cita/paráfrasis)",
+              "Interpretación"
+            ],
+            "rows": [
+              [
+                "Planificación",
+                "\"...\" (Entrevistado 1)",
+                "Se evidencia planificación informal sin métricas."
+              ],
+              [
+                "Ejecución",
+                "\"...\" (Entrevistado 2)",
+                "Se observa variabilidad en la ejecución del proceso."
+              ]
+            ]
+          },
+          "tabla_titulo": "Tabla 4.1. Resultados por categoría (ejemplo)",
+          "tabla_nota": "Ejemplo de tabla de resultados. Reemplace por sus resultados reales e incluya fuente si aplica."
+        }
+      ],
+      "nota_capitulo": "Presente los hallazgos organizados por categorías/subcategorías. Incluya tablas o figuras solo cuando ayuden a resumir o visualizar resultados."
+    },
+    {
+      "titulo": "V. DISCUSIÓN DE RESULTADOS",
+      "contenido": [
+        {
+          "texto": "5.1 Discusión",
+          "instruccion_detallada": "Interprete y compare los resultados con la literatura (antecedentes y bases teóricas).\n\nExplique coincidencias y discrepancias, implicancias prácticas, y limitaciones del estudio."
+        }
+      ],
+      "nota_capitulo": "Interprete y contraste los hallazgos con la literatura revisada. Explique coincidencias, diferencias y aportes del estudio."
+    },
+    {
+      "titulo": "VI. CONCLUSIONES",
+      "contenido": [
+        {
+          "texto": "6.1 Conclusiones",
+          "instruccion_detallada": "Redacte conclusiones directas y numeradas, alineadas a los objetivos e hipótesis.\n\nAñada recomendaciones aplicables y, si corresponde, propuestas de investigación futura."
+        }
+      ],
+      "nota_capitulo": "Sintetice los principales hallazgos y responda a los objetivos planteados."
+    },
+    {
+      "titulo": "VII. RECOMENDACIONES",
+      "contenido": [
+        {
+          "texto": "7.1 Recomendaciones",
+          "instruccion_detallada": "Presente recomendaciones aplicables para la institución/sector y sugerencias para futuras investigaciones."
+        }
+      ],
+      "nota_capitulo": "Proponga acciones, mejoras o futuras líneas de investigación en función de los hallazgos."
+    }
+  ],
+  "finales": {
+    "referencias": {
+      "titulo": "VIII. REFERENCIAS BIBLIOGRÁFICAS",
+      "nota": "Liste todas las fuentes citadas en el texto. Use un estilo de citación consistente (según norma indicada por su programa).\n\nVerifique: autor, año, título, editorial/revista, volumen(número), páginas, DOI/URL.\n\nIncluya solo referencias citadas en el texto. Orden alfabético. Use estilo APA (última edición indicada por la UNAC).",
+      "ejemplos_apa": [
+        "Ejemplos (formato referencial):",
+        "Hernández, R., Fernández, C., & Baptista, P. (2018). Metodología de la investigación (6.a ed.). McGraw-Hill.",
+        "Oblitas, M., & Villegas, M. (2023). Gestión de la calidad y desempeño organizacional. Revista Científica UNAC, 12(2), 45–60.",
+        "Organización Mundial de la Salud. (2021). Título del documento. Sitio web institucional. https://ejemplo.org"
+      ]
+    },
+    "anexos": {
+      "titulo_seccion": "ANEXOS",
+      "nota": "Incluya instrumentos, matrices (consistencia, operacionalización), evidencias, y documentos complementarios.\n\nNumere los anexos y refiéralos dentro del texto cuando corresponda.",
+      "lista": [
+        {
+          "titulo": "ANEXO 1. Matriz de consistencia (ejemplo completo)",
+          "nota": "Incluya la matriz de consistencia completa (problema, objetivos, hipótesis si aplica, variables, metodología).",
+          "tabla": {
+            "headers": [
+              "Problema",
+              "Objetivo",
+              "Hipótesis",
+              "Variables",
+              "Metodología"
+            ],
+            "rows": [
+              [
+                "¿Problema general?",
+                "Objetivo general",
+                "Hipótesis general",
+                "VI/VD",
+                "Tipo/diseño/nivel"
+              ],
+              [
+                "Problema específico 1",
+                "Objetivo específico 1",
+                "Hipótesis específica 1",
+                "Indicadores",
+                "Población/muestra"
+              ]
+            ]
+          },
+          "tabla_titulo": "Tabla A1. Matriz de consistencia (ejemplo)",
+          "tabla_nota": "Ejemplo de anexo. Reemplace cada celda con su información real."
+        },
+        {
+          "titulo": "ANEXO 2. Instrumento / evidencias (ejemplo completo)",
+          "nota": "Adjunte el instrumento (cuestionario, guía de entrevista, ficha) y/o evidencias necesarias.",
+          "parrafos": [
+            "Instrumento (ejemplo):",
+            "1) Pregunta 1: ________________________________",
+            "2) Pregunta 2: ________________________________",
+            "3) Pregunta 3: ________________________________",
+            "",
+            "Evidencia (ejemplo): actas, resoluciones, autorizaciones, fotografías u otros documentos pertinentes."
+          ]
         }
       ]
     }
-  ],
-  "content": {
-    "chapters": [
+  },
+  "version": "1.0.0",
+  "descripcion": "Plantilla oficial de tesis de maestría (legacy).",
+  "informacion_basica": {
+    "titulo": "INFORMACIÓN BÁSICA",
+    "elementos": [
       {
-        "title": "INTRODUCCIÓN",
-        "level": 1,
-        "guide": "Manifiesta la importancia y las razones por que realiza la tesis de maestría. Referencie trabajos similares anteriormente publicados (nacionales e internacionales), mencione los objetivos de estudio, la problemática y las soluciones.\n\nAsimismo, presente una descripción de la estructura del documento (máximo 02 páginas)."
+        "label": "FACULTAD:",
+        "valor": "[FACULTAD]"
       },
       {
-        "title": "I. PLANTEAMIENTO DEL PROBLEMA",
-        "level": 1,
-        "sections": [
-          {
-            "title": "1.1 Descripción de la realidad problemática",
-            "level": 2,
-            "guide": "Describe, explica y evidencia la realidad problemática en el contexto internacional y/o nacional y, cuando corresponda, en el contexto institucional.\n\nSustente la identificación del problema relevante y evidencie el análisis de la problemática utilizando al menos una herramienta de ingeniería (por ejemplo: Pareto, Ishikawa, Árbol de problemas, Matriz de relevancia, Matriz de priorización, entre otras).\n\nSe debe mencionar la propuesta de solución del problema de investigación.",
-            "elements": [
-              {
-                "type": "figure",
-                "caption": "Figura 1.1. Herramienta de ingeniería (ejemplo)",
-                "bookmark": "fig_1_1",
-                "image": "placeholder",
-                "note": "Ejemplo de figura. Reemplace por un gráfico/diagrama real (Pareto, Ishikawa, árbol de problemas, etc.) con fuente."
-              }
-            ]
-          },
-          {
-            "title": "1.2 Formulación del problema",
-            "level": 2,
-            "guide": "Formule el problema general y los problemas específicos. Redacte en forma interrogativa, clara y medible."
-          },
-          {
-            "title": "1.3 Objetivos",
-            "level": 2,
-            "guide": "Redacte un objetivo general y objetivos específicos, coherentes con el problema y medibles."
-          },
-          {
-            "title": "1.4 Justificación e importancia",
-            "level": 2,
-            "guide": "Sustente la relevancia teórica, práctica, social e institucional. Indique beneficiarios y aportes."
-          },
-          {
-            "title": "1.5 Limitaciones",
-            "level": 2,
-            "guide": "Indique limitaciones (tiempo, acceso a información, recursos) y cómo se mitigarán."
-          }
-        ]
+        "label": "UNIDAD DE INVESTIGACIÓN:",
+        "valor": "[Unidad de Investigación]"
       },
       {
-        "title": "II. REVISIÓN DE LA LITERATURA",
-        "level": 1,
-        "sections": [
-          {
-            "title": "2.1 Antecedentes",
-            "level": 2,
-            "guide": "Los antecedentes de la presente investigación son el reflejo de una búsqueda exhaustiva en bases de datos científicas, repositorios universitarios y fuentes oficiales relacionadas al tema de estudio.\n\nPara cada antecedente, indique: autor(es), año, título, objetivo, metodología (tipo/enfoque/diseño), población/muestra, instrumentos, resultados y la conclusión principal que aporta a su investigación.\n\nOrganice en: antecedentes internacionales y nacionales."
-          },
-          {
-            "title": "2.1.1 Antecedentes internacionales",
-            "level": 3,
-            "guide": "Presente antecedentes internacionales con el formato: autor(año), título, objetivo, metodología, resultados y conclusión."
-          },
-          {
-            "title": "2.1.2 Antecedentes nacionales",
-            "level": 3,
-            "guide": "Presente antecedentes nacionales con el mismo formato. Relacione explícitamente el aporte al presente estudio."
-          },
-          {
-            "title": "2.2 Marco conceptual",
-            "level": 2,
-            "guide": "Defina términos clave del estudio. Incluya definiciones operacionales si aplica.",
-            "elements": [
-              {
-                "type": "figure",
-                "caption": "Figura 2.1. Modelo conceptual / esquema (ejemplo)",
-                "bookmark": "fig_2_1",
-                "image": "placeholder",
-                "note": "Ejemplo de figura para visualizar el formato. Reemplace por un esquema/modelo/diagrama propio con fuente."
-              }
-            ]
-          },
-          {
-            "title": "2.3 Definición de términos básicos",
-            "guide": "Defina los términos clave que se usarán en la investigación (conceptos técnicos, categorías, actores, etc.). Use definiciones operativas alineadas al contexto del estudio."
-          }
-        ]
+        "label": "TÍTULO:",
+        "valor": "[TÍTULO DE TESIS]"
       },
       {
-        "title": "III. METODOLOGÍA DEL PROYECTO",
-        "level": 1,
-        "guide": "Describe el diseño cualitativo y cómo se recolectará y analizará la información. Incluya categorías, escenario, participantes, técnicas, procedimiento, rigor científico y aspectos éticos.",
-        "sections": [
-          {
-            "title": "3.1 Categorías, subcategorías y matriz de categorización",
-            "level": 2,
-            "guide": "Defina categorías y subcategorías (si aplica). Explique cómo se observarán/interpretarán.",
-            "elements": [
-              {
-                "type": "table",
-                "caption": "Tabla 3.1. Matriz de categorización (ejemplo)",
-                "bookmark": "tab_3_1",
-                "headers": [
-                  "Categoría",
-                  "Subcategoría",
-                  "Definición operativa",
-                  "Técnica/Instrumento"
-                ],
-                "rows": [
-                  [
-                    "Gestión del proceso",
-                    "Planificación",
-                    "Cómo se organiza y planifica la ejecución del proceso en el contexto del estudio.",
-                    "Entrevista semiestructurada"
-                  ],
-                  [
-                    "Gestión del proceso",
-                    "Ejecución",
-                    "Cómo se ejecuta y controla el proceso en la práctica.",
-                    "Guía de observación"
-                  ],
-                  [
-                    "Percepción",
-                    "Satisfacción",
-                    "Percepciones de los participantes sobre el fenómeno estudiado.",
-                    "Entrevista / Grupo focal"
-                  ]
-                ],
-                "note": "Ejemplo de tabla. Reemplace por su matriz de operacionalización completa.",
-                "col_widths_cm": [
-                  4.0,
-                  4.0,
-                  7.0,
-                  4.0
-                ]
-              }
-            ]
-          },
-          {
-            "title": "3.2 Escenario de estudio",
-            "guide": "Describa el contexto donde se realizará el estudio: institución/empresa, ubicación, condiciones relevantes y por qué es un escenario pertinente."
-          },
-          {
-            "title": "3.3 Participantes",
-            "level": 2,
-            "guide": "Describa población, criterios, muestra y técnica de muestreo. Indique tamaño final."
-          },
-          {
-            "title": "3.4 Técnicas e instrumentos de recolección de datos",
-            "level": 2,
-            "guide": "Detalle técnica(s) e instrumento(s). Incluya validez (juicio de expertos) y confiabilidad (Alfa de Cronbach u otro)."
-          },
-          {
-            "title": "3.5 Procedimiento",
-            "level": 2,
-            "guide": "Explique el procedimiento paso a paso y el plan de análisis (estadística descriptiva e inferencial)."
-          },
-          {
-            "title": "3.6 Rigor científico",
-            "level": 2,
-            "guide": "Explique credibilidad, transferibilidad, dependencia y confirmabilidad. Indique técnicas para asegurar rigor."
-          },
-          {
-            "title": "3.7 Método de análisis de datos",
-            "guide": "Describa el enfoque de análisis (análisis temático, teoría fundamentada, análisis de contenido, etc.), codificación (abierta/axial/selectiva) y uso de software si aplica (NVivo, Atlas.ti)."
-          },
-          {
-            "title": "3.8 Aspectos Éticos en Investigación",
-            "guide": "Incluya consentimiento informado, confidencialidad, resguardo de datos, y aprobación institucional si corresponde."
-          }
-        ]
+        "label": "AUTOR(ES) / CÓDIGO ORCID / DNI:",
+        "valor": "[AUTOR]\nCódigo orcid:[0000-0000-0000-0000]\nDNI:[00000000]"
       },
       {
-        "title": "IV. RESULTADOS",
-        "level": 1,
-        "guide": "Presente los hallazgos organizados por categorías/subcategorías. Incluya tablas o figuras solo cuando ayuden a resumir o visualizar resultados.",
-        "sections": [
-          {
-            "title": "4.1 Presentación de resultados",
-            "level": 2,
-            "guide": "Presente los resultados de manera ordenada según objetivos/hipótesis.\n\nIncluya tablas y figuras numeradas, con títulos claros y fuente cuando corresponda.\n\nEvite interpretación extensa en esta sección; la discusión va en el apartado correspondiente.",
-            "elements": [
-              {
-                "type": "table",
-                "caption": "Tabla 4.1. Resultados por categoría (ejemplo)",
-                "bookmark": "tab_4_1",
-                "headers": [
-                  "Categoría",
-                  "Evidencia (cita/paráfrasis)",
-                  "Interpretación"
-                ],
-                "rows": [
-                  [
-                    "Planificación",
-                    "\"...\" (Entrevistado 1)",
-                    "Se evidencia planificación informal sin métricas."
-                  ],
-                  [
-                    "Ejecución",
-                    "\"...\" (Entrevistado 2)",
-                    "Se observa variabilidad en la ejecución del proceso."
-                  ]
-                ],
-                "note": "Ejemplo de tabla de resultados. Reemplace por sus resultados reales e incluya fuente si aplica.",
-                "col_widths_cm": [
-                  4.0,
-                  8.0,
-                  6.0
-                ]
-              }
-            ]
-          }
-        ]
+        "label": "ASESOR / COASESOR / CÓDIGO ORCID / DNI:",
+        "valor": "[ASESOR]\nCódigo orcid:[0000-0000-0000-0000]\nDNI:[00000000]"
       },
       {
-        "title": "V. DISCUSIÓN DE RESULTADOS",
-        "level": 1,
-        "guide": "Interprete y contraste los hallazgos con la literatura revisada. Explique coincidencias, diferencias y aportes del estudio.",
-        "sections": [
-          {
-            "title": "5.1 Discusión",
-            "level": 2,
-            "guide": "Interprete y compare los resultados con la literatura (antecedentes y bases teóricas).\n\nExplique coincidencias y discrepancias, implicancias prácticas, y limitaciones del estudio."
-          }
-        ]
+        "label": "LUGAR DE EJECUCIÓN:",
+        "valor": "[Lugar de ejecución]"
       },
       {
-        "title": "VI. CONCLUSIONES",
-        "level": 1,
-        "guide": "Sintetice los principales hallazgos y responda a los objetivos planteados.",
-        "sections": [
-          {
-            "title": "6.1 Conclusiones",
-            "level": 2,
-            "guide": "Redacte conclusiones directas y numeradas, alineadas a los objetivos e hipótesis.\n\nAñada recomendaciones aplicables y, si corresponde, propuestas de investigación futura."
-          }
-        ]
+        "label": "UNIDAD DE ANÁLISIS:",
+        "valor": "[Unidad de análisis]"
       },
       {
-        "title": "VII. RECOMENDACIONES",
-        "level": 1,
-        "guide": "Proponga acciones, mejoras o futuras líneas de investigación en función de los hallazgos.",
-        "sections": [
-          {
-            "title": "7.1 Recomendaciones",
-            "level": 2,
-            "guide": "Presente recomendaciones aplicables para la institución/sector y sugerencias para futuras investigaciones."
-          }
-        ]
+        "label": "INVESTIGACIÓN:",
+        "valor": "TIPO: [Tipo] / ENFOQUE: CUALITATIVO / DISEÑO: [Diseño] / NIVEL: [Nivel]"
       },
       {
-        "title": "VIII. REFERENCIAS BIBLIOGRÁFICAS",
-        "level": 1,
-        "guide": "Liste todas las fuentes citadas en el texto. Use un estilo de citación consistente (según norma indicada por su programa).\n\nVerifique: autor, año, título, editorial/revista, volumen(número), páginas, DOI/URL.",
-        "sections": [
-          {
-            "title": "",
-            "level": 2,
-            "paragraphs": [
-              "Ejemplos (formato referencial):",
-              "Hernández, R., Fernández, C., & Baptista, P. (2018). Metodología de la investigación (6.a ed.). McGraw-Hill.",
-              "Oblitas, M., & Villegas, M. (2023). Gestión de la calidad y desempeño organizacional. Revista Científica UNAC, 12(2), 45–60.",
-              "Organización Mundial de la Salud. (2021). Título del documento. Sitio web institucional. https://ejemplo.org"
-            ],
-            "guide": "Incluya solo referencias citadas en el texto. Orden alfabético. Use estilo APA (última edición indicada por la UNAC)."
-          }
-        ]
-      },
-      {
-        "title": "ANEXOS",
-        "level": 1,
-        "guide": "Incluya instrumentos, matrices (consistencia, operacionalización), evidencias, y documentos complementarios.\n\nNumere los anexos y refiéralos dentro del texto cuando corresponda.",
-        "sections": [
-          {
-            "title": "ANEXO 1. Matriz de consistencia (ejemplo completo)",
-            "level": 2,
-            "guide": "Incluya la matriz de consistencia completa (problema, objetivos, hipótesis si aplica, variables, metodología).",
-            "elements": [
-              {
-                "type": "table",
-                "caption": "Tabla A1. Matriz de consistencia (ejemplo)",
-                "bookmark": "tab_a1",
-                "headers": [
-                  "Problema",
-                  "Objetivo",
-                  "Hipótesis",
-                  "Variables",
-                  "Metodología"
-                ],
-                "rows": [
-                  [
-                    "¿Problema general?",
-                    "Objetivo general",
-                    "Hipótesis general",
-                    "VI/VD",
-                    "Tipo/diseño/nivel"
-                  ],
-                  [
-                    "Problema específico 1",
-                    "Objetivo específico 1",
-                    "Hipótesis específica 1",
-                    "Indicadores",
-                    "Población/muestra"
-                  ]
-                ],
-                "note": "Ejemplo de anexo. Reemplace cada celda con su información real."
-              }
-            ]
-          },
-          {
-            "title": "ANEXO 2. Instrumento / evidencias (ejemplo completo)",
-            "level": 2,
-            "guide": "Adjunte el instrumento (cuestionario, guía de entrevista, ficha) y/o evidencias necesarias.",
-            "elements": [
-              {
-                "type": "paragraphs",
-                "paragraphs": [
-                  "Instrumento (ejemplo):",
-                  "1) Pregunta 1: ________________________________",
-                  "2) Pregunta 2: ________________________________",
-                  "3) Pregunta 3: ________________________________",
-                  "",
-                  "Evidencia (ejemplo): actas, resoluciones, autorizaciones, fotografías u otros documentos pertinentes."
-                ]
-              }
-            ]
-          }
-        ]
+        "label": "TEMA OCDE:",
+        "valor": "[Código y descripción OCDE]"
       }
     ]
   }
