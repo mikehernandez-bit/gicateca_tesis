@@ -1,51 +1,156 @@
 {% extends "base.html" %}
-{% block content %}
-<div class="max-w-6xl mx-auto">
 
-  <div class="flex justify-between items-end mb-8">
-    <div>
-      <h1 class="text-2xl font-bold text-gray-900">Catálogo de Formatos</h1>
-      <p class="text-gray-500 mt-1">Placeholder leyendo <code class="bg-gray-100 px-1 rounded">data/seed/formatos.sample.json</code></p>
+{% block content %}
+<div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+  <div class="mb-10">
+    <div class="flex items-center gap-2 mb-6">
+      <svg class="w-8 h-8 text-yellow-500 fill-current" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+      <h1 class="text-3xl font-bold text-gray-900">Accesos Rápidos</h1>
     </div>
 
-    <div class="hidden md:flex bg-white rounded-lg shadow-sm border border-gray-200 p-1">
-      <button class="px-4 py-1.5 text-sm font-medium bg-gray-100 text-gray-900 rounded-md">Todos</button>
-      <button class="px-4 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-md">Tesis</button>
-      <button class="px-4 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-md">Inv. Formativa</button>
-      <button class="px-4 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-md">Suficiencia</button>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      
+      <div id="quick-caratulas"
+           onclick="iniciarFlujo('caratula', 'quick-caratulas')" 
+           class="quick-card group bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer h-full">
+        <div class="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-orange-100 transition-colors">
+          <i data-lucide="layout-template" class="w-7 h-7 text-orange-600"></i>
+        </div>
+        <h3 class="font-bold text-gray-900 text-xl mb-2">Carátulas</h3>
+        <p class="text-sm text-gray-500 leading-relaxed">Modo visual: Explora las portadas oficiales.</p>
+      </div>
+
+      <div id="quick-referencias"
+           onclick="iniciarFlujo('referencias', 'quick-referencias')" 
+           class="quick-card group bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer h-full">
+        <div class="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-indigo-100 transition-colors">
+          <i data-lucide="book-open-check" class="w-7 h-7 text-indigo-600"></i>
+        </div>
+        <h3 class="font-bold text-gray-900 text-xl mb-2">Referencias Bibliográficas</h3>
+        <p class="text-sm text-gray-500 leading-relaxed">Modo consulta: Normativas de citación.</p>
+      </div>
+
+      <div id="quick-todos"
+           onclick="iniciarFlujo('normal', 'quick-todos')" 
+           class="quick-card group bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer h-full">
+        <div class="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-green-100 transition-colors">
+          <i data-lucide="layers" class="w-7 h-7 text-green-600"></i>
+        </div>
+        <h3 class="font-bold text-gray-900 text-xl mb-2">Ver Todo</h3>
+        <p class="text-sm text-gray-500 leading-relaxed">Modo estándar: Estructura completa y descargas.</p>
+      </div>
+
     </div>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    {% for f in formatos %}
-    <a href="/formatos/{{ f.id }}" class="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow cursor-pointer flex flex-col h-full">
-      <div class="p-5 flex-1">
-        <div class="flex justify-between items-start mb-3">
-          <span class="text-xs font-bold px-2 py-1 rounded uppercase tracking-wider
-            {% if f.uni == 'UNAC' %} bg-blue-100 text-blue-700 {% else %} bg-red-100 text-red-700 {% endif %}">
-            {{ f.uni }}
-          </span>
+  <div id="bloque-categorias" class="hidden transition-all duration-500 ease-in-out opacity-0 translate-y-4 mb-8">
+    <div class="flex items-center gap-2 mb-6 border-t border-gray-200 pt-8">
+      <i data-lucide="filter" class="w-5 h-5 text-gray-400"></i>
+      <h2 class="text-xl font-bold text-gray-800" id="titulo-paso-2">Selecciona qué documentos ver</h2>
+    </div>
 
-          <span class="flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full border
-            {% if f.estado == 'VIGENTE' %} bg-green-50 text-green-700 border-green-100 {% else %} bg-orange-50 text-orange-700 border-orange-100 {% endif %}">
-            <span class="w-2 h-2 rounded-full {% if f.estado == 'VIGENTE' %} bg-green-500 {% else %} bg-orange-500 {% endif %}"></span>
-            {{ f.estado }}
-          </span>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      
+      <div id="cat-todos" onclick="seleccionarCategoriaFinal('todos', 'cat-todos')" 
+           class="cat-card bg-white p-4 rounded-xl border border-gray-200 hover:border-gray-400 hover:shadow-md transition-all cursor-pointer flex flex-col items-center text-center gap-3">
+        <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600">
+          <i data-lucide="grid" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h3 class="font-bold text-gray-900 text-sm">Todos</h3>
+          <p class="text-[10px] text-gray-500">Todo el catálogo</p>
+        </div>
+      </div>
+
+      <div id="cat-tesis" onclick="seleccionarCategoriaFinal('Tesis', 'cat-tesis')" 
+           class="cat-card bg-white p-4 rounded-xl border border-gray-200 hover:border-blue-400 hover:shadow-md transition-all cursor-pointer flex flex-col items-center text-center gap-3">
+        <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600">
+          <i data-lucide="folder-kanban" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h3 class="font-bold text-gray-900 text-sm">Proyectos</h3>
+          <p class="text-[10px] text-gray-500">Anteproyectos</p>
+        </div>
+      </div>
+
+      <div id="cat-info" onclick="seleccionarCategoriaFinal('Inv. Formativa', 'cat-info')" 
+           class="cat-card bg-white p-4 rounded-xl border border-gray-200 hover:border-purple-400 hover:shadow-md transition-all cursor-pointer flex flex-col items-center text-center gap-3">
+        <div class="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center text-purple-600">
+          <i data-lucide="file-text" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h3 class="font-bold text-gray-900 text-sm">Informes</h3>
+          <p class="text-[10px] text-gray-500">Sustentación</p>
+        </div>
+      </div>
+
+      <div id="cat-maestria" onclick="seleccionarCategoriaFinal('Suficiencia', 'cat-maestria')" 
+           class="cat-card bg-white p-4 rounded-xl border border-gray-200 hover:border-orange-400 hover:shadow-md transition-all cursor-pointer flex flex-col items-center text-center gap-3">
+        <div class="w-10 h-10 bg-orange-50 rounded-lg flex items-center justify-center text-orange-600">
+          <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h3 class="font-bold text-gray-900 text-sm">Posgrado</h3>
+          <p class="text-[10px] text-gray-500">Maestría/Doc.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="bloque-resultados" class="hidden transition-all duration-500 ease-in-out opacity-0 translate-y-4">
+    
+    <div class="mb-6 mt-8 border-t border-gray-100 pt-6">
+        <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+            <span class="w-2 h-6 bg-blue-600 rounded-full"></span>
+            Formatos Disponibles
+        </h2>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="formatos-grid">
+      {% for f in formatos %}
+      <a href="/formatos/{{ f.id }}" 
+         onclick="return handleCardClick(event, '{{ f.id }}')"
+         class="formato-card group bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer flex flex-col h-full overflow-hidden relative" 
+         data-tipo="{{ f.tipo }}">
+        
+        <div class="hidden mode-badge absolute top-3 right-3 z-10 text-[10px] font-bold px-2 py-1 rounded shadow-sm border flex items-center gap-1"></div>
+
+        <div class="p-6 flex-1 flex flex-col">
+          <div class="flex justify-between items-start gap-3 mb-4 original-badges transition-opacity duration-300">
+            <span class="inline-block text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider
+              {% if f.uni == 'UNAC' %} bg-blue-50 text-blue-700 border border-blue-100 {% else %} bg-red-50 text-red-700 {% endif %}">
+              {{ f.uni }}
+            </span>
+            <span class="flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1 rounded-full border
+              {% if f.estado == 'VIGENTE' %} bg-green-50 text-green-700 border-green-100 {% else %} bg-orange-50 text-orange-700 border-orange-100 {% endif %}">
+              <span class="w-1.5 h-1.5 rounded-full {% if f.estado == 'VIGENTE' %} bg-green-500 {% else %} bg-orange-500 {% endif %}"></span>
+              {{ f.estado }}
+            </span>
+          </div>
+
+          <h3 class="font-bold text-lg text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">{{ f.titulo }}</h3>
+          <p class="text-sm text-gray-500 line-clamp-2">{{ f.facultad }}</p>
         </div>
 
-        <h3 class="font-bold text-lg text-gray-900 mb-2 leading-tight">{{ f.titulo }}</h3>
-        <p class="text-sm text-gray-500">{{ f.facultad }} — {{ f.escuela }}</p>
-      </div>
-
-      <div class="px-5 py-4 border-t border-gray-50 bg-gray-50/50 rounded-b-xl flex items-center justify-between">
-        <span class="text-xs font-medium text-gray-500 flex items-center gap-1">
-          <i data-lucide="history" class="w-3 h-3"></i> v{{ f.version }} ({{ f.fecha }})
-        </span>
-        <span class="text-blue-600 text-sm font-medium hover:underline">Ver detalles</span>
-      </div>
-    </a>
-    {% endfor %}
+        <div class="px-6 py-4 border-t border-gray-50 bg-gray-50/30 flex items-center justify-between mt-auto">
+          <span class="text-xs text-gray-400 font-medium flex items-center gap-1.5">
+            <i data-lucide="clock" class="w-3.5 h-3.5"></i> v{{ f.version }}
+          </span>
+          <span class="action-text text-blue-600 text-sm font-semibold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+            Ver Estructura <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+          </span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
   </div>
 
 </div>
+
+<div id="coverModal" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true"><div class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm" onclick="closeModal('coverModal')"></div><div class="fixed inset-0 z-10 overflow-y-auto"><div class="flex min-h-full items-center justify-center p-4"><div class="relative bg-white shadow-2xl sm:max-w-3xl w-full flex flex-col rounded-sm" style="aspect-ratio: 210/297; max-height: 90vh;"><button onclick="closeModal('coverModal')" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 z-20 bg-white rounded-full p-2 shadow-md"><i data-lucide="x" class="w-5 h-5"></i></button><div id="coverLoader" class="absolute inset-0 flex items-center justify-center bg-white z-10"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div></div><div id="coverContent" class="hidden flex-1 flex flex-col items-center text-center px-16 py-12 font-serif text-gray-900 h-full overflow-hidden border-2 border-gray-100 m-2"><h2 id="c-uni" class="text-xl font-bold uppercase mb-2"></h2><h3 id="c-fac" class="text-lg font-bold uppercase mb-2"></h3><h3 id="c-esc" class="text-lg font-bold uppercase mb-8"></h3><div class="mb-8"><img src="/static/assets/LogoUNAC.png" class="h-28 w-auto object-contain mx-auto opacity-90"></div><div class="w-full flex-1 flex flex-col justify-center my-4"><h2 id="c-titulo" class="text-xl font-bold uppercase leading-snug"></h2><p class="text-sm italic mt-2 text-gray-500">(Título del proyecto)</p></div><div class="mb-8 w-full"><p id="c-frase" class="text-base mb-1"></p><h3 id="c-grado" class="text-lg font-bold uppercase"></h3></div><div class="mb-12 w-full text-center space-y-2"><p class="text-sm font-bold">PRESENTADO POR:</p><p class="text-base uppercase text-gray-400">[Nombres]</p><p class="text-sm font-bold mt-4">ASESOR:</p><p class="text-base uppercase text-gray-400">[Grado y Nombre]</p></div><div class="mt-auto"><p id="c-lugar" class="text-base font-bold uppercase">CALLAO, PERÚ</p><p id="c-anio" class="text-base font-bold">2026</p></div></div></div></div></div></div>
+<div id="refModal" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true"><div class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm" onclick="closeModal('refModal')"></div><div class="fixed inset-0 z-10 overflow-y-auto"><div class="flex min-h-full items-center justify-center p-4"><div class="relative bg-white shadow-2xl rounded-xl sm:max-w-2xl w-full flex flex-col max-h-[85vh]"><div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 rounded-t-xl"><h3 class="text-lg font-bold text-gray-900 flex items-center gap-2"><i data-lucide="book-open-check" class="w-5 h-5 text-indigo-600"></i> Referencias Bibliográficas</h3><button onclick="closeModal('refModal')" class="text-gray-400 hover:text-gray-600 p-1"><i data-lucide="x" class="w-5 h-5"></i></button></div><div id="refLoader" class="flex-1 flex items-center justify-center py-12"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div></div><div id="refContent" class="hidden p-6 overflow-y-auto font-serif"><div id="refList" class="space-y-4 text-gray-700 text-sm leading-relaxed text-justify"></div></div></div></div></div>
+
+<script src="/static/js/catalog.js?v=6"></script>
 {% endblock %}

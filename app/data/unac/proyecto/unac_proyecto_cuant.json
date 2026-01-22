@@ -1,0 +1,513 @@
+{
+  "configuracion": {
+    "fuente_normal": "Times New Roman",
+    "tamano_normal": 12,
+    "ruta_logo": "LogoUNAC.png",
+    "color_encabezado": "BDD7EE"
+  },
+  "caratula": {
+    "universidad": "UNIVERSIDAD NACIONAL DEL CALLAO",
+    "facultad": "FACULTAD DE INGENIERÍA MECÁNICA Y DE ENERGÍA",
+    "escuela": "UNIDAD DE POSGRADO",
+    "tipo_documento": "PROYECTO DE INVESTIGACIÓN",
+    "titulo_placeholder": "“TÍTULO DEL PROYECTO”",
+    "frase_grado": "[Nota: Contiene: Las variables, unidad de análisis, ámbito de estudio. Máximo 15 palabras sin considerar artículos conectores.]",
+    "grado_objetivo": "",
+    "label_autor": "AUTOR(ES)\n\nNombres y Apellidos",
+    "label_asesor": "ASESOR\nDr. Abel Tapia Díaz",
+    "label_linea": "LÍNEA DE INVESTIGACIÓN:\nIngeniería y Tecnología",
+    "fecha": "Callao, 2025",
+    "pais": "PERÚ"
+  },
+  "pagina_respeto": {
+    "titulo": "PÁGINA DE RESPETO",
+    "notas": [
+      {
+        "texto": "Los datos no deben tener más de 4 años de antigüedad una vez terminada la experiencia.\n\nEn caso de tener la autorización de la empresa, se deberá presentar en una hoja membretada (o un formato oficial).\n\nAnexo 3",
+        "formato": "recuadro"
+      }
+    ]
+  },
+  "informacion_basica": {
+    "titulo": "INFORMACIÓN BÁSICA",
+    "elementos": [
+      {
+        "label": "FACULTAD:",
+        "valor": "Facultad de Ingeniería Mecánica y de Energía"
+      },
+      {
+        "label": "UNIDAD DE INVESTIGACIÓN:",
+        "valor": "Unidad de Posgrado..."
+      },
+      {
+        "label": "TÍTULO:",
+        "valor": "Implementación xxx"
+      },
+      {
+        "label": "AUTOR(ES):",
+        "valor": "Nombres y Apellidos / DNI: XXX / ORCID: YYYY"
+      },
+      {
+        "label": "ASESOR:",
+        "valor": "Dr. Abel Tapia Díaz / DNI: ... / ORCID: ..."
+      },
+      {
+        "label": "LUGAR DE EJECUCIÓN:",
+        "valor": ""
+      },
+      {
+        "label": "UNIDAD DE ANÁLISIS:",
+        "valor": ""
+      },
+      {
+        "label": "TIPO:",
+        "valor": ""
+      },
+      {
+        "label": "ENFOQUE:",
+        "valor": ""
+      },
+      {
+        "label": "DISEÑO DE INVESTIGACIÓN:",
+        "valor": ""
+      },
+      {
+        "label": "TEMA OCDE:",
+        "valor": ""
+      }
+    ]
+  },
+  "preliminares": {
+    "indices": [
+      {
+        "titulo": "ÍNDICE",
+        "items": [
+          {
+            "texto": "ÍNDICE",
+            "pag": 1
+          },
+          {
+            "texto": "ÍNDICE DE TABLAS",
+            "pag": 2
+          },
+          {
+            "texto": "ÍNDICE DE FIGURAS",
+            "pag": 3
+          },
+          {
+            "texto": "ÍNDICE DE ABREVIATURAS",
+            "pag": 4
+          },
+          {
+            "texto": "INTRODUCCIÓN",
+            "pag": 5
+          },
+          {
+            "texto": "I. PLANTEAMIENTO DEL PROBLEMA",
+            "pag": 6,
+            "bold": true
+          },
+          {
+            "texto": "II. MARCO TEÓRICO",
+            "pag": 10,
+            "bold": true
+          },
+          {
+            "texto": "III. HIPÓTESIS Y VARIABLES",
+            "pag": 17,
+            "bold": true
+          },
+          {
+            "texto": "IV. METODOLOGÍA DEL PROYECTO",
+            "pag": 19,
+            "bold": true
+          },
+          {
+            "texto": "V. CRONOGRAMA DE ACTIVIDADES",
+            "pag": 21,
+            "bold": true
+          },
+          {
+            "texto": "VI. PRESUPUESTO",
+            "pag": 22,
+            "bold": true
+          },
+          {
+            "texto": "VII. REFERENCIAS BIBLIOGRÁFICAS",
+            "pag": 23,
+            "bold": true
+          },
+          {
+            "texto": "VIII. ANEXOS",
+            "pag": 24,
+            "bold": true
+          }
+        ]
+      },
+      {
+        "titulo": "ÍNDICE DE TABLAS",
+        "items": [
+          {
+            "texto": "Tabla 1.1. Frecuencia de fallas en los equipos",
+            "pag": 8
+          },
+          {
+            "texto": "Tabla 1.2. Diagrama de Pareto",
+            "pag": 8
+          },
+          {
+            "texto": "Tabla 2.1. Mapa de Procesos",
+            "pag": 12
+          },
+          {
+            "texto": "Tabla 2.2. Diagrama de Procesos",
+            "pag": 12
+          }
+        ]
+      },
+      {
+        "titulo": "ÍNDICE DE FIGURAS",
+        "items": [
+          {
+            "texto": "Figura 1.1 Frecuencia de los fallas en el área de mantenimiento",
+            "pag": 7
+          },
+          {
+            "texto": "Figura 1.2 Ejemplo",
+            "pag": 7
+          },
+          {
+            "texto": "Figura 2.1 Matriz de consistencia de variable simple",
+            "pag": 13
+          },
+          {
+            "texto": "Figura 2.2 Matriz de consistencia de implementación",
+            "pag": 13
+          },
+          {
+            "texto": "Figura 2.3 Matriz de operacionalización de diseño",
+            "pag": 14
+          },
+          {
+            "texto": "Figura 2.4 Matriz de operacionalización de diseño",
+            "pag": 15
+          }
+        ]
+      },
+      {
+        "titulo": "ÍNDICE DE ABREVIATURAS",
+        "items": [
+          {
+            "texto": "ORGANIZACIÓN MUNDIAL DE LA SALUD (OMS)",
+            "pag": 6
+          }
+        ],
+        "nota": "Colocar el significado de las abreviaturas utilizadas en la investigación sin la paginación"
+      }
+    ],
+    "introduccion": {
+      "titulo": "INTRODUCCIÓN",
+      "texto": "Manifiesta la importancia y las razones por las que realiza el proyecto de tesis, referencia algunos trabajos similares anteriormente publicados, menciona los objetivos de estudio, la problemática y las soluciones. Asimismo presentar una descripción de la estructura del proyecto (máximo 02 páginas)."
+    }
+  },
+  "cuerpo": [
+    {
+      "titulo": "I. PLANTEAMIENTO DEL PROBLEMA",
+      "nota_capitulo": "Nota: Los datos no deben tener más de 4 años de antigüedad una vez terminada la experiencia.",
+      "contenido": [
+        {
+          "texto": "1.1 Descripción de la realidad problemática",
+          "nota": "Describe, explica y evidencia la realidad problemática en el contexto internacional y/o nacional y de la empresa.",
+          "instruccion_detallada": "Describe, explica y evidencia la realidad problemática en el contexto internacional y/o nacional y de la empresa, de las líneas de investigación prioritarias o transversales utilizando fuentes científicas y/o oficiales. Sustenta la identificación del problema relevante y evidencia el análisis de la problemática utilizando al menos una herramienta de ingeniería (Pareto, Ishikawa, árbol de problemas, matriz de relevancia, matriz de priorización, entre otras). Se debe mencionar la propuesta de solución del problema de investigación."
+        },
+        {
+          "texto": "1.2 Formulación del problema",
+          "nota": "Problema general y específicos expresados en forma interrogativa.",
+          "instruccion_detallada": "Problema general: Se expresa en forma interrogativa, incluye las variables, unidad de análisis, lugar de la investigación y está redactado en tiempo presente.\nProblemas específicos: Están expresados en forma interrogativa, se derivan del problema general, su enunciado es claro y conciso."
+        },
+        {
+          "texto": "1.3 Objetivos",
+          "nota": "Objetivo general y específicos (verbo en infinitivo).",
+          "instruccion_detallada": "Objetivo general: Es coherente con el problema, incluye las variables, inicia con verbo en infinitivo (Ejemplo: Establecer, determinar, incrementar, etc.), enuncia la acción para la propuesta de solución. Guarda relación con el problema general. (Sugerencia revisar la taxonomía de Bloom).\nObjetivos específicos: Orientan todas las acciones parciales para lograr el objetivo general. Se inician con verbos en infinitivo y guarda relación con los problemas específicos."
+        },
+        {
+          "texto": "1.4 Justificación",
+          "nota": "Sustenta el por qué se realiza el trabajo (teórica, práctica, metodológica).",
+          "instruccion_detallada": "Sustenta adecuadamente el por qué se realiza el trabajo de investigación de acuerdo con la naturaleza del problema explicando cuáles son las contribuciones científicas o sociales y los beneficiarios de su trabajo. Definir los tipos de justificación (teórica, práctica, metodológica, etc) citando adecuadamente y el sustento respectivo explicando las razones por las cuales la investigación posee dicha justificación. Se redacta en tiempo futuro."
+        },
+        {
+          "texto": "1.5 Delimitantes de la investigación",
+          "nota": "Delimitante Teórica, Temporal y Espacial.",
+          "instruccion_detallada": "Delimitante Teórica: Especifica las teorías que soportan su investigación.\nDelimitante Temporal: Especifica en qué momento (tiempo) se realiza la investigación.\nDelimitante Espacial: Especifica en qué lugar se realiza la investigación."
+        }
+      ]
+    },
+    {
+      "titulo": "II. MARCO TEÓRICO",
+      "contenido": [
+        {
+          "texto": "2.1 Antecedentes",
+          "nota": "Búsqueda exhaustiva en bases de datos (mínimo 5 antecedentes).",
+          "instruccion_detallada": "Los antecedentes de la presente investigación son el reflejo de una búsqueda exhaustiva en diferentes bases de datos de las universidades y de artículos científicos relacionados al tema de estudio.\n2.1.1 Antecedentes Internacionales.\n2.1.2 Antecedentes Nacionales.\n(Se debe considerar mínimo 5 antecedentes, puede incluir artículos científicos nacionales)."
+        },
+        {
+          "texto": "2.2 Bases teóricas",
+          "nota": "Principios, leyes, enfoques y teorías relacionadas con las variables.",
+          "instruccion_detallada": "Describen y explican principios, leyes, enfoques, teorías relacionadas con sus variables de investigación.\n• Todas las bases teóricas tienen las citas textuales o parafraseados correspondientes.\n• Las bases teóricas tienen relación con las variables de investigación.\nTambién se puede considerar marco legal, ambiental u otro que requiera la investigación.",
+          "mostrar_matriz": true,
+          "tablas_especiales": [
+  {
+    "titulo": "Figura 2.2 Matriz de consistencia de implementación",
+    "headers": ["PROBLEMA GENERAL", "OBJETIVO GENERAL", "HIPÓTESIS GENERAL", "VARIABLES", "METODOLOGÍA"],
+    "rows": [
+      [
+        "¿De qué manera la implementación de un plan de mantenimiento preventivo mejora la disponibilidad del sistema de bombeo?",
+        "Determinar cómo la implementación de un plan de mantenimiento preventivo mejora la disponibilidad del sistema de bombeo.",
+        "La implementación de un plan de mantenimiento preventivo mejora la disponibilidad del sistema de bombeo.",
+        "VARIABLE INDEPENDIENTE:\nPLAN DE MANTENIMIENTO PREVENTIVO",
+        "TIPO: Aplicada\nENFOQUE: Cuantitativo\nNIVEL: Explicativo"
+      ],
+      [
+        "PROBLEMAS ESPECÍFICOS:\n¿De qué manera mejora la confiabilidad?",
+        "OBJETIVOS ESPECÍFICOS:\nDeterminar cómo mejora la confiabilidad.",
+        "HIPÓTESIS ESPECÍFICAS:\nLa implementación mejora la confiabilidad.",
+        "DIMENSIONES VI:\n- Diagnóstico inicial\n- AMEF\n- Programación de actividades",
+        "DISEÑO: Pre Experimental\nPOBLACIÓN: Sistema de bombeo\nMUESTRA: 2 estaciones"
+      ],
+      [
+        "¿De qué manera mejora la mantenibilidad?",
+        "Determinar cómo mejora la mantenibilidad.",
+        "La implementación mejora la mantenibilidad.",
+        "VARIABLE DEPENDIENTE:\nDISPONIBILIDAD\n\nDIMENSIONES VD:\n- Confiabilidad\n- Mantenibilidad",
+        "TÉCNICAS: Análisis documental, Observación\nINSTRUMENTOS: Ficha de datos\nPROCESAMIENTO: SPSS v25"
+      ]
+    ]
+  },
+  {
+    "titulo": "Figura 2.3 Matriz de operacionalización de diseño",
+    "headers": ["VARIABLES", "DIMENSIONES", "INDICADORES", "ÍNDICE", "MÉTODO Y TÉCNICA"],
+    "rows": [
+      [
+        "VARIABLE I:\nDiseño de un sistema de ventilación mecánica con jetfan",
+        "Parámetros básicos de diseño",
+        "Volumen\nCaudal",
+        "Área x altura\nVolumen de aire/minuto",
+        "MÉTODO:\nCuantitativo"
+      ],
+      [
+        "",
+        "Redes de distribución de aire",
+        "Pérdidas\nRuta crítica",
+        "Pulg. columna agua/100 pies\nMáxima pérdida de presión",
+        "MÉTODO:\nCualitativo"
+      ],
+      [
+        "",
+        "Selección de equipos",
+        "Caída de presión\nCaudal de operación\nEficiencia",
+        "Pérdida real\nVolumen real\nPotencia mecánica/eléctrica",
+        "TÉCNICA:\nDocumental"
+      ],
+      [
+        "",
+        "Validación de diseño",
+        "Preproceso\nResolución\nPostproceso",
+        "Diseño, mallado\nEcuaciones diferenciales\nGráficos",
+        "TÉCNICA:\nEmpírica"
+      ]
+    ]
+  }
+]
+        },
+        {
+          "texto": "2.3 Marco conceptual",
+          "instruccion_detallada": "Elabora nuevos constructos fundamentados de las teorías en relación al problema de investigación. Recopila, sistematiza y construye conceptos para el desarrollo de la investigación.\n2.3.1 Variable 1 (Dimensiones, Indicadores).\n2.3.2 Variable 2 (en caso fuese necesario)."
+        },
+        {
+          "texto": "2.4 Definición de términos básicos",
+          "instruccion_detallada": "Se recomienda declarar los términos que permitan facilitar el entendimiento de la investigación al lector, como términos propios de la industria o de la investigación."
+        }
+      ]
+    },
+    {
+      "titulo": "III. HIPÓTESIS Y VARIABLES",
+      "contenido": [
+        {
+          "texto": "3.1 Hipótesis",
+          "nota": "Afirmación que debe ser probada (General y Específicas).",
+          "instruccion_detallada": "En caso de no aplicar a la investigación sustentar el motivo. Las investigaciones descriptivas simples no requieren hipótesis.\nHipótesis General: Plantearse como afirmación, las cuales deben ser probada por medio de técnicas de investigación usando datos empíricos y ser acordes a los objetivos planteados.\nHipótesis Específicas: Expresa respuestas coherentes de cómo dar solución a cada uno de los problemas específicos y está formulado en forma afirmativa de proposición."
+        },
+        {
+          "texto": "3.2 Operacionalización de variable",
+          "nota": "Matriz de operacionalización (sin rotulado de tabla).",
+          "instruccion_detallada": "Se puede colocar un texto previo a la matriz de operacionalización de variables (opcional). No lleva rotulado de tabla ni fuente. Constituye el conjunto de procedimientos para medir una variable.",
+          "tabla": {
+            "headers": [
+              "VARIABLES",
+              "DEFINICIÓN CONCEPTUAL",
+              "DEFINICIÓN OPERACIONAL",
+              "DIMENSIONES",
+              "INDICADORES",
+              "ÍNDICE",
+              "MÉTODO Y TÉCNICA"
+            ],
+            "rows": [
+              [
+                "",
+                "Definición según un autor de un libro, ley, norma o artículo científico (Citar)",
+                "Constituye el conjunto de procedimientos, actividades u operaciones que deben realizarse para medir una variable.",
+                "Pueden denominarse como sub variables. En conjunto detallan el comportamiento de la variable en estudio; se recomienda que las dimensiones provengan de teorías, las cuales deben estar detalladas en el marco teórico.",
+                "Elemento observable, que permiten estudiar o cuantificar las dimensiones. Información transformable en valores numéricos que nos permitirán realizar operaciones de cálculo, estadísticas, que nos permiten nuevas operaciones para describir la realidad estudiada, comprenderla, explicar e, incluso, predecir acontecimientos en términos probabilísticos.",
+                "Permiten medir características de las variables de manera general según dimensiones. Debe tener coherencia con el marco teórico y con lo que propuesto en los instrumentos de recolección de datos.\nLos índices expresan la intensidad de la cualidad de los indicadores.",
+                "Menciona el método y la técnica que empleará para cuantificar u observar las variables."
+              ]
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "titulo": "IV. METODOLOGÍA DEL PROYECTO",
+      "contenido": [
+        {
+          "texto": "4.1 Diseño metodológico",
+          "nota": "Tipo, Enfoque, Nivel y Diseño de investigación.",
+          "instruccion_detallada": "En esta sección se debe indicar: Tipo de investigación (Básica o Aplicada), Enfoque de Investigación (Cuantitativa o Cualitativa), Nivel de Investigación (Descriptiva, Correlacional, explicativo u otros), Diseño de Investigación (No experimental, Experimental, y su esquema correspondiente) especificando el tipo. Debe definir cada clasificación de su investigación citando y argumentar su elección."
+        },
+        {
+          "texto": "4.2 Método de investigación",
+          "nota": "Método científico y etapas de desarrollo.",
+          "instruccion_detallada": "Método de investigación científica. Definir el método citando un autor y argumentar su elección especificando las etapas ¿Cómo se va a desarrollar? estableciendo los procedimientos del desarrollo de la investigación."
+        },
+        {
+          "texto": "4.3 Población y muestra",
+          "nota": "Descripción de población y tipo de muestreo.",
+          "instruccion_detallada": "Describe la población y argumenta la elección de la muestra, si la naturaleza de la investigación lo requiere (indicando el tipo de muestreo). En caso de que no aplique argumentar adecuadamente (Tesis de Diseño)."
+        },
+        {
+          "texto": "4.4 Lugar de estudio",
+          "nota": "Ubicación y descripción del área.",
+          "instruccion_detallada": "Muestra la ubicación de la empresa y describe el área o lugar específico donde se realiza la investigación. Se recomienda: Usar Google maps indicando la ubicación. Usar una herramienta que permita visualizar el área donde se realiza la investigación. Contexto de la empresa."
+        },
+        {
+          "texto": "4.5 Técnicas e instrumentos para la recolección de la información",
+          "instruccion_detallada": "Define (citando) y sustente el uso de las técnicas e instrumentos utilizados en la investigación, especificando que información van a obtener. Las fichas de recolección de datos no requieren validación."
+        },
+        {
+          "texto": "4.6 Análisis y procesamiento de datos",
+          "instruccion_detallada": "Explica ¿Cómo se utiliza la información? Seguir las etapas del procedimiento especificando las herramientas utilizadas y como se analizan los datos."
+        },
+        {
+          "texto": "4.7 Aspectos éticos en Investigación",
+          "instruccion_detallada": "Considerar los principios del código de ética de la UNAC y especificar ¿Cómo se aplican los principios mencionados?"
+        }
+      ]
+    },
+    {
+      "titulo": "V. CRONOGRAMA DE ACTIVIDADES",
+      "contenido": [
+        {
+          "texto": "Cronograma de ejecución",
+          "nota": "Secuencia del desarrollo de la investigación.",
+          "instruccion_detallada": "Evidencia la secuencia del desarrollo de la investigación hasta la elaboración del informe final. La frecuencia (meses / semanas / días) va a depender de la investigación. No requiere enumerar como tabla. No requiere indicar elaboración propia."
+        }
+      ]
+    },
+    {
+      "titulo": "VI. PRESUPUESTO",
+      "contenido": [
+        {
+          "texto": "Recursos y Presupuesto",
+          "nota": "Inversión, recursos humanos, materiales y financieros.",
+          "instruccion_detallada": "Se debe presentar lo que el investigador ha invertido bajo su responsabilidad, en la investigación. Se considera los recursos humanos, materiales y financieros necesarios para el desarrollo de la investigación (en soles) e indicar la fuente de financiamiento."
+        }
+      ]
+    }
+  ],
+  "finales": {
+    "referencias": {
+      "titulo": "VII. REFERENCIAS BIBLIOGRÁFICAS",
+      "nota": "Las referencias deben seguir el estilo APA (7ma edición). Deben contener únicamente las fuentes citadas en el cuerpo del proyecto y ordenarse alfabéticamente.",
+      "ejemplos": [
+        "Chiavenato, I. (2011). Administración de recursos humanos (5.ª ed.). McGraw-Hill.",
+        "Hernández Sampieri, R., Fernández Collado, C., & Baptista Lucio, P. (2014). Metodología de la investigación (6.ª ed.). McGraw-Hill.",
+        "Pérez, J. (2023). Implementación de un sistema de mantenimiento preventivo [Tesis de pregrado, Universidad Nacional del Callao]. Repositorio Institucional UNAC.",
+        "Rodríguez, L. (2022). Análisis de fallas en sistemas de bombeo. Revista Ingeniería Mecánica, 15(2), 45-52. https://doi.org/10.1016/j.eng.2022.01.001"
+      ]
+    },
+    "anexos": {
+      "titulo_seccion": "VIII. ANEXOS",
+      "lista": [
+        {
+          "titulo": "Anexo 1: Matriz de consistencia",
+          "nota": "Está conformada por una matriz (cuadro) formado por columnas y filas que permite evaluar la coherencia y conexión lógica que existe entre el título de la investigación, la formulación del problema, el (los) objetivo(s), la (s) hipótesis, las variables, y la metodología. (Resolución 017-18-CU)."
+        },
+        {
+          "titulo": "Anexo 2: Herramienta de ingeniería para el análisis de la problemática",
+          "nota": "Se debe incluir la aplicación de al menos una herramienta de ingeniería utilizada para evidenciar el problema central (Ejemplo: Diagrama de Pareto, Diagrama de Ishikawa, Árbol de problemas, Matriz de relevancia, entre otras)."
+        },
+        {
+          "titulo": "Anexo 3: Autorización del uso de datos",
+          "nota": "Utilice este formato para imprimirlo en papel membretado con las firmas correspondientes:\n\nYo .................................................................................., identificado con DNI .................................., en mi calidad de ........................................................... del área ......................................... de la empresa/institución ................................................................................................. con R.U.C N° ................................................., ubicada en la ciudad de ............................................\n\nOTORGO LA AUTORIZACIÓN..."
+        },
+        {
+          "titulo": "Anexo 4: Ficha de recolección de datos",
+          "nota": "Adjuntar los formatos de las fichas, cuestionarios o guías de observación utilizados para la captura de datos en campo. Nota: Las fichas de recolección de datos no requieren validación por juicio de expertos según normativa vigente."
+        }
+      ]
+    }
+  },
+  "matriz_consistencia": {
+    "problemas": {
+      "general": "¿De qué manera la implementación de un plan de mantenimiento reduce el tiempo perdido en el área de trapiche de la empresa Pomalca - 2023?",
+      "especificos": [
+        "Realizar un diagnóstico inicial midiendo el tiempo perdido en el área de trapiche",
+        "Realizar un análisis de criticidad de los equipos del área de trapiche.",
+        "Desarrollar un análisis de modos y efectos de fallas de los equipos críticos.",
+        "Programar las actividades del plan de mantenimiento de los equipos.",
+        "Implementar el plan de mantenimiento preventivo elaborado.",
+        "Medir el tiempo perdido después de la implementación del plan."
+      ]
+    },
+    "objetivos": {
+      "general": "Determinar cómo la implementación de un plan de mantenimiento reduce el tiempo perdido en el área de trapiche de la empresa Pomalca",
+      "especificos": [
+        "Realizar un diagnóstico inicial midiendo el tiempo perdido en el área de trapiche",
+        "Realizar un análisis de criticidad de los equipos del área de trapiche.",
+        "Desarrollar un análisis de modos y efectos de fallas de los equipos críticos.",
+        "Programar las actividades del plan de mantenimiento de los equipos.",
+        "Implementar el plan de mantenimiento preventivo elaborado.",
+        "Medir el tiempo perdido después de la implementación del plan."
+      ]
+    },
+    "hipotesis": {
+      "general": "La implementación de un plan de mantenimiento reduce el tiempo perdido en el área de trapiche de la empresa Pomalca",
+      "especificos": []
+    },
+    "variables": {
+      "independiente": {
+        "nombre": "PLAN DE MANTENIMIENTO",
+        "dimensiones": [
+          "Análisis de Criticidad",
+          "AMEF",
+          "Programación de actividades"
+        ]
+      },
+      "dependiente": {
+        "nombre": "TIEMPO PERDIDO",
+        "dimensiones": []
+      }
+    },
+    "metodologia": {
+      "tipo": "Aplicada",
+      "enfoque": "Cuantitativo",
+      "nivel": "Explicativo",
+      "diseno": "Pre Experimental",
+      "poblacion": "32 equipos del área de Trapiche",
+      "muestra": "24 equipos críticos",
+      "tecnicas": "Análisis documental, Observación",
+      "instrumentos": "Ficha de recolección de datos",
+      "procesamiento": "SPSS v25"
+    }
+  }
+}

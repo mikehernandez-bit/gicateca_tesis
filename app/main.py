@@ -11,6 +11,7 @@ app = FastAPI(title="Formatoteca", version="0.1.0")
 
 # Static files
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
+app.mount("/recursos_data", StaticFiles(directory="app/data/unac"), name="data_unac")
 
 # Routers (cada módulo es una sección del mockup)
 app.include_router(home_router)
