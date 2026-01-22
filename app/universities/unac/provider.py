@@ -1,7 +1,7 @@
 from pathlib import Path
 import json
 
-ROOT = Path(__file__).resolve().parents[3]  # carpeta del proyecto
+from app.core.loaders import get_data_dir
 
 class UNACProvider:
     code = "unac"
@@ -50,11 +50,11 @@ class UNACProvider:
             return None
 
     def list_formatos(self):
-        """Lee los 6 archivos JSON de los subdirectorios de data/unac/"""
+        """Lee los 6 archivos JSON de los subdirectorios de app/data/unac/"""
         formatos = []
-        data_dir = ROOT / "data" / "unac"
+        data_dir = get_data_dir(self.code)
         
-        # Estructura esperada: data/unac/{tipo}/{archivo}.json
+        # Estructura esperada: app/data/unac/{tipo}/{archivo}.json
         tipos_estructura = {
             "informe": ["cual", "cuant"],
             "maestria": ["cual", "cuant"],
@@ -78,7 +78,7 @@ class UNACProvider:
         return formatos
 
     def list_alerts(self):
-        path = ROOT / "data" / "unac" / "alerts.json"
+        path = get_data_dir(self.code) / "alerts.json"
         return json.loads(path.read_text(encoding="utf-8")) if path.exists() else []
 
     def get_formato(self, format_id: str):

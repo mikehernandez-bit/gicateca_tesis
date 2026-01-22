@@ -7,8 +7,7 @@ import sys
 import tempfile
 from typing import Dict, List
 
-from app.core.university_registry import get_provider
-from app.core.loaders import load_json_file, get_data_dir
+from app.core.loaders import discover_format_files, load_format_by_id, load_json_file, get_data_dir
 
 ROOT = Path(__file__).resolve().parents[3]
 CF_DIR = ROOT / "app" / "universities" / "unac" / "centro_formatos"
@@ -43,45 +42,84 @@ ALIASES = {
 }
 
 
-def get_all_formatos() -> List[Dict]:
-    """Get all 6 formats (informe, maestria, proyecto × cualitativo, cuantitativo)."""
-    formatos = []
-    data_dir = get_data_dir()
-    
-    tipo_labels = {"informe": "Informe de Tesis", "maestria": "Tesis de Maestría", "proyecto": "Proyecto de Tesis"}
-    enfoque_label = {"cual": "Cualitativo", "cuant": "Cuantitativo"}
-    tipo_filtro = {
-        "informe": "Inv. Formativa",
-        "maestria": "Suficiencia",
-        "proyecto": "Tesis",
+TIPO_LABELS = {
+    "informe": "Informe de Tesis",
+    "maestria": "Tesis de Maestr\u00eda",
+    "proyecto": "Proyecto de Tesis",
+}
+ENFOQUE_LABELS = {"cual": "Cualitativo", "cuant": "Cuantitativo"}
+TIPO_FILTRO = {
+    "informe": "Inv. Formativa",
+    "maestria": "Suficiencia",
+    "proyecto": "Tesis",
+}
+
+
+def _build_format_title(categoria: str, enfoque: str, raw_title: str, fallback_title: str) -> str:
+    if raw_title:
+        return raw_title
+    cat_label = TIPO_LABELS.get(categoria)
+    enfoque_label = ENFOQUE_LABELS.get(enfoque)
+    if cat_label and enfoque_label:
+        return f"{cat_label} - {enfoque_label}"
+    if cat_label:
+        return cat_label
+    return fallback_title or categoria.capitalize()
+
+
+def _build_format_entry(item, data: Dict) -> Dict:
+    raw_title = data.get("titulo") if isinstance(data, dict) else None
+    titulo = _build_format_title(item.categoria, item.enfoque, raw_title, item.titulo)
+    cat_label = TIPO_LABELS.get(item.categoria, item.categoria.capitalize())
+    enfoque_label = ENFOQUE_LABELS.get(item.enfoque)
+    resumen = None
+    if isinstance(data, dict):
+        resumen = data.get("descripcion")
+    if not resumen:
+        if enfoque_label:
+            resumen = f"Plantilla oficial de {cat_label} con enfoque {enfoque_label}"
+        else:
+            resumen = f"Plantilla oficial de {cat_label}"
+
+    return {
+        "id": item.format_id,
+        "uni": item.uni.upper(),
+        "uni_code": item.uni,
+        "tipo": TIPO_FILTRO.get(item.categoria, "Otros"),
+        "titulo": titulo,
+        "facultad": "Centro de Formatos UNAC",
+        "escuela": "Direcci\u00f3n Acad\u00e9mica",
+        "estado": "VIGENTE",
+        "version": data.get("version", "1.0.0") if isinstance(data, dict) else "1.0.0",
+        "fecha": "2026-01-17",
+        "resumen": resumen,
+        "tipo_formato": item.categoria,
+        "enfoque": item.enfoque,
     }
-    
-    for tipo in ["informe", "maestria", "proyecto"]:
-        for enfoque in ["cual", "cuant"]:
-            json_file = data_dir / tipo / f"unac_{tipo}_{enfoque}.json"
-            
-            try:
-                data = load_json_file(json_file)
-                formatos.append({
-                    "id": f"unac-{tipo}-{enfoque}",
-                    "uni": "UNAC",
-                    "uni_code": "unac",
-                    "tipo": tipo_filtro[tipo],
-                    "titulo": f"{tipo_labels[tipo]} - {enfoque_label[enfoque]}",
-                    "facultad": "Centro de Formatos UNAC",
-                    "escuela": "Dirección Académica",
-                    "estado": "VIGENTE",
-                    "version": data.get("version", "1.0.0"),
-                    "fecha": "2026-01-17",
-                    "resumen": data.get("descripcion", f"Plantilla oficial de {tipo_labels[tipo]} con enfoque {enfoque_label[enfoque]}"),
-                    "tipo_formato": tipo,
-                    "enfoque": enfoque,
-                })
-            except (FileNotFoundError, ValueError) as e:
-                print(f"Warning: Could not load {json_file}: {e}")
-                continue
-    
-    return formatos
+
+
+def build_catalog(uni: str = "unac") -> Dict[str, Dict]:
+    formatos: List[Dict] = []
+    grouped: Dict[str, Dict] = {}
+
+    for item in discover_format_files(uni):
+        try:
+            data = load_json_file(item.path)
+        except (FileNotFoundError, ValueError) as exc:
+            print(f"Warning: Could not load {item.path}: {exc}")
+            continue
+
+        entry = _build_format_entry(item, data)
+        formatos.append(entry)
+        grouped.setdefault(item.uni, {}).setdefault(item.categoria, {}).setdefault(item.enfoque, []).append(entry)
+
+    return {"formatos": formatos, "grouped": grouped}
+
+
+def get_all_formatos() -> List[Dict]:
+    """Get all formats discovered under app/data."""
+    return build_catalog()["formatos"]
+
 
 
 def _normalize_format(fmt_type: str) -> str:
@@ -144,28 +182,10 @@ def generate_document(fmt_type: str, sub_type: str):
 def get_format_json_content(format_id: str) -> Dict:
     """
     Busca y devuelve el contenido crudo del JSON para las vistas previas.
-    ID esperado: unac-informe-cual -> data/unac/informe/unac_informe_cual.json
+    ID esperado: unac-informe-cual -> app/data/unac/informe/unac_informe_cual.json
     """
     try:
-        parts = format_id.split("-") # ['unac', 'informe', 'cual']
-        if len(parts) < 3:
-            raise ValueError("ID incompleto")
-            
-        tipo = parts[1]    # informe, proyecto, maestria
-        enfoque = parts[2] # cual, cuant
-        
-        # Construimos la ruta al archivo JSON
-        data_dir = get_data_dir() 
-        filename = f"unac_{tipo}_{enfoque}.json"
-        
-        # Ruta construida: app/data/unac/proyecto/unac_proyecto_cuant.json
-        json_path = data_dir / tipo / filename
-        
-        if not json_path.exists():
-            raise FileNotFoundError(f"Archivo JSON no encontrado: {json_path}")
-
-        return load_json_file(json_path)
-        
+        return load_format_by_id(format_id)
     except Exception as e:
         print(f"[ERROR SERVICE] No se pudo leer JSON para {format_id}: {e}")
         raise

@@ -12,7 +12,9 @@ router = APIRouter()
 @router.get("/catalog", response_class=HTMLResponse)
 async def get_catalog(request: Request):
     """Get all formats for catalog view."""
-    formatos = service.get_all_formatos()
+    uni = request.query_params.get("uni", "unac")
+    catalog = service.build_catalog(uni)
+    formatos = catalog["formatos"]
     return templates.TemplateResponse(
         "pages/catalog.html",
         {
@@ -21,8 +23,9 @@ async def get_catalog(request: Request):
             "breadcrumb": "Catalogo",
             "active_nav": "catalog",
             "formatos": formatos,
-            "active_uni": "unac",
-            "uni_name": "UNAC",
+            "catalogo": catalog["grouped"],
+            "active_uni": uni,
+            "uni_name": uni.upper(),
         },
     )
 
@@ -49,20 +52,3 @@ async def generate_document(request: Request, background_tasks: BackgroundTasks)
         media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         background=background_tasks,
     )
-
-# NUEVO ENDPOINT PARA ENTREGAR DATOS AL MODAL (CARÁTULAS)
-@router.get("/formatos/{format_id}/data")
-async def get_format_data_api(format_id: str):
-    """
-    API que alimenta el Modal de Carátulas.
-    Devuelve el JSON completo del formato solicitado.
-    """
-    try:
-        data = service.get_format_json_content(format_id)
-        return JSONResponse(content=data)
-    except FileNotFoundError:
-        return JSONResponse({"error": "Formato no encontrado"}, status_code=404)
-    except Exception as e:
-        return JSONResponse({"error": str(e)}, status_code=500)
-    
-    

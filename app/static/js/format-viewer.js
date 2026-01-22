@@ -4,17 +4,14 @@
  */
 
 function buildJsonPath(formatId) {
-  const parts = formatId.split('-');
-  const category = parts[1];
-  const jsonName = formatId.replace(/-/g, '_') + '.json';
-  return `/recursos_data/${category}/${jsonName}`;
+  return `/formatos/${formatId}/data`;
 }
 
 async function fetchFormatJson(formatId) {
   const jsonPath = buildJsonPath(formatId);
   const response = await fetch(jsonPath + '?t=' + new Date().getTime());
   if (!response.ok) {
-    throw new Error(`No se encontró el archivo (Error ${response.status}) en: ${jsonPath}`);
+    throw new Error(`No se encontr\u00f3 el archivo (Error ${response.status}) en: ${jsonPath}`);
   }
   return response.json();
 }
@@ -349,9 +346,14 @@ async function previewChapter(formatId, searchPrefix) {
                 cap.titulo && cap.titulo.trim().toUpperCase().startsWith(searchPrefix)
             );
         }
-        // 2. Buscar en finales (para Referencias VII.)
-        if (!capitulo && searchPrefix === "VII." && data.finales && data.finales.referencias) {
-            capitulo = data.finales.referencias;
+        // 2. Buscar en finales (Referencias/Anexos)
+        if (!capitulo && data.finales) {
+            const prefix = (searchPrefix || "").toUpperCase();
+            if ((prefix.includes("REFERENCIAS") || prefix.includes("BIBLIOGRAF")) && data.finales.referencias) {
+                capitulo = data.finales.referencias;
+            } else if (prefix.includes("ANEXO") && data.finales.anexos) {
+                capitulo = data.finales.anexos;
+            }
         }
 
         if (!capitulo) throw new Error(`No se encontró el Capítulo ${searchPrefix} en el JSON.`);
@@ -365,16 +367,27 @@ async function previewChapter(formatId, searchPrefix) {
                 const itemDiv = document.createElement('div');
                 itemDiv.className = "p-4 bg-gray-50 rounded-lg border border-gray-100 hover:border-blue-200 transition-colors";
                 
-                let html = `<h4 class="font-bold text-gray-800 text-base mb-1">${item.texto}</h4>`;
-                
-                if (item.nota) {
+                let html = `<h4 class="font-bold text-gray-800 text-base mb-1">${item.texto || ""}</h4>`;
+
+                const notes = [];
+                if (item.instruccion_detallada) notes.push(item.instruccion_detallada);
+                if (item.nota) notes.push(item.nota);
+                if (item.tabla_nota) notes.push(item.tabla_nota);
+                if (Array.isArray(item.imagenes)) {
+                    item.imagenes.forEach((img) => {
+                        if (img && img.fuente) notes.push(img.fuente);
+                    });
+                }
+
+                notes.forEach((note) => {
+                    const noteText = shortGuide(note);
                     html += `
                         <div class="flex gap-2 mt-2">
                             <span class="text-blue-500 mt-0.5"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></span>
-                            <p class="text-gray-600 text-sm italic">${item.nota}</p>
+                            <p class="text-gray-600 text-sm italic">${noteText}</p>
                         </div>
                     `;
-                }
+                });
                 itemDiv.innerHTML = html;
                 listContainer.appendChild(itemDiv);
             });
@@ -552,13 +565,21 @@ async function hydrateRequirementsList() {
                 } else if (capitulo.contenido && Array.isArray(capitulo.contenido) && capitulo.contenido.length > 0) {
                     // Intentar obtener la primera nota disponible
                     const primerContenido = capitulo.contenido[0];
-                    if (primerContenido.nota) {
+                    if (primerContenido.instruccion_detallada) {
+                        descripcion = primerContenido.instruccion_detallada;
+                    } else if (primerContenido.nota) {
                         descripcion = primerContenido.nota;
+                    } else if (primerContenido.tabla_nota) {
+                        descripcion = primerContenido.tabla_nota;
+                    } else if (Array.isArray(primerContenido.imagenes)) {
+                        const fuente = primerContenido.imagenes.find(img => img && img.fuente)?.fuente;
+                        if (fuente) {
+                            descripcion = fuente;
+                        }
                     } else if (primerContenido.texto) {
                         descripcion = primerContenido.texto;
                     }
                 }
-                
                 // Truncar descripción si es muy larga
                 if (descripcion.length > 100) {
                     descripcion = descripcion.substring(0, 97) + '...';
@@ -595,7 +616,7 @@ async function hydrateRequirementsList() {
             
             if (capituloReferencias) {
                 referenciasTitulo = capituloReferencias.titulo;
-                referenciasDescripcion = capituloReferencias.nota_capitulo || "Normativa bibliográfica según corresponda.";
+                referenciasDescripcion = capituloReferencias.nota_capitulo || capituloReferencias.nota || "Normativa bibliográfica según corresponda.";
                 const match = capituloReferencias.titulo.match(/^([IVXLCDM]+)\./);
                 referenciasPrefijo = match ? match[1] + '.' : 'REFERENCIAS';
             }
@@ -615,7 +636,7 @@ async function hydrateRequirementsList() {
         if (data.finales?.anexos) {
             const anexos = data.finales.anexos;
             const anexosTitulo = anexos.titulo_seccion || "Anexos";
-            const anexosDescripcion = anexos.nota_general || "Documentación complementaria.";
+            const anexosDescripcion = anexos.nota_general || anexos.nota || "Documentación complementaria.";
             
             container.appendChild(buildRequirementItem(
                 anexosTitulo,
