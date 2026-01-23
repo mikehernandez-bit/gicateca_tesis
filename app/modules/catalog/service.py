@@ -26,9 +26,11 @@ Donde tocar si falla:
 """
 
 from pathlib import Path
+import re
 import subprocess
 import sys
 import tempfile
+import unicodedata
 from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 from app.core.loaders import discover_format_files, load_format_by_id, load_json_file
@@ -50,6 +52,43 @@ TIPO_FILTRO = {
     "maestria": "Suficiencia",
     "proyecto": "Tesis",
 }
+_REFERENCE_KEYWORDS = {
+    "references",
+    "referencias",
+    "bibliografia",
+    "bibliografica",
+    "bibliograficas",
+}
+
+
+def _normalize_text(value: str) -> str:
+    """Normaliza texto para comparar keywords (sin tildes)."""
+    text = (value or "").strip().lower()
+    text = unicodedata.normalize("NFKD", text)
+    text = "".join(ch for ch in text if not unicodedata.combining(ch))
+    text = re.sub(r"[^a-z0-9_-]+", "", text)
+    return text
+
+
+def _is_reference_like(item, data: Dict) -> bool:
+    """Detecta si un item corresponde a referencias (debe excluirse del catalogo)."""
+    format_id = _normalize_text(getattr(item, "format_id", ""))
+    categoria = _normalize_text(getattr(item, "categoria", ""))
+    stem = _normalize_text(getattr(getattr(item, "path", None), "stem", ""))
+    raw_title = ""
+    if isinstance(data, dict):
+        raw_title = data.get("titulo") or data.get("title") or ""
+    title = _normalize_text(raw_title)
+
+    if categoria in _REFERENCE_KEYWORDS:
+        return True
+    if stem in _REFERENCE_KEYWORDS:
+        return True
+    if any(keyword in format_id for keyword in _REFERENCE_KEYWORDS):
+        return True
+    if title in _REFERENCE_KEYWORDS:
+        return True
+    return False
 
 
 def _build_format_title(categoria: str, enfoque: str, raw_title: str, fallback_title: str) -> str:
@@ -108,6 +147,8 @@ def build_catalog(uni: Optional[str] = None) -> Dict[str, Dict]:
             data = item.data if item.data is not None else load_json_file(item.path)
         except (FileNotFoundError, ValueError) as exc:
             print(f"Warning: Could not load {item.path}: {exc}")
+            continue
+        if _is_reference_like(item, data):
             continue
 
         entry = _build_format_entry(item, data)

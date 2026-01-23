@@ -1,0 +1,102 @@
+{
+  "id": "apa7",
+  "titulo": "Normas APA 7",
+  "tags": ["Autor-fecha", "Ciencias sociales", "Educación", "Psicología"],
+  "descripcion": "APA 7 es un estilo autor-fecha: citas breves dentro del texto (Apellido, año) y una lista de referencias final en orden alfabético. En la lista, usa sangría francesa y doble interlineado. Ideal para tesis e informes académicos cuando tu programa exige consistencia y claridad en citas y referencias.",
+  "preview": {
+    "cita": "(García & Quispe, 2022)",
+    "referencia": "García, J. A., & Quispe, M. R. (2022). *Metodología de investigación aplicada*. Editorial Andina."
+  },
+  "secciones": [
+    {
+      "titulo": "1) Qué es y cuándo usarlo",
+      "items": [
+        { "tipo": "texto", "contenido": "APA 7 organiza las citas por autor y año. La lista de referencias se presenta al final y solo incluye fuentes citadas en el texto." },
+        { "tipo": "lista", "titulo": "Úsalo cuando:", "items": [
+          "Tu escuela/programa exige APA.",
+          "Tu trabajo es de ciencias sociales, educación, psicología o afines.",
+          "Necesitas un estilo claro y estandarizado (autor-fecha)."
+        ] }
+      ]
+    },
+    {
+      "titulo": "2) Regla rápida (lo mínimo que debes recordar)",
+      "items": [
+        { "tipo": "lista", "titulo": "En el texto:", "items": [
+          "Idea/paráfrasis: (Apellido, año).",
+          "Dos autores: (Apellido & Apellido, año).",
+          "3+ autores: (Apellido et al., año).",
+          "Cita textual: agrega página: (Apellido, año, p. X)."
+        ] },
+        { "tipo": "lista", "titulo": "En la lista de referencias:", "items": [
+          "Orden alfabético por apellido del primer autor.",
+          "Sangría francesa.",
+          "Doble interlineado."
+        ] }
+      ]
+    },
+    {
+      "titulo": "3) Cómo se ve (muestra del formato)",
+      "items": [
+        { "tipo": "muestra_cita_texto", "etiqueta": "En el texto", "items": [
+          "El mantenimiento preventivo reduce fallas no planificadas (Pérez, 2020).",
+          "García y Quispe (2022) describen un enfoque aplicado para tesis.",
+          "“La confiabilidad del sistema depende del plan de mantenimiento” (García, 2019, p. 45)."
+        ] },
+        { "tipo": "referencias_formateadas", "etiqueta": "Lista de referencias (APA 7 — sangría francesa + doble interlineado)", "lineas": [
+          "García, J. A., & Quispe, M. R. (2022). *Metodología de investigación aplicada*. Editorial Andina.",
+          "López, M., & Rojas, P. (2022). Gestión del mantenimiento en plantas industriales. *Revista Peruana de Ingeniería*, 18(2), 33–48. https://doi.org/10.1234/rpi.2022.018",
+          "Ministerio de Educación. (2023, marzo 12). Normas de citación institucional. Minedu. https://www.gob.pe/minedu"
+        ] }
+      ]
+    },
+    {
+      "titulo": "4) Citas en el texto (plantillas + ejemplos)",
+      "items": [
+        { "tipo": "formato", "etiqueta": "Cita parentética", "contenido": "(Apellido, Año)" },
+        { "tipo": "ejemplo", "etiqueta": "Ejemplo", "contenido": "(Pérez, 2020)" },
+        { "tipo": "formato", "etiqueta": "Cita narrativa", "contenido": "Apellido (Año) ..." },
+        { "tipo": "ejemplo", "etiqueta": "Ejemplo", "contenido": "Pérez (2020) explica el modelo de mantenimiento." },
+        { "tipo": "formato", "etiqueta": "Dos autores", "contenido": "(Apellido & Apellido, Año)" },
+        { "tipo": "ejemplo", "etiqueta": "Ejemplo", "contenido": "(García & Quispe, 2022)" },
+        { "tipo": "formato", "etiqueta": "3+ autores", "contenido": "(Apellido et al., Año)" },
+        { "tipo": "ejemplo", "etiqueta": "Ejemplo", "contenido": "(Ramos et al., 2019)" },
+        { "tipo": "formato", "etiqueta": "Cita textual (con página)", "contenido": "(Apellido, Año, p. X)" },
+        { "tipo": "ejemplo", "etiqueta": "Ejemplo", "contenido": "(García, 2019, p. 45)" }
+      ]
+    },
+    {
+      "titulo": "5) Lista de referencias (plantillas por tipo)",
+      "items": [
+        { "tipo": "formato", "etiqueta": "Libro", "contenido": "Apellido, A. A., & Apellido, B. B. (Año). *Título en cursiva*. Editorial." },
+        { "tipo": "ejemplo", "etiqueta": "Ejemplo libro", "contenido": "Hernández Sampieri, R., Fernández Collado, C., & Baptista Lucio, P. (2014). *Metodología de la investigación* (6.a ed.). McGraw-Hill." },
+        { "tipo": "formato", "etiqueta": "Artículo con DOI", "contenido": "Apellido, A. A. (Año). Título del artículo. *Revista*, volumen(número), xx–xx. https://doi.org/xxxxx" },
+        { "tipo": "ejemplo", "etiqueta": "Ejemplo artículo", "contenido": "López, M., & Rojas, P. (2022). Gestión del mantenimiento en plantas industriales. *Revista Peruana de Ingeniería*, 18(2), 33–48. https://doi.org/10.1234/rpi.2022.018" },
+        { "tipo": "formato", "etiqueta": "Página web", "contenido": "Autor/Institución. (Año, mes día). Título de la página. Sitio. URL" },
+        { "tipo": "ejemplo", "etiqueta": "Ejemplo web", "contenido": "Ministerio de Educación. (2023, marzo 12). Normas de citación institucional. Minedu. https://www.gob.pe/minedu" }
+      ]
+    },
+    {
+      "titulo": "6) Checklist antes de entregar",
+      "items": [
+        { "tipo": "checklist", "items": [
+          "Todas las fuentes citadas en el texto aparecen en la lista de referencias.",
+          "La lista está en orden alfabético por apellido.",
+          "La lista usa sangría francesa y doble interlineado.",
+          "Las citas textuales incluyen página (p.)."
+        ] }
+      ]
+    },
+    {
+      "titulo": "7) Errores comunes (evítalos)",
+      "items": [
+        { "tipo": "texto", "contenido": "Mezclar estilos (APA con numeración tipo [1]). Elige un solo estilo por documento." },
+        { "tipo": "texto", "contenido": "Omitir DOI cuando existe o escribirlo sin formato URL." },
+        { "tipo": "texto", "contenido": "Incluir referencias que no fueron citadas en el texto." }
+      ]
+    }
+  ],
+  "fuentes": [
+    { "label": "APA Style (7th edition)", "nota": "Guía oficial del estilo APA." }
+  ]
+}

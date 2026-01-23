@@ -12,3 +12,79 @@ body { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, H
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+/* Referencias: layout tipo docs */
+.refs-layout { display: grid; grid-template-columns: 280px minmax(0, 1fr) 260px; gap: 18px; align-items: start; }
+@media (max-width: 1024px){
+  .refs-layout { grid-template-columns: 1fr; }
+  .refs-sticky { position: static; }
+}
+.refs-sticky { position: sticky; top: 90px; }
+
+/* Grid */
+.refs-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 1100px){ .refs-grid { grid-template-columns: repeat(2, 1fr);} }
+@media (max-width: 700px){ .refs-grid { grid-template-columns: 1fr;} }
+
+/* Cards */
+.ref-card { border: 1px solid #e5e7eb; border-radius: 16px; padding: 16px; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+.ref-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,.08); transform: translateY(-1px); transition: .18s; }
+.ref-card-desc { color: #6b7280; font-size: 0.95rem; line-height: 1.4; margin-top: 8px; }
+.ref-preview { margin-top: 12px; padding: 10px 12px; border-radius: 12px; background: #f8fafc; font-size: 0.85rem; color: #374151; display: grid; gap: 6px; }
+.ref-preview-line { line-height: 1.4; }
+
+/* Chips */
+.ref-chip { display:inline-flex; gap:6px; padding: 4px 10px; border-radius: 999px; background:#f3f4f6; font-size:.78rem; color:#374151; font-weight: 600; }
+
+/* Sidebar items */
+.ref-side-item { width: 100%; text-align: left; padding: 8px 10px; border-radius: 10px; color: #374151; font-size: 0.9rem; transition: background 0.15s ease; }
+.ref-side-item:hover { background: #f3f4f6; }
+.ref-side-item.active { background: #eef2ff; color: #1d4ed8; font-weight: 700; }
+
+/* Secciones */
+.ref-section { padding-top: 10px; margin-top: 18px; border-top: 1px solid #f1f5f9; }
+.ref-section h3 { font-size: 1.05rem; margin: 0 0 8px; font-weight: 700; }
+
+/* Callouts/nota */
+.ref-note { border: 1px solid #e5e7eb; background: #f9fafb; padding: 12px 12px; border-radius: 14px; }
+
+/* Bullets + checklist */
+.ref-bullets { margin: 8px 0 0 18px; color: #111827; }
+.ref-check { margin: 8px 0 0 0; padding: 0; list-style: none; }
+.ref-check li { display: flex; gap: 10px; align-items: flex-start; margin: 8px 0; }
+.ref-check input { margin-top: 3px; }
+
+/* Formato/ejemplo */
+.ref-format pre, .ref-example pre { margin: 0; white-space: pre-wrap; word-break: break-word; }
+.ref-format { background: #0b1220; color: #ffffff; padding: 12px; border-radius: 14px; }
+.ref-format .label { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; color: #9ca3af; }
+.ref-example { background: #eef2ff; color: #111827; padding: 12px; border-radius: 14px; }
+.ref-example .label { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; color: #4338ca; }
+
+/* Muestra texto */
+.ref-sample { border: 1px dashed #e5e7eb; border-radius: 14px; padding: 12px; background: #fff; }
+.ref-sample-label { font-weight: 700; font-size: .85rem; margin-bottom: 8px; color:#374151; }
+.ref-sample-line { background:#f8fafc; padding: 8px 10px; border-radius: 12px; margin: 8px 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+/* APA/autor-fecha: sangría francesa + doble espacio */
+.ref-apa7 { line-height: 2; margin: 0; padding: 0; list-style: none; }
+.ref-apa7 li { padding-left: 2.25rem; text-indent: -2.25rem; margin: 0; }
+
+/* Numérico: alineación [n] */
+.ref-numeric { display: grid; gap: 10px; line-height: 1.55; }
+.ref-row { display: grid; grid-template-columns: 3rem 1fr; gap: 0.85rem; align-items: start; }
+.ref-num { font-weight: 800; text-align: right; white-space: nowrap; color:#111827; }
+.ref-text { word-break: break-word; color:#111827; }
+
+/* Títulos de bloque */
+.ref-block-title { font-weight: 700; margin: 10px 0 8px; }
+
+/* TOC local */
+.ref-toc a { display: block; padding: 6px 8px; border-radius: 10px; color:#374151; text-decoration: none; font-size: 0.9rem; }
+.ref-toc a.active { background:#eef2ff; color:#1d4ed8; font-weight: 700; }
+
+/* Drawer móvil */
+.refs-drawer { position: fixed; inset: 0; z-index: 60; display: flex; }
+.refs-drawer.hidden { display: none; }
+.refs-drawer-backdrop { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.55); }
+.refs-drawer-panel { position: relative; margin-left: auto; width: min(85vw, 320px); height: 100%; background: #fff; padding: 16px; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }

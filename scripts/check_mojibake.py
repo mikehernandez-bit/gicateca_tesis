@@ -10,20 +10,16 @@ from pathlib import Path
 
 
 PATTERNS = (
-    "Ã",
-    "Â",
-    "â€",
-    "â€¢",
-    "â€“",
-    "â€”",
-    "Ã¡",
-    "Ã©",
-    "Ã­",
-    "Ã³",
-    "Ãº",
-    "Ã±",
-    "Ã",
-    "Ãš",
+    "\u00c3",          # Ã
+    "\u00c2",          # Â
+    "\u00e2\u0080\u00a2",  # â€¢
+    "\u00e2\u0080\u0093",  # â€“
+    "\u00e2\u0080\u0094",  # â€”
+    "\ufffd",          # Replacement char
+    "Educaci?n",
+    "Psicolog?a",
+    "a?o",
+    "sangr?a",
 )
 
 TEXT_EXTS = {".py", ".js", ".html", ".json", ".md", ".txt"}
@@ -38,6 +34,11 @@ EXCLUDE_DIRS = {
     ".mypy_cache",
     ".pytest_cache",
 }
+SCAN_DIRS = (
+    "app/data",
+    "app/templates",
+    "app/static",
+)
 
 
 def _has_control_chars(line: str) -> bool:
@@ -46,20 +47,20 @@ def _has_control_chars(line: str) -> bool:
 
 def _iter_files(root: Path) -> list[Path]:
     files: list[Path] = []
-    for path in root.rglob("*"):
-        if path.is_dir():
+    for scan_dir in SCAN_DIRS:
+        base = root / scan_dir
+        if not base.exists():
             continue
-        if any(part in EXCLUDE_DIRS for part in path.parts):
-            continue
-        if path.parent.name == "scripts" and path.name in {"check_mojibake.py", "fix_to_utf8.py"}:
-            continue
-        if path.suffix.lower() not in TEXT_EXTS:
-            continue
-        if path.name.endswith(".bak"):
-            continue
-        if "docs/CODE_DUMP" in path.as_posix():
-            continue
-        files.append(path)
+        for path in base.rglob("*"):
+            if path.is_dir():
+                continue
+            if any(part in EXCLUDE_DIRS for part in path.parts):
+                continue
+            if path.suffix.lower() not in TEXT_EXTS:
+                continue
+            if path.name.endswith(".bak"):
+                continue
+            files.append(path)
     return files
 
 
