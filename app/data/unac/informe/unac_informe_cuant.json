@@ -10,7 +10,7 @@
     "label_autor": "AUTOR: [NOMBRES Y APELLIDOS]",
     "label_asesor": "ASESOR: [NOMBRES Y APELLIDOS]",
     "label_linea": "LÍNEA DE INVESTIGACIÓN: [NOMBRE DE LA LÍNEA]",
-    "fecha": "Callao, 2026",
+    "fecha": "Callao, [AÑO]",
     "pais": "PERÚ"
   },
   "preliminares": {

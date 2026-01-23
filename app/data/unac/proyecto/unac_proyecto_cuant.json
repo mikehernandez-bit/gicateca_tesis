@@ -7,17 +7,18 @@
   },
   "caratula": {
     "universidad": "UNIVERSIDAD NACIONAL DEL CALLAO",
-    "facultad": "FACULTAD DE INGENIERÍA MECÁNICA Y DE ENERGÍA",
-    "escuela": "UNIDAD DE POSGRADO",
+    "facultad": "FACULTAD DE [NOMBRE DE LA FACULTAD]",
+    "escuela": "",
     "tipo_documento": "PROYECTO DE INVESTIGACIÓN",
     "titulo_placeholder": "“TÍTULO DEL PROYECTO”",
     "frase_grado": "[Nota: Contiene: Las variables, unidad de análisis, ámbito de estudio. Máximo 15 palabras sin considerar artículos conectores.]",
     "grado_objetivo": "",
-    "label_autor": "AUTOR(ES)\n\nNombres y Apellidos",
-    "label_asesor": "ASESOR\nDr. Abel Tapia Díaz",
-    "label_linea": "LÍNEA DE INVESTIGACIÓN:\nIngeniería y Tecnología",
-    "fecha": "Callao, 2025",
-    "pais": "PERÚ"
+    "label_autor": "AUTOR(ES)\n\n[NOMBRES Y APELLIDOS]\n[NOMBRES Y APELLIDOS]",
+    "label_asesor": "ASESOR\n[GRADO Y NOMBRES]",
+    "label_linea": "LÍNEA DE INVESTIGACIÓN:\n[Unidad de Investigación]",
+    "fecha": "Callao, [AÑO]",
+    "pais": "PERÚ\n"
+
   },
   "pagina_respeto": {
     "titulo": "PÁGINA DE RESPETO",
@@ -427,7 +428,7 @@
   "finales": {
     "referencias": {
       "titulo": "VII. REFERENCIAS BIBLIOGRÁFICAS",
-      "nota": "Las referencias deben seguir el estilo APA (7ma edición). Deben contener únicamente las fuentes citadas en el cuerpo del proyecto y ordenarse alfabéticamente.",
+      "nota": "Liste todas las fuentes citadas en el texto. Use un estilo de citación consistente (según norma indicada por su programa).\n\nVerifique: autor, año, título, editorial/revista, volumen(número), páginas, DOI/URL.",
       "ejemplos": [
         "Chiavenato, I. (2011). Administración de recursos humanos (5.ª ed.). McGraw-Hill.",
         "Hernández Sampieri, R., Fernández Collado, C., & Baptista Lucio, P. (2014). Metodología de la investigación (6.ª ed.). McGraw-Hill.",
