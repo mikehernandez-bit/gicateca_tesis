@@ -1,4 +1,28 @@
-"""Shared loaders for data access across modules."""
+"""
+Archivo: app/core/loaders.py
+Proposito:
+- Carga datos JSON y construye el indice de formatos disponibles.
+
+Responsabilidades:
+- Leer JSON con UTF-8 y manejar errores comunes.
+- Descubrir formatos por universidad/categoria/enfoque desde app/data.
+- Proveer busqueda por format_id y lectura con _meta.
+No hace:
+- No valida reglas de negocio ni genera documentos.
+
+Entradas/Salidas:
+- Entradas: codigos de universidad y format_id.
+- Salidas: items de indice y payloads JSON normalizados.
+
+Dependencias:
+- json, pathlib, app.core.registry, app.core.paths.
+
+Puntos de extension:
+- Ajustar heuristicas de discovery o normalizacion de IDs.
+
+Donde tocar si falla:
+- Revisar discovery, normalizacion de IDs o lectura JSON.
+"""
 import json
 import re
 from dataclasses import dataclass
@@ -7,7 +31,7 @@ from typing import Any, Dict, List, Optional
 
 
 def load_json_file(file_path: Path) -> Any:
-    """Load and parse a JSON file."""
+    """Carga y parsea un archivo JSON con UTF-8."""
     try:
         with open(file_path, "r", encoding="utf-8") as f:
             return json.load(f)
@@ -18,20 +42,22 @@ def load_json_file(file_path: Path) -> Any:
 
 
 def get_data_dir(uni: str = "unac") -> Path:
-    """Get the path to the data directory for a university code."""
-    uni = (uni or "unac").strip().lower()
-    app_dir = Path(__file__).resolve().parents[1]
-    return app_dir / "data" / uni
+    """Obtiene la carpeta de datos para una universidad."""
+    from app.core.paths import get_data_dir as _get_data_dir
+
+    return _get_data_dir(uni or "unac")
 
 
 @dataclass(frozen=True)
 class FormatIndexItem:
+    """Entrada inmutable del indice de formatos descubiertos."""
     format_id: str
     uni: str
     categoria: str
     enfoque: str
     path: Path
     titulo: str
+    data: Optional[Dict[str, Any]] = None
 
 
 _ENFOQUE_ALIASES = {
@@ -42,9 +68,23 @@ _ENFOQUE_ALIASES = {
 }
 
 _IGNORE_FILENAMES = {"alerts.json"}
+_HIDDEN_PREFIXES = ("_", "__")
+
+
+def _is_ignored_path(path: Path) -> bool:
+    """Indica si un path debe excluirse del discovery."""
+    if path.name in _IGNORE_FILENAMES:
+        return True
+    if path.name.endswith(".sample.json"):
+        return True
+    for part in path.parts:
+        if part.startswith(_HIDDEN_PREFIXES):
+            return True
+    return False
 
 
 def _normalize_format_id(raw_id: str, uni: str) -> str:
+    """Normaliza el format_id a un slug estable con prefijo de universidad."""
     if not raw_id:
         return ""
     normalized = re.sub(r"[_\s]+", "-", raw_id.strip().lower())
@@ -55,6 +95,7 @@ def _normalize_format_id(raw_id: str, uni: str) -> str:
 
 
 def _derive_enfoque(tokens: List[str]) -> str:
+    """Deriva el enfoque (cual/cuant/general) desde tokens del nombre."""
     for token in tokens:
         mapped = _ENFOQUE_ALIASES.get(token)
         if mapped:
@@ -63,6 +104,7 @@ def _derive_enfoque(tokens: List[str]) -> str:
 
 
 def _humanize_id(format_id: str, uni: str) -> str:
+    """Convierte un format_id en titulo humano si no hay titulo."""
     cleaned = format_id
     if cleaned.startswith(f"{uni}-"):
         cleaned = cleaned[len(uni) + 1 :]
@@ -70,22 +112,19 @@ def _humanize_id(format_id: str, uni: str) -> str:
     return " ".join(word.capitalize() for word in parts) or format_id
 
 
-def discover_format_files(uni: str) -> List[FormatIndexItem]:
-    """Discover JSON format files for a university."""
-    uni = (uni or "unac").strip().lower()
-    data_dir = get_data_dir(uni)
+def _discover_for_uni(uni: str) -> List[FormatIndexItem]:
+    """Descubre formatos para una universidad especifica."""
+    from app.core.registry import get_provider
+
+    data_dir = get_provider(uni).get_data_dir()
     if not data_dir.exists():
         return []
 
     items: List[FormatIndexItem] = []
+    seen_ids: set[str] = set()
+
     for path in data_dir.rglob("*.json"):
-        if path.name in _IGNORE_FILENAMES:
-            continue
-        if path.name.endswith(".sample.json"):
-            continue
-        if "seed" in path.parts:
-            continue
-        if "_spec_backup" in path.parts:
+        if _is_ignored_path(path):
             continue
 
         rel_path = path.relative_to(data_dir)
@@ -94,18 +133,51 @@ def discover_format_files(uni: str) -> List[FormatIndexItem]:
         tokens = [t for t in re.split(r"[_-]+", stem.lower()) if t]
         enfoque = _derive_enfoque(tokens)
 
-        titulo = None
+        # Lee JSON; si falla, se omite el contenido pero se conserva el indice.
         try:
             data = load_json_file(path)
-            if isinstance(data, dict):
-                titulo = data.get("titulo")
-                raw_id = data.get("id") or stem
-            else:
-                raw_id = stem
         except Exception:
-            raw_id = stem
+            data = None
 
-        format_id = _normalize_format_id(raw_id, uni)
+        if isinstance(data, list):
+            # Soporta listas de formatos dentro de un mismo JSON (ej. UNI).
+            for idx, entry in enumerate(data):
+                if not isinstance(entry, dict):
+                    continue
+                raw_id = entry.get("id") or entry.get("format_id") or f"{stem}-{idx + 1}"
+                entry_tokens = [t for t in re.split(r"[_-]+", str(raw_id).lower()) if t]
+                entry_categoria = (entry.get("tipo_formato") or entry.get("categoria") or categoria).lower()
+                entry_enfoque = (entry.get("enfoque") or _derive_enfoque(entry_tokens)).lower()
+                format_id = _normalize_format_id(str(raw_id), uni)
+                if format_id in seen_ids:
+                    continue
+                seen_ids.add(format_id)
+
+                titulo = entry.get("titulo") or entry.get("title") or _humanize_id(format_id, uni)
+                items.append(
+                    FormatIndexItem(
+                        format_id=format_id,
+                        uni=uni,
+                        categoria=entry_categoria,
+                        enfoque=entry_enfoque,
+                        path=path.resolve(),
+                        titulo=str(titulo),
+                        data=dict(entry),
+                    )
+                )
+            continue
+
+        if isinstance(data, dict):
+            raw_id = data.get("id") or stem
+            titulo = data.get("titulo")
+        else:
+            raw_id = stem
+            titulo = None
+
+        format_id = _normalize_format_id(str(raw_id), uni)
+        if format_id in seen_ids:
+            continue
+        seen_ids.add(format_id)
         if not titulo:
             titulo = _humanize_id(format_id, uni)
 
@@ -124,25 +196,56 @@ def discover_format_files(uni: str) -> List[FormatIndexItem]:
     return items
 
 
+def discover_format_files(uni: Optional[str] = None) -> List[FormatIndexItem]:
+    """Descubre JSON de formatos para una universidad o todas."""
+    if uni:
+        return _discover_for_uni((uni or "unac").strip().lower())
+
+    from app.core.registry import list_universities
+
+    items: List[FormatIndexItem] = []
+    for code in list_universities():
+        items.extend(_discover_for_uni(code))
+
+    items.sort(key=lambda item: (item.uni, item.categoria, item.enfoque, item.titulo.lower(), item.format_id))
+    return items
+
+
 def find_format_index(format_id: str) -> Optional[FormatIndexItem]:
+    """Busca un formato por ID normalizado."""
     if not format_id:
         return None
     parts = format_id.split("-")
     uni = (parts[0] if parts else "unac").strip().lower()
     normalized = _normalize_format_id(format_id, uni)
-    for item in discover_format_files(uni):
+    try:
+        items = discover_format_files(uni)
+    except KeyError:
+        return None
+    for item in items:
         if item.format_id == normalized:
             return item
     return None
 
 
 def load_format_by_id(format_id: str) -> Dict[str, Any]:
-    """Load raw JSON by format id, attaching metadata in _meta if missing."""
+    """Carga JSON por format_id y agrega _meta si falta."""
     item = find_format_index(format_id)
     if not item:
         raise FileNotFoundError(f"Formato no encontrado: {format_id}")
 
-    data = load_json_file(item.path)
+    data = item.data if item.data is not None else load_json_file(item.path)
+    if isinstance(data, list):
+        # Selecciona la entrada exacta cuando el JSON contiene lista.
+        match = None
+        for entry in data:
+            if not isinstance(entry, dict):
+                continue
+            raw_id = entry.get("id") or entry.get("format_id")
+            if raw_id and _normalize_format_id(str(raw_id), item.uni) == item.format_id:
+                match = entry
+                break
+        data = match or data
     if isinstance(data, dict):
         payload = dict(data)
         if "_meta" not in payload:

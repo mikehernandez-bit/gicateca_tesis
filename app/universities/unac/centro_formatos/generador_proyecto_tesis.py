@@ -1,3 +1,28 @@
+"""
+Archivo: app/universities/unac/centro_formatos/generador_proyecto_tesis.py
+Proposito:
+- Genera documentos DOCX para el formato "proyecto" de UNAC.
+
+Responsabilidades:
+- Cargar JSON legacy y construir el documento Word con estilos oficiales.
+- Renderizar caratula, preliminares, cuerpo y finales.
+No hace:
+- No descubre formatos ni valida reglas del catalogo.
+
+Entradas/Salidas:
+- Entradas: ruta JSON y ruta de salida (via CLI o funciones internas).
+- Salidas: archivo DOCX generado en la ruta indicada.
+
+Dependencias:
+- python-docx, json, os, sys.
+
+Puntos de extension:
+- Ajustar estilos/estructura si cambia el formato institucional.
+
+Donde tocar si falla:
+- Revisar cargar_contenido y generar_documento_core.
+"""
+
 import json
 import os
 import sys
@@ -13,8 +38,9 @@ from docx.enum.text import WD_TAB_ALIGNMENT, WD_TAB_LEADER
 # 1. CONFIGURACIÓN Y RUTAS
 # ==========================================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, "..", "..", "..", ".."))
 FORMATS_DIR = os.path.join(BASE_DIR, "formats")
-ASSETS_DIR = os.path.join(BASE_DIR, "assets")
+STATIC_ASSETS_DIR = os.path.join(PROJECT_ROOT, "app", "static", "assets")
 
 def encontrar_recurso(nombre_archivo):
     """Busca imágenes o logos en varias carpetas comunes."""
@@ -23,11 +49,12 @@ def encontrar_recurso(nombre_archivo):
         os.path.join(BASE_DIR, nombre_archivo),
         os.path.join(BASE_DIR, "assets", nombre_archivo),
         os.path.join(BASE_DIR, "static", "assets", nombre_archivo),
+        os.path.join(STATIC_ASSETS_DIR, nombre_archivo),
         # Subir un nivel
         os.path.join(BASE_DIR, "..", nombre_archivo),
         os.path.join(BASE_DIR, "..", "assets", nombre_archivo),
         # Estructura típica de proyectos web
-        os.path.join(BASE_DIR, "app", "static", "assets", nombre_archivo)
+        os.path.join(PROJECT_ROOT, "app", "static", "assets", nombre_archivo)
     ]
     
     for ruta in rutas_a_probar:
@@ -37,6 +64,7 @@ def encontrar_recurso(nombre_archivo):
     return None
 
 def cargar_contenido(path_archivo):
+    """Carga el JSON base desde la ruta indicada."""
     if not os.path.exists(path_archivo):
         path_archivo = os.path.join(BASE_DIR, path_archivo)
     if not os.path.exists(path_archivo):
@@ -50,6 +78,7 @@ def cargar_contenido(path_archivo):
 # ==========================================
 
 def configurar_formato_unac(doc):
+    """Configura el formato de pagina y estilos base."""
     for section in doc.sections:
         section.page_width = Cm(21.0); section.page_height = Cm(29.7)
         section.left_margin = Cm(3.5); section.right_margin = Cm(2.5)
@@ -64,6 +93,7 @@ def configurar_formato_unac(doc):
     style.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.LEFT
 
 def agregar_bloque(doc, texto, negrita=False, tamano=12, antes=0, despues=0, cursiva=False):
+    """Agrega un bloque centrado con estilo basico."""
     if not texto: return
     p = doc.add_paragraph()
     
@@ -76,6 +106,7 @@ def agregar_bloque(doc, texto, negrita=False, tamano=12, antes=0, despues=0, cur
     run.bold = negrita; run.italic = cursiva; run.font.size = Pt(tamano)
 
 def agregar_titulo_formal(doc, texto, espaciado_antes=0):
+    """Agrega un titulo formal con estilo institucional."""
     if not texto: return
     h = doc.add_heading(level=1)
     h.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -85,6 +116,7 @@ def agregar_titulo_formal(doc, texto, espaciado_antes=0):
     h.paragraph_format.space_after = Pt(12)
 
 def agregar_nota_guia(doc, texto):
+    """Agrega una nota guia en cursiva."""
     if not texto: return
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.LEFT
@@ -140,6 +172,7 @@ def agregar_nota_estilizada(doc, texto):
         p.runs[0].italic = True
 
 def agregar_tabla_simple(doc, data_tabla):
+    """Agrega una tabla simple tipo grid."""
     if not data_tabla: return
     headers = data_tabla.get('headers', [])
     rows = data_tabla.get('rows', [])
@@ -158,6 +191,7 @@ def agregar_tabla_simple(doc, data_tabla):
     doc.add_paragraph()
 
 def crear_tabla_estilizada(doc, data_tabla):
+    """Crea una tabla con estilos y anchos fijos."""
     if not data_tabla: return
     headers = data_tabla.get('headers', [])
     rows = data_tabla.get('rows', [])
@@ -214,6 +248,7 @@ def crear_tabla_estilizada(doc, data_tabla):
 # 3. LÓGICA DE MATRIZ (COMPACTA)
 # ==========================================
 def establecer_bordes_horizontales(table):
+    """Configura bordes horizontales de la tabla."""
     tbl = table._tbl
     tblPr = tbl.tblPr
     tblBorders = OxmlElement('w:tblBorders')
@@ -229,6 +264,7 @@ def establecer_bordes_horizontales(table):
     tblPr.append(tblBorders)
 
 def add_compact_p(cell, text, bold=False, italic=False, color=None, bullet=False, align=WD_ALIGN_PARAGRAPH.LEFT):
+    """Agrega un parrafo compacto dentro de una celda."""
     p = cell.add_paragraph()
     p.alignment = align
     p.paragraph_format.line_spacing = 1.0
@@ -242,6 +278,7 @@ def add_compact_p(cell, text, bold=False, italic=False, color=None, bullet=False
     return p
 
 def crear_tabla_matriz_consistencia(doc, matriz_data, titulo="Figura 2.1 Matriz de consistencia"):
+    """Construye la matriz de consistencia compacta."""
     p_titulo = doc.add_paragraph(titulo)
     p_titulo.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p_titulo.runs[0].bold = True; p_titulo.runs[0].font.size = Pt(11)
@@ -319,6 +356,7 @@ def crear_tabla_matriz_consistencia(doc, matriz_data, titulo="Figura 2.1 Matriz 
 # ==========================================
 
 def crear_caratula_dinamica(doc, data):
+    """Construye la caratula del proyecto desde el JSON."""
     c = data.get('caratula', {})
     agregar_bloque(doc, c.get('universidad', ''), negrita=True, tamano=18, despues=4)
     agregar_bloque(doc, c.get('facultad', ''), negrita=True, tamano=14, despues=4)
@@ -344,6 +382,7 @@ def crear_caratula_dinamica(doc, data):
     agregar_bloque(doc, c.get('pais', ''), negrita=True, tamano=12)
 
 def generar_pagina_respeto(doc, data):
+    """Genera la pagina de respeto con notas."""
     respeto = data.get('pagina_respeto', {})
     if not respeto: return
     table = doc.add_table(rows=1, cols=1)
@@ -356,6 +395,7 @@ def generar_pagina_respeto(doc, data):
     doc.add_page_break()
 
 def agregar_preliminares_dinamico(doc, data):
+    """Genera indices y preliminares desde JSON."""
     p = data.get('preliminares', {})
     
     # 1. GENERACIÓN DE ÍNDICES (General, Tablas, Figuras, Abreviaturas)
@@ -400,6 +440,7 @@ def agregar_preliminares_dinamico(doc, data):
                 doc.add_page_break()
 
 def agregar_cuerpo_dinamico(doc, data):
+    """Construye el cuerpo principal desde el JSON."""
     for cap in data.get('cuerpo', []):
         agregar_titulo_formal(doc, cap.get('titulo', ''), espaciado_antes=24)
         
@@ -459,6 +500,7 @@ def agregar_cuerpo_dinamico(doc, data):
         doc.add_page_break()
 
 def agregar_finales_dinamico(doc, data):
+    """Construye la seccion de finales y anexos."""
     fin = data.get('finales', {})
     
     # --- SECCIÓN REFERENCIAS ---
@@ -497,6 +539,7 @@ def agregar_finales_dinamico(doc, data):
                 doc.add_paragraph("")
 
 def agregar_numeracion_paginas(doc):
+    """Inserta numeracion de paginas en footers."""
     try:
         for section in doc.sections:
             footer = section.footer
@@ -509,6 +552,7 @@ def agregar_numeracion_paginas(doc):
     except: pass
 
 def generar_documento_core(ruta_json, ruta_salida):
+    """Orquesta la generacion completa del DOCX."""
     data = cargar_contenido(ruta_json)
     doc = Document()
     configurar_formato_unac(doc)

@@ -1,3 +1,9 @@
+{#
+Archivo: app/templates/pages/alerts.html
+Proposito: Lista de alertas/notificaciones por universidad.
+Bloques: content (lista de alertas).
+Donde tocar si falla: loop de alerts y enlaces relacionados.
+#}
 {% extends "base.html" %}
 {% block content %}
 <div class="max-w-3xl mx-auto">
@@ -7,6 +13,7 @@
     <button class="text-sm text-blue-600 font-medium hover:text-blue-800">Marcar todo como leído (placeholder)</button>
   </div>
 
+  {# Lista de alertas #}
   <div class="bg-white rounded-xl shadow-sm border border-gray-200 divide-y divide-gray-100">
     {% for n in alerts %}
     <div class="p-6 flex gap-4 hover:bg-gray-50 transition-colors relative">

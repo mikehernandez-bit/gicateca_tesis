@@ -2,7 +2,7 @@
   "configuracion": {
     "fuente_normal": "Times New Roman",
     "tamano_normal": 12,
-    "ruta_logo": "LogoUNAC.png",
+    "ruta_logo": "app/static/assets/LogoUNAC.png",
     "color_encabezado": "BDD7EE"
   },
   "caratula": {

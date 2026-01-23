@@ -1,9 +1,28 @@
 ﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Generador de maestria UNAC (legacy-style).
-- Espera JSON con schema legacy: caratula/preliminares/cuerpo/finales.
-- Mantiene flujo y secciones similares a generador_informe_tesis.py.
+Archivo: app/universities/unac/centro_formatos/generador_maestria.py
+Proposito:
+- Genera documentos DOCX para maestria UNAC en formato legacy.
+
+Responsabilidades:
+- Cargar JSON legacy y construir el documento con secciones oficiales.
+- Aplicar numeracion romana/arabiga segun lineamientos.
+No hace:
+- No descubre formatos ni valida reglas del catalogo.
+
+Entradas/Salidas:
+- Entradas: ruta JSON y ruta de salida (via CLI o funciones internas).
+- Salidas: archivo DOCX generado en la ruta indicada.
+
+Dependencias:
+- python-docx, json, os, sys, generadores compartidos.
+
+Puntos de extension:
+- Ajustar caratula o secciones si cambia el formato UNAC.
+
+Donde tocar si falla:
+- Revisar cargar_contenido y generar_documento_core.
 """
 import json
 import os
@@ -45,6 +64,7 @@ FALLBACK_FIGURE_PATH = os.path.abspath(os.path.join(BASE_DIR, "..", "..", "..", 
 # ==========================================
 
 def cargar_contenido(path_archivo):
+    """Carga el JSON base desde la ruta indicada o fallback."""
     if not os.path.exists(path_archivo):
         nombre = os.path.basename(path_archivo)
         path_archivo = os.path.join(FORMATS_DIR, nombre)
@@ -62,13 +82,14 @@ def cargar_contenido(path_archivo):
 # ==========================================
 
 def crear_caratula_dinamica(doc, data):
+    """Construye la caratula de maestria desde el JSON."""
     c = data.get("caratula", {})
     agregar_bloque(doc, c.get("universidad", ""), negrita=True, tamano=16, despues=4)
     agregar_bloque(doc, c.get("facultad", ""), negrita=True, tamano=13, despues=4)
     agregar_bloque(doc, c.get("escuela", ""), negrita=True, tamano=13, despues=14)
 
-    ruta_logo = os.path.join(ASSETS_DIR, "LogoUNAC.png")
-    if os.path.exists(ruta_logo):
+    ruta_logo = encontrar_recurso("LogoUNAC.png")
+    if ruta_logo:
         p = doc.add_paragraph()
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
         p.add_run().add_picture(ruta_logo, width=Inches(2.4))
@@ -94,6 +115,7 @@ def crear_caratula_dinamica(doc, data):
 # ==========================================
 
 def _add_label_value(doc, label, value):
+    """Agrega un par label/valor en un parrafo."""
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.LEFT
     run = p.add_run(label or "")
@@ -103,6 +125,7 @@ def _add_label_value(doc, label, value):
 
 
 def agregar_titulo_preliminar(doc, texto):
+    """Agrega un titulo de preliminares con estilo."""
     if not texto:
         return
     p = doc.add_paragraph()
@@ -116,6 +139,7 @@ def agregar_titulo_preliminar(doc, texto):
     run.font.color.rgb = RGBColor(0, 0, 0)
 
 def agregar_informacion_basica(doc, info, add_page_break=True):
+    """Agrega el bloque de informacion basica."""
     if not info:
         return
     agregar_titulo_preliminar(doc, info.get("titulo", "INFORMACION BASICA"))
@@ -126,6 +150,7 @@ def agregar_informacion_basica(doc, info, add_page_break=True):
 
 
 def agregar_hoja_jurado(doc, data, add_page_break=True):
+    """Agrega la hoja de jurado y aprobacion."""
     if not data:
         return
     agregar_titulo_preliminar(doc, data.get("titulo", "HOJA DE REFERENCIA DEL JURADO Y APROBACION"))
@@ -153,6 +178,7 @@ def agregar_hoja_jurado(doc, data, add_page_break=True):
 
 
 def agregar_titulo_indice(doc, texto):
+    """Agrega un titulo centrado para indices."""
     if not texto:
         return
     h = doc.add_heading(texto, level=1)
@@ -166,6 +192,7 @@ def agregar_titulo_indice(doc, texto):
 
 
 def _strip_caption_prefix(label, texto):
+    """Elimina prefijos numericos del caption."""
     if not texto:
         return ""
     t = texto.strip()
@@ -175,11 +202,13 @@ def _strip_caption_prefix(label, texto):
     return t
 
 def _infer_caption_label(texto):
+    """Infere el label (Figura/Tabla) segun el texto."""
     if texto and texto.strip().lower().startswith("figura"):
         return "Figura"
     return "Tabla"
 
 def agregar_caption(doc, label, texto):
+    """Agrega caption numerado para figura o tabla."""
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
     run = p.add_run(f"{label} ")
@@ -197,6 +226,7 @@ def agregar_caption(doc, label, texto):
 
 
 def agregar_abreviaturas(doc, data, add_page_break=True):
+    """Agrega la seccion de abreviaturas."""
     if not data:
         return
     agregar_titulo_indice(doc, data.get("titulo", "INDICE DE ABREVIATURAS"))
@@ -212,6 +242,7 @@ def agregar_abreviaturas(doc, data, add_page_break=True):
 
 
 def agregar_indices(doc, indices):
+    """Genera indices de contenido/tablas/figuras."""
     if not indices:
         return
     agregar_titulo_indice(doc, indices.get("contenido", "INDICE DE CONTENIDO"))
@@ -242,6 +273,7 @@ def agregar_indices(doc, indices):
 
 
 def agregar_preliminares_romanos(doc, data):
+    """Construye preliminares con numeracion romana."""
     p = data.get("preliminares", {})
 
     info = data.get("informacion_basica") or p.get("informacion_basica")
@@ -269,6 +301,7 @@ def agregar_preliminares_romanos(doc, data):
 
 
 def agregar_indices_y_introduccion(doc, data):
+    """Agrega indices y seccion de introduccion."""
     p = data.get("preliminares", {})
     if "indices" in p:
         agregar_indices(doc, p.get("indices"))
@@ -288,6 +321,7 @@ def agregar_indices_y_introduccion(doc, data):
 # ==========================================
 
 def _agregar_imagenes(doc, imagenes):
+    """Inserta imagenes con caption en el documento."""
     for img in imagenes or []:
         caption_raw = img.get("titulo") or "Figura"
         caption_text = _strip_caption_prefix("Figura", caption_raw)
@@ -313,6 +347,7 @@ def _agregar_imagenes(doc, imagenes):
 
 
 def agregar_cuerpo_dinamico(doc, data):
+    """Construye el cuerpo principal desde el JSON."""
     for cap in data.get("cuerpo", []):
         agregar_titulo_formal(doc, cap.get("titulo", ""), espaciado_antes=10)
         if "nota_capitulo" in cap:
@@ -372,6 +407,7 @@ def agregar_cuerpo_dinamico(doc, data):
 # ==========================================
 
 def agregar_finales_dinamico(doc, data):
+    """Construye las secciones finales y anexos."""
     fin = data.get("finales", {})
 
     if "referencias" in fin:
@@ -459,6 +495,7 @@ def configurar_numeracion_maestria(doc):
 
 
 def generar_documento_core(ruta_json, ruta_salida):
+    """Orquesta la generacion completa del DOCX."""
     data = cargar_contenido(ruta_json)
     doc = Document()
     configurar_estilos_base(doc)

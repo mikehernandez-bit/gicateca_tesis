@@ -1,3 +1,9 @@
+{#
+Archivo: app/templates/base.html
+Proposito: Layout base para todas las paginas y carga de assets globales.
+Bloques: block content (contenido de cada pagina).
+Donde tocar si falla: Includes de header/sidebar, active_nav y assets globales.
+#}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -12,15 +18,19 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <link rel="stylesheet" href="/static/css/extra.css">
+  <link rel="icon" type="image/png" href="/static/assets/LogoUNAC.png">
 </head>
 
 <body class="flex h-screen overflow-hidden text-gray-800 bg-gray-50/50">
 
+  {# Sidebar global #}
   {% include "components/sidebar.html" %}
 
   <main class="flex-1 flex flex-col min-w-0 bg-gray-50/50">
+    {# Header global #}
     {% include "components/header.html" %}
 
+    {# Contenido principal #}
     <div id="main-content" class="flex-1 overflow-auto p-8 relative scroll-smooth">
       <div class="fade-in">
         {% block content %}{% endblock %}
@@ -29,6 +39,7 @@
     </div>
   </main>
 
+  {# Scripts base y estado de navegacion #}
   <script>window.__ACTIVE_NAV__ = "{{ active_nav or "" }}";</script>
   <script src="/static/js/navigation.js"></script>
   <script>

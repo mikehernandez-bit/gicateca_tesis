@@ -1,22 +1,34 @@
-from pathlib import Path
-import json
+"""
+Archivo: app/universities/uni/provider.py
+Proposito:
+- Declara el provider UNI para discovery de formatos.
 
-from app.core.loaders import get_data_dir
+Responsabilidades:
+- Configurar code/display_name/data_dir.
+No hace:
+- No define generadores (se espera error si se solicita).
 
-class UNIProvider:
-    code = "uni"
-    name = "UNI"
+Entradas/Salidas:
+- Entradas: N/A (constantes y rutas).
+- Salidas: Instancia PROVIDER utilizada por el registry.
 
-    def list_formatos(self):
-        path = get_data_dir(self.code) / "formatos.json"
-        return json.loads(path.read_text(encoding="utf-8")) if path.exists() else []
+Dependencias:
+- app.core.paths, app.universities.contracts.
 
-    def list_alerts(self):
-        path = get_data_dir(self.code) / "alerts.json"
-        return json.loads(path.read_text(encoding="utf-8")) if path.exists() else []
+Puntos de extension:
+- Agregar generadores al mapa cuando existan scripts.
 
-    def get_formato(self, format_id: str):
-        for f in self.list_formatos():
-            if f.get("id") == format_id:
-                return f
-        return None
+Donde tocar si falla:
+- Revisar data_dir o agregar generator_map si se requiere generar.
+"""
+
+from app.core.paths import get_data_dir
+from app.universities.contracts import SimpleUniversityProvider
+
+# Instancia principal que el registry descubre via PROVIDER.
+PROVIDER = SimpleUniversityProvider(
+    code="uni",
+    display_name="UNI",
+    data_dir=get_data_dir("uni"),
+    generator_map={},
+)

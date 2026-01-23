@@ -1,10 +1,25 @@
-"""Service layer (placeholder) - módulo home
+"""
+Archivo: app/modules/home/service.py
+Proposito:
+- Placeholder de logica de negocio para el modulo home.
 
-Aquí va la lógica del negocio (luego):
-- lectura desde BD o API
-- validación de vigencia
-- filtros, búsquedas
-- versionado, auditoría, etc.
+Responsabilidades:
+- Centralizar operaciones de portada cuando se implementen.
+No hace:
+- No ejecuta logica mientras el modulo sea solo UI.
+
+Entradas/Salidas:
+- Entradas: N/A.
+- Salidas: N/A.
+
+Dependencias:
+- N/A.
+
+Puntos de extension:
+- Agregar funciones de resumen y contenido dinamico.
+
+Donde tocar si falla:
+- Revisar implementaciones futuras del modulo home.
 """
 
-# TODO: implementar lógica del módulo home
+# TODO: implementar logica del modulo home cuando existan endpoints.

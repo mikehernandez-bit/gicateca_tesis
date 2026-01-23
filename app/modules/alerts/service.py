@@ -1,10 +1,25 @@
-"""Service layer (placeholder) - módulo alerts
+"""
+Archivo: app/modules/alerts/service.py
+Proposito:
+- Placeholder de logica de negocio para el modulo alerts.
 
-Aquí va la lógica del negocio (luego):
-- lectura desde BD o API
-- validación de vigencia
-- filtros, búsquedas
-- versionado, auditoría, etc.
+Responsabilidades:
+- Centralizar operaciones sobre alertas cuando se implementen.
+No hace:
+- No ejecuta logica mientras el modulo sea solo UI.
+
+Entradas/Salidas:
+- Entradas: N/A.
+- Salidas: N/A.
+
+Dependencias:
+- N/A.
+
+Puntos de extension:
+- Agregar funciones de lectura/validacion de alertas.
+
+Donde tocar si falla:
+- Revisar implementaciones futuras del modulo alerts.
 """
 
-# TODO: implementar lógica del módulo alerts
+# TODO: implementar logica del modulo alerts cuando existan endpoints.

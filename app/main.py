@@ -1,4 +1,32 @@
-from fastapi import FastAPI
+"""
+Archivo: app/main.py
+Proposito:
+- Inicializa la aplicacion FastAPI, registra routers y configura middleware/globales.
+
+Responsabilidades:
+- Crear la instancia de FastAPI y montar recursos estaticos.
+- Registrar routers de los modulos funcionales.
+- Forzar charset UTF-8 en respuestas de texto/JSON.
+No hace:
+- No implementa logica de negocio ni acceso directo a datos.
+
+Entradas/Salidas:
+- Entradas: Requests HTTP entrantes.
+- Salidas: Responses HTTP de los routers registrados.
+
+Dependencias:
+- FastAPI, StaticFiles, routers de app.modules.*.
+
+Puntos de extension:
+- Agregar middleware global o routers adicionales.
+- Ajustar configuracion de montaje de estaticos.
+
+Donde tocar si falla:
+- Verificar middleware y rutas registradas en este archivo.
+"""
+
+from fastapi import FastAPI, Request
+from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.modules.home.router import router as home_router
@@ -9,11 +37,30 @@ from app.modules.admin.router import router as admin_router
 
 app = FastAPI(title="Formatoteca", version="0.1.0")
 
+@app.middleware("http")
+async def ensure_utf8_charset(request: Request, call_next):
+    # Garantiza que respuestas textuales incluyan charset utf-8.
+    response = await call_next(request)
+    content_type = response.headers.get("content-type")
+    if content_type:
+        lower_type = content_type.lower()
+        if (
+            lower_type.startswith("text/")
+            or lower_type.startswith("application/json")
+            or lower_type.startswith("application/javascript")
+        ) and "charset=" not in lower_type:
+            response.headers["content-type"] = f"{content_type}; charset=utf-8"
+    return response
+
 # Static files
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 app.mount("/recursos_data", StaticFiles(directory="app/data/unac"), name="data_unac")
 
-# Routers (cada módulo es una sección del mockup)
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon():
+    return RedirectResponse(url="/static/assets/LogoUNAC.png")
+
+# Routers (cada modulo es una seccion del mockup)
 app.include_router(home_router)
 app.include_router(catalog_router)
 app.include_router(formats_router)
