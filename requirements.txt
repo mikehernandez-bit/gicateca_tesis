@@ -4,3 +4,4 @@ jinja2==3.1.4
 pydantic
 python-docx
 docx2pdf
+pywin32

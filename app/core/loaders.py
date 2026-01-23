@@ -69,6 +69,59 @@ _ENFOQUE_ALIASES = {
 
 _IGNORE_FILENAMES = {"alerts.json"}
 _HIDDEN_PREFIXES = ("_", "__")
+_MOJIBAKE_PATTERNS = (
+    "\u00c3",
+    "\u00c2",
+    "\u00e2\u20ac",
+    "\u00e2\u20ac\u00a2",
+    "\u00e2\u20ac\u201c",
+    "\u00e2\u20ac\u201d",
+    "\u00c3\u00a1",
+    "\u00c3\u00a9",
+    "\u00c3\u00ad",
+    "\u00c3\u00b3",
+    "\u00c3\u00ba",
+    "\u00c3\u00b1",
+    "\u00c3\u008d",
+    "\u00c3\u009a",
+)
+
+
+def _contains_mojibake(text: str) -> bool:
+    return any(token in text for token in _MOJIBAKE_PATTERNS)
+
+
+def _scan_mojibake(value: Any, path: str, hits: list[tuple[str, str]], limit: int = 5) -> None:
+    if len(hits) >= limit:
+        return
+    if isinstance(value, str):
+        if _contains_mojibake(value):
+            hits.append((path, value))
+        return
+    if isinstance(value, dict):
+        for key, item in value.items():
+            _scan_mojibake(item, f"{path}.{key}", hits, limit)
+            if len(hits) >= limit:
+                return
+        return
+    if isinstance(value, list):
+        for idx, item in enumerate(value):
+            _scan_mojibake(item, f"{path}[{idx}]", hits, limit)
+            if len(hits) >= limit:
+                return
+
+
+def _warn_if_mojibake(data: Any, format_id: str, source_path: Path) -> None:
+    hits: list[tuple[str, str]] = []
+    _scan_mojibake(data, "$", hits)
+    if not hits:
+        return
+    print(f"[WARN] Posible mojibake en {format_id} ({source_path}):")
+    for location, sample in hits:
+        snippet = sample.replace("\n", " ").strip()
+        if len(snippet) > 120:
+            snippet = snippet[:117] + "..."
+        print(f"  - {location}: {snippet}")
 
 
 def _is_ignored_path(path: Path) -> bool:
@@ -257,5 +310,8 @@ def load_format_by_id(format_id: str) -> Dict[str, Any]:
                 "titulo": item.titulo,
                 "path": str(item.path),
             }
+        _warn_if_mojibake(payload, item.format_id, item.path)
         return payload
-    return {"_meta": {"format_id": item.format_id, "uni": item.uni, "path": str(item.path)}, "data": data}
+    payload = {"_meta": {"format_id": item.format_id, "uni": item.uni, "path": str(item.path)}, "data": data}
+    _warn_if_mojibake(payload, item.format_id, item.path)
+    return payload

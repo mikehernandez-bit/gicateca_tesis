@@ -31,11 +31,17 @@ from fastapi.staticfiles import StaticFiles
 
 from app.modules.home.router import router as home_router
 from app.modules.catalog.router import router as catalog_router
-from app.modules.formats.router import router as formats_router
+from app.modules.formats.router import router as formats_router, prewarm_pdfs as _prewarm_pdfs
 from app.modules.alerts.router import router as alerts_router
 from app.modules.admin.router import router as admin_router
 
 app = FastAPI(title="Formatoteca", version="0.1.0")
+
+
+@app.on_event("startup")
+def _prewarm_pdf_cache() -> None:
+    # Precalienta PDFs solo si el flag de entorno esta activo.
+    _prewarm_pdfs()
 
 @app.middleware("http")
 async def ensure_utf8_charset(request: Request, call_next):
