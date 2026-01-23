@@ -515,7 +515,7 @@ def agregar_finales_dinamico(doc, data):
         # 2. Agregar los ejemplos de referencias (ESTO ES LO QUE FALTABA)
         if 'ejemplos' in ref_data:
             p_ej = doc.add_paragraph()
-            p_ej.add_run("Ejemplos de formato:").bold = True
+            p_ej.add_run("Ejemplos de formato estilo APA (7ma edición):").bold = True
             p_ej.paragraph_format.space_after = Pt(6)
             
             for ejemplo in ref_data['ejemplos']:
