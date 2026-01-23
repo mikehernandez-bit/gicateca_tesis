@@ -1,3 +1,28 @@
+"""
+Archivo: app/universities/unac/centro_formatos/generador_informe_tesis.py
+Proposito:
+- Genera documentos DOCX para el formato "informe" de UNAC.
+
+Responsabilidades:
+- Cargar JSON legacy y construir el documento Word con estilos oficiales.
+- Aplicar estructura (caratula, preliminares, cuerpo, finales).
+No hace:
+- No descubre formatos ni valida reglas del catalogo.
+
+Entradas/Salidas:
+- Entradas: ruta JSON y ruta de salida (via CLI o funciones internas).
+- Salidas: archivo DOCX generado en la ruta indicada.
+
+Dependencias:
+- python-docx, json, os, sys.
+
+Puntos de extension:
+- Ajustar estilos/estructura si cambia el formato institucional.
+
+Donde tocar si falla:
+- Revisar cargar_contenido y generar_documento_core.
+"""
+
 import json
 import os
 import sys
@@ -12,10 +37,12 @@ from docx.enum.section import WD_SECTION
 # CONFIGURACIÓN
 # ==========================================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, "..", "..", "..", ".."))
 FORMATS_DIR = os.path.join(BASE_DIR, "formats")
-ASSETS_DIR = os.path.join(BASE_DIR, "assets")
+STATIC_ASSETS_DIR = os.path.join(PROJECT_ROOT, "app", "static", "assets")
 
 def cargar_contenido(path_archivo):
+    """Carga el JSON base desde la ruta indicada o fallback."""
     if not os.path.exists(path_archivo):
         nombre = os.path.basename(path_archivo)
         path_archivo = os.path.join(FORMATS_DIR, nombre)
@@ -41,6 +68,7 @@ def configurar_seccion_unac(section):
     section.bottom_margin = Cm(3.0)
 
 def configurar_estilos_base(doc):
+    """Configura estilos base del documento (fuente e interlineado)."""
     style = doc.styles['Normal']
     font = style.font
     font.name = 'Arial'; font.size = Pt(11)
@@ -59,6 +87,7 @@ def _add_fldSimple(paragraph, instr: str):
     fld.append(r)
 
 def agregar_bloque(doc, texto, negrita=False, tamano=12, antes=0, despues=0):
+    """Agrega un bloque centrado con estilo basico."""
     if not texto: return None
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -70,6 +99,7 @@ def agregar_bloque(doc, texto, negrita=False, tamano=12, antes=0, despues=0):
     return p
 
 def agregar_titulo_formal(doc, texto, espaciado_antes=0):
+    """Agrega un titulo formal nivel 1."""
     if not texto: return
     h = doc.add_heading(texto, level=1)
     h.alignment = WD_ALIGN_PARAGRAPH.LEFT 
@@ -78,6 +108,7 @@ def agregar_titulo_formal(doc, texto, espaciado_antes=0):
     run.font.name = 'Arial'; run.font.size = Pt(14); run.bold = True; run.font.color.rgb = RGBColor(0, 0, 0)
 
 def agregar_nota_estilizada(doc, texto):
+    """Renderiza una nota destacada en una tabla sombreada."""
     if not texto: return
     try:
         table = doc.add_table(rows=1, cols=1)
@@ -115,6 +146,7 @@ def agregar_nota_estilizada(doc, texto):
 
 # --- REFERENCIAS APA 7 ---
 def imprimir_ejemplos_apa(doc, lista_ejemplos):
+    """Imprime referencias APA con sangria francesa."""
     if not lista_ejemplos: return
     p_head = doc.add_paragraph()
     p_head.add_run("Referencias Bibliográficas (Formato APA 7ma Ed.):").bold = True
@@ -134,6 +166,7 @@ def imprimir_ejemplos_apa(doc, lista_ejemplos):
 # ==========================================
 
 def add_compact_p(cell, text, bold=False, color=None, bullet=False):
+    """Agrega un parrafo compacto dentro de una celda."""
     p = cell.add_paragraph(); p.paragraph_format.line_spacing = 1.0; p.paragraph_format.space_after = Pt(2)
     if bullet: p.style = 'List Bullet'; p.paragraph_format.left_indent = Pt(10)
     run = p.add_run(str(text)); run.font.name = 'Arial'; run.font.size = Pt(8); run.bold = bold
@@ -141,6 +174,7 @@ def add_compact_p(cell, text, bold=False, color=None, bullet=False):
     return p
 
 def crear_tabla_matriz_consistencia(doc, matriz_data, es_cualitativo=False):
+    """Construye la tabla de matriz de consistencia."""
     doc.add_paragraph()
     p_t = doc.add_paragraph(); p_t.alignment = WD_ALIGN_PARAGRAPH.CENTER
     titulo = "Anexo 1: Matriz de Categorización" if es_cualitativo else "Anexo 1: Matriz de Consistencia"
@@ -180,7 +214,7 @@ def crear_caratula_dinamica(doc, data):
     agregar_bloque(doc, c.get('facultad', ''), negrita=True, tamano=13, despues=4)
     agregar_bloque(doc, c.get('escuela', ''), negrita=True, tamano=13, despues=25)
     
-    r_l = os.path.join(ASSETS_DIR, "LogoUNAC.png")
+    r_l = os.path.join(STATIC_ASSETS_DIR, "LogoUNAC.png")
     if os.path.exists(r_l):
         p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.CENTER
         p.add_run().add_picture(r_l, width=Inches(2.4))
@@ -199,12 +233,14 @@ def crear_caratula_dinamica(doc, data):
     agregar_bloque(doc, c.get('pais', ''), negrita=True, tamano=11)
 
 def agregar_indice_automatico(doc):
+    """Inserta el indice de contenido automatico."""
     agregar_bloque(doc, "ÍNDICE DE CONTENIDO", negrita=True, tamano=14, despues=12)
     p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.RIGHT; p.add_run("Pág.")
     p2 = doc.add_paragraph()
     _add_fldSimple(p2, 'TOC \\o "1-3" \\h \\z \\u')
 
 def agregar_preliminares_dinamico(doc, data):
+    """Construye las secciones preliminares desde JSON."""
     p = data.get('preliminares', {})
     for sec in ['dedicatoria', 'resumen']:
         if sec in p:
@@ -218,6 +254,7 @@ def agregar_preliminares_dinamico(doc, data):
         doc.add_paragraph(p['introduccion'].get('texto', ''))
 
 def agregar_cuerpo_dinamico(doc, data):
+    """Construye el cuerpo principal y capitulos."""
     for cap in data.get('cuerpo', []):
         agregar_titulo_formal(doc, cap.get('titulo', ''), espaciado_antes=10)
         if 'nota_capitulo' in cap: agregar_nota_estilizada(doc, cap['nota_capitulo'])
@@ -231,6 +268,7 @@ def agregar_cuerpo_dinamico(doc, data):
         doc.add_page_break()
 
 def agregar_finales_dinamico(doc, data):
+    """Construye las secciones finales y anexos."""
     fin = data.get('finales', {})
     if 'referencias' in fin:
         agregar_titulo_formal(doc, fin['referencias'].get('titulo', 'REFERENCIAS BIBLIOGRÁFICAS'))
@@ -252,6 +290,7 @@ def agregar_finales_dinamico(doc, data):
 # ==========================================
 
 def configurar_numeracion_tesis(doc):
+    """Configura numeracion romana y arabiga."""
     doc.sections[0].different_first_page_header_footer = True
     # Carátula y Hoja Respeto no llevan número visible
     for i in range(min(len(doc.sections), 2)):
@@ -268,6 +307,7 @@ def configurar_numeracion_tesis(doc):
         s._sectPr.append(pg); _insertar_n(s.footer)
 
 def _insertar_n(footer):
+    """Inserta el campo PAGE en el footer."""
     p = footer.paragraphs[0] if footer.paragraphs else footer.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.RIGHT; run = p.add_run()
     f1 = OxmlElement('w:fldChar'); f1.set(qn('w:fldCharType'), 'begin')
@@ -276,6 +316,7 @@ def _insertar_n(footer):
     run._r.extend([f1, it, f2])
 
 def generar_documento_core(ruta_json, ruta_salida):
+    """Orquesta la generacion completa del DOCX."""
     data = cargar_contenido(ruta_json); doc = Document(); configurar_estilos_base(doc)
     
     # 1. CARÁTULA

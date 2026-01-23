@@ -1,15 +1,24 @@
+﻿/*
+Archivo: app/static/js/catalog.js
+Proposito: Controla el flujo del catalogo (modo, filtros, modales de vista).
+Responsabilidades: Gestion de UI, filtros de tarjetas y modales de previsualizacion.
+No hace: No consume APIs fuera de /formatos/{id}/data ni maneja routing servidor.
+Entradas/Salidas: Entradas = eventos UI; Salidas = cambios DOM y modales.
+Donde tocar si falla: Revisar funciones de flujo y preview (iniciarFlujo, previewCover, previewReferencias).
+*/
+
 /**
  * catalog.js v6.0
- * Flujo: Nivel 1 (Modo) -> Nivel 2 (Categoría Persistente) -> Nivel 3 (Resultados)
+ * Flujo: Nivel 1 (Modo) -> Nivel 2 (CategorÃ­a Persistente) -> Nivel 3 (Resultados)
  */
 
 let currentMode = 'normal'; // 'normal', 'caratula', 'referencias'
 
 /* ==========================================================================
-   1. GESTIÓN VISUAL (SOMBREADO DE TARJETAS)
+   1. GESTIÃ“N VISUAL (SOMBREADO DE TARJETAS)
    ========================================================================== */
 
-// Sombrea las tarjetas de Nivel 1 (Accesos Rápidos)
+// Sombrea las tarjetas de Nivel 1 (Accesos RÃ¡pidos)
 function highlightTopCard(cardId) {
     document.querySelectorAll('.quick-card').forEach(card => {
         card.classList.remove('ring-2', 'ring-offset-2', 'ring-orange-500', 'ring-indigo-500', 'ring-green-500', 'border-orange-500', 'border-indigo-500', 'border-green-500');
@@ -25,12 +34,12 @@ function highlightTopCard(cardId) {
     else activeCard.classList.add('ring-2', 'ring-offset-2', 'ring-green-500', 'border-green-500');
 }
 
-// Sombrea las tarjetas de Nivel 2 (Filtro Categoría)
+// Sombrea las tarjetas de Nivel 2 (Filtro CategorÃ­a)
 function highlightCategoryCard(cardId) {
     document.querySelectorAll('.cat-card').forEach(card => {
         card.classList.remove('ring-2', 'ring-offset-2', 'ring-blue-500', 'border-blue-500');
         card.classList.add('border-gray-200');
-        // Reset backgrounds (opcional, si quisieras un estado "inactivo" más fuerte)
+        // Reset backgrounds (opcional, si quisieras un estado "inactivo" mÃ¡s fuerte)
     });
 
     const activeCard = document.getElementById(cardId);
@@ -48,7 +57,7 @@ function iniciarFlujo(modo, cardId) {
     currentMode = modo;
     highlightTopCard(cardId);
 
-    // 1. Mostrar Bloque Categorías (Nivel 2)
+    // 1. Mostrar Bloque CategorÃ­as (Nivel 2)
     const categorias = document.getElementById("bloque-categorias");
     categorias.classList.remove("hidden");
     setTimeout(() => { 
@@ -56,11 +65,11 @@ function iniciarFlujo(modo, cardId) {
         categorias.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 50);
 
-    // 2. Ocultar Resultados (Nivel 3) hasta que elija categoría
+    // 2. Ocultar Resultados (Nivel 3) hasta que elija categorÃ­a
     const resultados = document.getElementById("bloque-resultados");
     resultados.classList.add("hidden", "opacity-0", "translate-y-4");
 
-    // 3. Limpiar selección visual del Nivel 2
+    // 3. Limpiar selecciÃ³n visual del Nivel 2
     document.querySelectorAll('.cat-card').forEach(c => {
         c.classList.remove('ring-2', 'ring-offset-2', 'ring-blue-500', 'border-blue-500');
         c.classList.add('border-gray-200');
@@ -78,7 +87,7 @@ function seleccionarCategoriaFinal(filtro, cardId) {
     // 2. Filtrar Grid
     filtrarGrid(filtro);
 
-    // 3. Aplicar Estilos según el Modo (Normal, Carátula, Ref)
+    // 3. Aplicar Estilos segÃºn el Modo (Normal, CarÃ¡tula, Ref)
     aplicarEstilosGrid();
 
     // 4. Mostrar Resultados (Nivel 3)
@@ -119,10 +128,10 @@ function aplicarEstilosGrid() {
             card.classList.add("hover:border-orange-300");
             
             badge.className = "mode-badge absolute top-3 right-3 z-10 bg-orange-100 text-orange-700 text-[10px] font-bold px-2 py-1 rounded shadow-sm border border-orange-200 flex items-center gap-1";
-            badge.innerHTML = `<i data-lucide="eye" class="w-3 h-3"></i> CARÁTULA`;
+            badge.innerHTML = `<i data-lucide="eye" class="w-3 h-3"></i> CARÃTULA`;
             badge.classList.remove("hidden");
 
-            actionText.innerHTML = `Ver Carátula <i data-lucide="eye" class="w-4 h-4"></i>`;
+            actionText.innerHTML = `Ver CarÃ¡tula <i data-lucide="eye" class="w-4 h-4"></i>`;
             actionText.className = "action-text text-orange-600 text-sm font-semibold flex items-center gap-1 group-hover:translate-x-1 transition-transform";
 
         } else if (currentMode === 'referencias') {
@@ -147,7 +156,7 @@ function aplicarEstilosGrid() {
 }
 
 /* ==========================================================================
-   4. INTERCEPTOR DE CLICS (MODALES vs NAVEGACIÓN)
+   4. INTERCEPTOR DE CLICS (MODALES vs NAVEGACIÃ“N)
    ========================================================================== */
 function handleCardClick(event, formatId) {
     if (currentMode === 'caratula') {
@@ -176,7 +185,7 @@ async function fetchFormatData(formatId) {
     return await response.json();
 }
 
-// Modal Carátula
+// Modal CarÃ¡tula
 async function previewCover(formatId) {
     const modal = document.getElementById('coverModal');
     const loader = document.getElementById('coverLoader');
@@ -190,16 +199,22 @@ async function previewCover(formatId) {
         document.getElementById('c-uni').textContent = c.universidad || "UNIVERSIDAD NACIONAL DEL CALLAO";
         document.getElementById('c-fac').textContent = c.facultad || "";
         document.getElementById('c-esc').textContent = c.escuela || "";
-        document.getElementById('c-titulo').textContent = c.titulo_placeholder || "TÍTULO DEL PROYECTO";
+        document.getElementById('c-titulo').textContent = c.titulo_placeholder || "TÃTULO DEL PROYECTO";
         document.getElementById('c-frase').textContent = c.frase_grado || "";
         document.getElementById('c-grado').textContent = c.grado_objetivo || "";
-        document.getElementById('c-lugar').textContent = (c.pais || "CALLAO, PERÚ");
+        document.getElementById('c-lugar').textContent = (c.pais || "CALLAO, PERÃš");
         document.getElementById('c-anio').textContent = (c.fecha || "2026");
+        const guiaEl = document.getElementById('c-guia');
+        if (guiaEl) {
+            const guia = (c.guia || c.nota || "").trim();
+            guiaEl.textContent = guia;
+            guiaEl.classList.toggle('hidden', !guia);
+        }
         loader.classList.add('hidden');
         content.classList.remove('hidden');
     } catch (error) {
         closeModal('coverModal');
-        alert("Error cargando carátula.");
+        alert("Error cargando carÃ¡tula.");
     }
 }
 
@@ -222,8 +237,8 @@ async function previewReferencias(formatId) {
         if (refData.secciones && Array.isArray(refData.secciones)) {
             refData.secciones.forEach(sec => { htmlContent += `<p class="mb-3"><span class="font-bold">${sec.sub || ''}</span> ${sec.texto}</p>`; });
         } else if (refData.contenido && Array.isArray(refData.contenido)) {
-             refData.contenido.forEach(item => { htmlContent += `<p class="mb-2">• ${item.texto}</p>`; });
-        } else if (!refData.titulo) { htmlContent = "<p class='text-gray-500 italic text-center'>No se encontró información.</p>"; }
+             refData.contenido.forEach(item => { htmlContent += `<p class="mb-2">â€¢ ${item.texto}</p>`; });
+        } else if (!refData.titulo) { htmlContent = "<p class='text-gray-500 italic text-center'>No se encontrÃ³ informaciÃ³n.</p>"; }
         list.innerHTML = htmlContent;
         loader.classList.add('hidden');
         content.classList.remove('hidden');
@@ -232,3 +247,4 @@ async function previewReferencias(formatId) {
         alert("Error cargando referencias.");
     }
 }
+

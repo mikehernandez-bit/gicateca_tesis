@@ -1,10 +1,18 @@
+{#
+Archivo: app/templates/components/header.html
+Proposito: Header global con breadcrumb y buscador.
+Bloques: breadcrumb y area de acciones.
+Donde tocar si falla: Render de breadcrumb o estilos de header.
+#}
 <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 shadow-sm z-10">
+  {# Breadcrumb #}
   <div class="flex items-center gap-2 text-sm text-gray-500">
     <span class="font-medium text-gray-900">Formatoteca</span>
     <i data-lucide="chevron-right" class="w-4 h-4"></i>
     <span>{{ breadcrumb or "Inicio" }}</span>
   </div>
 
+  {# Buscador y acciones #}
   <div class="flex items-center gap-4">
     <div class="relative w-96 hidden md:block">
       <i data-lucide="search" class="absolute left-3 top-2.5 w-4 h-4 text-gray-400"></i>

@@ -1,41 +1,38 @@
-"""Service layer for catalog module."""
+"""
+Archivo: app/modules/catalog/service.py
+Proposito:
+- Implementa la logica del catalogo y la generacion de documentos DOCX.
+
+Responsabilidades:
+- Construir el catalogo agrupado desde discovery.
+- Resolver comandos de generador y ejecutar subprocess.
+- Exponer helpers para obtener formatos y limpiar temporales.
+No hace:
+- No define rutas HTTP ni renderiza templates.
+
+Entradas/Salidas:
+- Entradas: ids de formato, tipo/subtipo y codigo de universidad.
+- Salidas: estructuras de catalogo, rutas de archivos y excepciones controladas.
+
+Dependencias:
+- app.core.loaders, app.core.registry, subprocess, tempfile.
+
+Puntos de extension:
+- Ajustar etiquetas del catalogo o mapping de categorias.
+- Integrar nuevos generadores por categoria.
+
+Donde tocar si falla:
+- Revisar resolucion de JSON y ejecucion de generadores.
+"""
 
 from pathlib import Path
-import json
 import subprocess
 import sys
 import tempfile
-from typing import Dict, List
+from typing import Dict, List, Optional, Sequence, Tuple, Union
 
-from app.core.loaders import discover_format_files, load_format_by_id, load_json_file, get_data_dir
-
-ROOT = Path(__file__).resolve().parents[3]
-CF_DIR = ROOT / "app" / "universities" / "unac" / "centro_formatos"
-DOCS_DIR = ROOT / "docs" / "centro_formatos"
-
-SCRIPTS_CONFIG: Dict[str, Dict[str, Dict[str, str]]] = {
-    "proyecto": {
-        "script": "generador_proyecto_tesis.py",
-        "jsons": {
-            "cuant": "proyecto/unac_proyecto_cuant.json",
-            "cual": "proyecto/unac_proyecto_cual.json",
-        },
-    },
-    "informe": {
-        "script": "generador_informe_tesis.py",
-        "jsons": {
-            "cuant": "informe/unac_informe_cuant.json",
-            "cual": "informe/unac_informe_cual.json",
-        },
-    },
-    "maestria": {
-        "script": "generador_maestria.py",
-        "jsons": {
-            "cuant": "maestria/unac_maestria_cuant.json",
-            "cual": "maestria/unac_maestria_cual.json",
-        },
-    },
-}
+from app.core.loaders import discover_format_files, load_format_by_id, load_json_file
+from app.core.registry import get_provider
 
 ALIASES = {
     "pregrado": "informe",
@@ -56,6 +53,7 @@ TIPO_FILTRO = {
 
 
 def _build_format_title(categoria: str, enfoque: str, raw_title: str, fallback_title: str) -> str:
+    """Calcula el titulo visible de un formato."""
     if raw_title:
         return raw_title
     cat_label = TIPO_LABELS.get(categoria)
@@ -68,6 +66,7 @@ def _build_format_title(categoria: str, enfoque: str, raw_title: str, fallback_t
 
 
 def _build_format_entry(item, data: Dict) -> Dict:
+    """Construye el dict que alimenta el catalogo UI."""
     raw_title = data.get("titulo") if isinstance(data, dict) else None
     titulo = _build_format_title(item.categoria, item.enfoque, raw_title, item.titulo)
     cat_label = TIPO_LABELS.get(item.categoria, item.categoria.capitalize())
@@ -87,24 +86,26 @@ def _build_format_entry(item, data: Dict) -> Dict:
         "uni_code": item.uni,
         "tipo": TIPO_FILTRO.get(item.categoria, "Otros"),
         "titulo": titulo,
-        "facultad": "Centro de Formatos UNAC",
-        "escuela": "Direcci\u00f3n Acad\u00e9mica",
+        "facultad": (data.get("facultad") if isinstance(data, dict) and data.get("facultad") else "Centro de Formatos UNAC"),
+        "escuela": (data.get("escuela") if isinstance(data, dict) and data.get("escuela") else "Direcci\u00f3n Acad\u00e9mica"),
         "estado": "VIGENTE",
         "version": data.get("version", "1.0.0") if isinstance(data, dict) else "1.0.0",
-        "fecha": "2026-01-17",
+        "fecha": (data.get("fecha") if isinstance(data, dict) and data.get("fecha") else "2026-01-17"),
         "resumen": resumen,
         "tipo_formato": item.categoria,
         "enfoque": item.enfoque,
     }
 
 
-def build_catalog(uni: str = "unac") -> Dict[str, Dict]:
+def build_catalog(uni: Optional[str] = None) -> Dict[str, Dict]:
+    """Construye el catalogo agrupado por universidad/categoria/enfoque."""
     formatos: List[Dict] = []
     grouped: Dict[str, Dict] = {}
 
     for item in discover_format_files(uni):
+        # Carga data asociada al item descubierto.
         try:
-            data = load_json_file(item.path)
+            data = item.data if item.data is not None else load_json_file(item.path)
         except (FileNotFoundError, ValueError) as exc:
             print(f"Warning: Could not load {item.path}: {exc}")
             continue
@@ -117,57 +118,69 @@ def build_catalog(uni: str = "unac") -> Dict[str, Dict]:
 
 
 def get_all_formatos() -> List[Dict]:
-    """Get all formats discovered under app/data."""
-    return build_catalog()["formatos"]
+    """Retorna todos los formatos descubiertos bajo app/data."""
+    return build_catalog(None)["formatos"]
 
 
 
 def _normalize_format(fmt_type: str) -> str:
+    """Normaliza el tipo de formato (alias -> canonical)."""
     fmt_type = (fmt_type or "").strip().lower()
     if fmt_type in ALIASES:
         fmt_type = ALIASES[fmt_type]
     return fmt_type
 
 
-def _resolve_paths(fmt_type: str, sub_type: str):
-    fmt_type = _normalize_format(fmt_type)
-    if fmt_type not in SCRIPTS_CONFIG:
-        raise ValueError("Formato no valido")
+def _resolve_generator_command(
+    generator: Union[Path, Sequence[str]],
+    json_path: Path,
+    output_path: Path,
+) -> Tuple[List[str], Optional[Path]]:
+    """Resuelve el comando de generador y el directorio de trabajo."""
+    if isinstance(generator, (list, tuple)):
+        cmd = [str(part) for part in generator]
+        workdir = None
+        for part in reversed(generator):
+            part_str = str(part)
+            if part_str.endswith(".py"):
+                workdir = Path(part_str).resolve().parent
+                break
+        return cmd + [str(json_path), str(output_path)], workdir
 
-    config = SCRIPTS_CONFIG[fmt_type]
-    sub_type = (sub_type or "").strip().lower()
-    if sub_type not in config["jsons"]:
-        raise ValueError("Subtipo no valido")
-
-    script_path = CF_DIR / config["script"]
+    script_path = Path(generator)
     if not script_path.exists():
-        raise RuntimeError(f"Script no encontrado: {config['script']}")
-
-    data_dir = get_data_dir()
-    json_path = data_dir / config["jsons"][sub_type]
-    if not json_path.exists():
-        raise RuntimeError(f"JSON no encontrado: {config['jsons'][sub_type]}")
-
-    return fmt_type, sub_type, script_path, json_path
+        raise RuntimeError(f"Script no encontrado: {script_path}")
+    return [sys.executable, str(script_path), str(json_path), str(output_path)], script_path.parent
 
 
 def cleanup_temp_file(path: Path) -> None:
+    """Elimina un archivo temporal si existe."""
     try:
         path.unlink(missing_ok=True)
     except Exception as exc:
         print(f"[WARN] No se pudo eliminar temporal: {exc}")
 
 
-def generate_document(fmt_type: str, sub_type: str):
-    fmt_type, sub_type, script_path, json_path = _resolve_paths(fmt_type, sub_type)
+def generate_document(fmt_type: str, sub_type: str, uni: str = "unac"):
+    """Genera un DOCX para un formato y retorna su ruta temporal."""
+    fmt_type = _normalize_format(fmt_type)
+    sub_type = (sub_type or "").strip().lower()
+    provider = get_provider(uni)
+    generator = provider.get_generator_command(fmt_type)
 
-    filename = f"UNAC_{fmt_type.upper()}_{sub_type.upper()}.docx"
+    # Resuelve el JSON del formato dentro de app/data/<uni>/<categoria>/.
+    json_path = provider.get_data_dir() / fmt_type / f"{provider.code}_{fmt_type}_{sub_type}.json"
+    if not json_path.exists():
+        raise RuntimeError(f"JSON no encontrado: {json_path}")
+
+    filename = f"{provider.code.upper()}_{fmt_type.upper()}_{sub_type.upper()}.docx"
     tmp_file = tempfile.NamedTemporaryFile(prefix="unac_", suffix=".docx", delete=False)
     output_path = Path(tmp_file.name)
     tmp_file.close()
 
-    cmd = [sys.executable, str(script_path), str(json_path), str(output_path)]
-    result = subprocess.run(cmd, cwd=str(CF_DIR), capture_output=True, text=True)
+    # Ejecuta el script generador sin modificar su logica interna.
+    cmd, workdir = _resolve_generator_command(generator, json_path, output_path)
+    result = subprocess.run(cmd, cwd=str(workdir) if workdir else None, capture_output=True, text=True)
 
     if result.returncode != 0:
         print("[ERROR PYTHON]", result.stderr)
@@ -184,6 +197,7 @@ def get_format_json_content(format_id: str) -> Dict:
     Busca y devuelve el contenido crudo del JSON para las vistas previas.
     ID esperado: unac-informe-cual -> app/data/unac/informe/unac_informe_cual.json
     """
+    # Reutiliza el loader central para obtener contenido legacy.
     try:
         return load_format_by_id(format_id)
     except Exception as e:

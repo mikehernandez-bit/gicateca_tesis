@@ -1,5 +1,27 @@
 #!/usr/bin/env python
-"""Test script to verify catalog data loading."""
+"""
+Archivo: test_data.py
+Proposito:
+- Ejecuta pruebas manuales basicas sobre catalogo y formatos.
+
+Responsabilidades:
+- Invocar servicios de catalogo y formatos y reportar resultados en consola.
+No hace:
+- No modifica datos ni genera documentos.
+
+Entradas/Salidas:
+- Entradas: N/A (usa IDs de prueba fijos).
+- Salidas: Codigo de salida 0/1 y logs en consola.
+
+Dependencias:
+- app.modules.catalog.service, app.modules.formats.service.
+
+Puntos de extension:
+- Agregar casos de prueba o IDs adicionales.
+
+Donde tocar si falla:
+- Revisar servicios llamados y los IDs de prueba.
+"""
 import sys
 from pathlib import Path
 from app.modules.catalog.service import get_all_formatos
@@ -12,6 +34,7 @@ def test_catalog():
     print("=" * 60)
     
     try:
+        # Carga el catalogo completo y lista formatos basicos.
         formatos = get_all_formatos()
         print(f"✓ Loaded {len(formatos)} formatos")
         
@@ -33,6 +56,7 @@ def test_formats():
     print("Testing Formats Service")
     print("=" * 60)
     
+    # IDs representativos para validar carga de formatos.
     test_ids = [
         "unac-informe-cual",
         "unac-proyecto-cuant",
