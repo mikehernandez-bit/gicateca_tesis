@@ -23,53 +23,266 @@ Puntos de extension:
 Donde tocar si falla:
 - Revisar generacion en service y conversion PDF en _convert_docx_to_pdf.
 """
-import tempfile
+import atexit
+import hashlib
+import json
+import os
+import shutil
+import threading
+import time
+from email.utils import formatdate, parsedate_to_datetime
 from pathlib import Path
 
 import pythoncom
 import win32com.client
-from fastapi import APIRouter, Request, HTTPException, BackgroundTasks
+from fastapi import APIRouter, Request, HTTPException, BackgroundTasks, Response
 from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
 
 from app.core.loaders import find_format_index, load_format_by_id
+from app.core.paths import get_docx_cache_dir, get_pdf_cache_dir
 from app.core.registry import get_provider
 from app.core.templates import templates
 from app.modules.formats import service
 
 router = APIRouter(prefix="/formatos", tags=["formatos"])
 
+_WORD_LOCK = threading.Lock()
+_WORD_APP = None
+_PDF_CACHE_MAX_AGE = int(os.getenv("PDF_CACHE_MAX_AGE", "3600"))
+_PDF_PREWARM_ON_STARTUP = os.getenv("PDF_PREWARM_ON_STARTUP", "false").lower() in ("1", "true", "yes", "on")
 
-def _convert_docx_to_pdf(docx_path: str, pdf_path: str) -> None:
-    """Convierte a PDF actualizando campos para que el índice salga completo."""
-    # Automatiza Word para actualizar indices y exportar a PDF.
-    pythoncom.CoInitialize()
-    word = None
-    doc = None
-    try:
-        word = win32com.client.DispatchEx("Word.Application")
-        word.Visible = False
-        word.DisplayAlerts = 0
-        doc = word.Documents.Open(docx_path, ReadOnly=0, AddToRecentFiles=False)
-        doc.Fields.Update()
-        for toc in doc.TablesOfContents:
-            toc.Update()
-        for tof in doc.TablesOfFigures:
-            tof.Update()
-        doc.SaveAs(pdf_path, FileFormat=17)
-    finally:
-        if doc is not None:
-            doc.Close(False)
-        if word is not None:
-            word.Quit()
-        pythoncom.CoUninitialize()
+
+def _ensure_cache_dirs() -> tuple[Path, Path]:
+    """Crea (si falta) los directorios de cache DOCX/PDF."""
+    docx_dir = get_docx_cache_dir()
+    pdf_dir = get_pdf_cache_dir()
+    docx_dir.mkdir(parents=True, exist_ok=True)
+    pdf_dir.mkdir(parents=True, exist_ok=True)
+    return docx_dir, pdf_dir
+
+
+def _get_cached_docx_path(format_id: str) -> Path:
+    """Ruta de cache DOCX para un format_id."""
+    docx_dir, _ = _ensure_cache_dirs()
+    safe_name = format_id.replace("/", "_")
+    return docx_dir / f"{safe_name}.docx"
 
 
 def _get_cached_pdf_path(format_id: str) -> Path:
-    """Retorna la ruta de cache para PDFs generados."""
-    cache_dir = Path(tempfile.gettempdir()) / "formatoteca_unac_pdf_cache"
-    cache_dir.mkdir(parents=True, exist_ok=True)
+    """Ruta de cache PDF para un format_id."""
+    _, pdf_dir = _ensure_cache_dirs()
     safe_name = format_id.replace("/", "_")
-    return cache_dir / f"{safe_name}.pdf"
+    return pdf_dir / f"{safe_name}.pdf"
+
+
+def _get_manifest_path(format_id: str) -> Path:
+    """Ruta de manifest JSON para un format_id."""
+    _, pdf_dir = _ensure_cache_dirs()
+    safe_name = format_id.replace("/", "_")
+    return pdf_dir / f"{safe_name}.manifest.json"
+
+
+def _is_cache_fresh(path: Path, source_mtime: float) -> bool:
+    """Verifica si el cache es mas nuevo que la fuente."""
+    return path.exists() and path.stat().st_mtime >= source_mtime
+
+
+def _calculate_sha256(path: Path) -> str:
+    """Calcula SHA256 de un archivo."""
+    sha = hashlib.sha256()
+    with open(path, "rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            sha.update(chunk)
+    return sha.hexdigest()
+
+
+def _replace_cached_file(src: Path, dest: Path) -> None:
+    """Reemplaza dest con src (copia segura si cambia de unidad)."""
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        os.replace(src, dest)
+    except OSError:
+        shutil.copy2(src, dest)
+        try:
+            src.unlink()
+        except Exception:
+            pass
+
+
+def _build_etag(format_id: str, source_mtime: float) -> str:
+    """Construye ETag estable basado en fuente."""
+    raw = f"{format_id}:{int(source_mtime)}".encode("utf-8")
+    return f"\"{hashlib.md5(raw).hexdigest()}\""
+
+
+def _http_date(timestamp: float) -> str:
+    """Convierte timestamp a HTTP-date."""
+    ts = int(timestamp) if timestamp else int(time.time())
+    return formatdate(ts, usegmt=True)
+
+
+def _is_client_cache_valid(request: Request, etag: str, source_mtime: float) -> bool:
+    """Evalua If-None-Match/If-Modified-Since para responder 304."""
+    inm = request.headers.get("if-none-match")
+    if inm and inm.strip() == etag:
+        return True
+    ims = request.headers.get("if-modified-since")
+    if ims:
+        try:
+            ims_dt = parsedate_to_datetime(ims)
+            if ims_dt.timestamp() >= source_mtime:
+                return True
+        except Exception:
+            return False
+    return False
+
+
+def _build_cache_headers(format_id: str, source_mtime: float) -> dict[str, str]:
+    """Construye headers HTTP para cache del navegador."""
+    etag = _build_etag(format_id, source_mtime)
+    return {
+        "Cache-Control": f"public, max-age={_PDF_CACHE_MAX_AGE}",
+        "ETag": etag,
+        "Last-Modified": _http_date(source_mtime),
+    }
+
+
+def _write_manifest(
+    format_id: str,
+    json_path: Path,
+    json_mtime: float,
+    generator_path: Path | None,
+    generator_mtime: float,
+    docx_path: Path,
+    pdf_path: Path,
+) -> None:
+    """Escribe un manifest JSON para depuracion de cache."""
+    manifest_path = _get_manifest_path(format_id)
+    payload = {
+        "format_id": format_id,
+        "json_path": str(json_path),
+        "json_mtime": json_mtime,
+        "generator_script_path": str(generator_path) if generator_path else None,
+        "generator_mtime": generator_mtime,
+        "created_at": _http_date(time.time()),
+        "docx_path": str(docx_path),
+        "pdf_path": str(pdf_path),
+    }
+    try:
+        payload["sha256_pdf"] = _calculate_sha256(pdf_path)
+    except Exception:
+        payload["sha256_pdf"] = None
+    manifest_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+
+def _get_word_app():
+    """Retorna instancia singleton de Word (COM)."""
+    global _WORD_APP
+    if _WORD_APP is None:
+        _WORD_APP = win32com.client.DispatchEx("Word.Application")
+        _WORD_APP.Visible = False
+        _WORD_APP.DisplayAlerts = 0
+    return _WORD_APP
+
+
+def _reset_word_app() -> None:
+    """Reinicia la instancia singleton de Word."""
+    global _WORD_APP
+    if _WORD_APP is not None:
+        try:
+            _WORD_APP.Quit()
+        except Exception:
+            pass
+        _WORD_APP = None
+
+
+def _shutdown_word_app() -> None:
+    """Cierra Word al terminar el proceso."""
+    with _WORD_LOCK:
+        _reset_word_app()
+
+
+atexit.register(_shutdown_word_app)
+
+
+def _convert_docx_to_pdf(docx_path: str, pdf_path: str) -> None:
+    """Convierte a PDF actualizando campos para que el indice salga completo."""
+    # Automatiza Word para actualizar indices y exportar a PDF.
+    with _WORD_LOCK:
+        pythoncom.CoInitialize()
+        doc = None
+        try:
+            word = _get_word_app()
+            doc = word.Documents.Open(docx_path, ReadOnly=0, AddToRecentFiles=False)
+            doc.Fields.Update()
+            for toc in doc.TablesOfContents:
+                toc.Update()
+            for tof in doc.TablesOfFigures:
+                tof.Update()
+            doc.SaveAs(pdf_path, FileFormat=17)
+        except Exception:
+            # Si Word falla, se reinicia el singleton para la proxima conversion.
+            _reset_word_app()
+            raise
+        finally:
+            if doc is not None:
+                doc.Close(False)
+            pythoncom.CoUninitialize()
+
+
+def _ensure_docx_cached(format_id: str, source_mtime: float) -> Path:
+    """Genera o reutiliza el DOCX cacheado."""
+    docx_path = _get_cached_docx_path(format_id)
+    if _is_cache_fresh(docx_path, source_mtime):
+        return docx_path
+
+    generated_path, _filename = service.generate_document(format_id)
+    _replace_cached_file(Path(generated_path), docx_path)
+    return docx_path
+
+
+def _ensure_pdf_cached(format_id: str, source_mtime: float) -> Path:
+    """Genera o reutiliza el PDF cacheado."""
+    pdf_path = _get_cached_pdf_path(format_id)
+    if _is_cache_fresh(pdf_path, source_mtime):
+        return pdf_path
+
+    docx_path = _ensure_docx_cached(format_id, source_mtime)
+    if pdf_path.exists():
+        try:
+            pdf_path.unlink()
+        except Exception:
+            pass
+    _convert_docx_to_pdf(str(docx_path), str(pdf_path))
+    return pdf_path
+
+
+def prewarm_pdfs() -> None:
+    """Precalienta el cache de PDF si esta habilitado por entorno."""
+    if not _PDF_PREWARM_ON_STARTUP:
+        return
+
+    try:
+        from app.core.loaders import discover_format_files
+    except Exception as exc:
+        print(f"[WARN] prewarm import failed: {exc}")
+        return
+
+    items = discover_format_files(None)
+    if not items:
+        return
+
+    # Prioriza UNAC; si no hay, precalienta todo lo disponible.
+    candidates = [item.format_id for item in items if item.uni == "unac"]
+    if not candidates:
+        candidates = [item.format_id for item in items]
+
+    for format_id in candidates:
+        try:
+            source_mtime = _get_source_mtime(format_id)
+            _ensure_pdf_cached(format_id, source_mtime)
+        except Exception as exc:
+            print(f"[WARN] prewarm failed {format_id}: {exc}")
 
 
 def _resolve_generator_path(generator) -> Path | None:
@@ -91,22 +304,43 @@ def _resolve_generator_path(generator) -> Path | None:
     return path if path.exists() else None
 
 
-def _get_source_mtime(format_id: str) -> float:
-    """Obtiene mtime del JSON y script para invalidar cache PDF."""
+def _get_source_info(format_id: str):
+    """Obtiene info de fuentes para invalidacion y manifest."""
     item = find_format_index(format_id)
     if not item:
-        return 0.0
+        return None, None, 0.0, None, 0.0, 0.0
+
     json_path = item.path
     json_mtime = json_path.stat().st_mtime if json_path.exists() else 0.0
+    script_path = None
     script_mtime = 0.0
+    extra_mtime = 0.0
+
     try:
         provider = get_provider(item.uni)
         generator = provider.get_generator_command(item.categoria)
         script_path = _resolve_generator_path(generator)
         script_mtime = script_path.stat().st_mtime if script_path and script_path.exists() else 0.0
     except Exception:
+        script_path = None
         script_mtime = 0.0
-    return max(json_mtime, script_mtime)
+
+    extra_paths = [
+        Path(__file__).resolve().parent / "service.py",
+        Path(__file__).resolve().parents[2] / "core" / "loaders.py",
+    ]
+    for path in extra_paths:
+        if path.exists():
+            extra_mtime = max(extra_mtime, path.stat().st_mtime)
+
+    source_mtime = max(json_mtime, script_mtime, extra_mtime)
+    return item, json_path, json_mtime, script_path, script_mtime, source_mtime
+
+
+def _get_source_mtime(format_id: str) -> float:
+    """Obtiene mtime total de fuentes para invalidar cache PDF."""
+    _item, _json_path, _json_mtime, _script_path, _script_mtime, source_mtime = _get_source_info(format_id)
+    return source_mtime
 
 
 @router.get("/{format_id}", response_class=HTMLResponse)
@@ -170,27 +404,43 @@ async def generate_format_document(format_id: str, background_tasks: BackgroundT
 
 
 @router.get("/{format_id}/pdf")
-async def get_format_pdf(format_id: str):
+async def get_format_pdf(format_id: str, request: Request):
     """Genera el DOCX, lo convierte a PDF y lo devuelve."""
     try:
+        item, json_path, json_mtime, script_path, script_mtime, source_mtime = _get_source_info(format_id)
+        headers = _build_cache_headers(format_id, source_mtime)
         cached_pdf = _get_cached_pdf_path(format_id)
-        source_mtime = _get_source_mtime(format_id)
-        if cached_pdf.exists() and cached_pdf.stat().st_mtime >= source_mtime:
+
+        if _is_cache_fresh(cached_pdf, source_mtime):
             # Reutiliza PDF si el JSON y el generador no cambiaron.
+            if _is_client_cache_valid(request, headers["ETag"], source_mtime):
+                return Response(status_code=304, headers=headers)
             return FileResponse(
                 path=str(cached_pdf),
                 media_type="application/pdf",
                 content_disposition_type="inline",
+                headers=headers,
             )
 
-        docx_path, _ = service.generate_document(format_id)
-        _convert_docx_to_pdf(str(docx_path), str(cached_pdf))
-        service.cleanup_temp_file(docx_path)
+        pdf_path = _ensure_pdf_cached(format_id, source_mtime)
+        docx_path = _get_cached_docx_path(format_id)
+        if item and json_path:
+            _write_manifest(
+                format_id=format_id,
+                json_path=json_path,
+                json_mtime=json_mtime,
+                generator_path=script_path,
+                generator_mtime=script_mtime,
+                docx_path=docx_path,
+                pdf_path=pdf_path,
+            )
 
+        headers = _build_cache_headers(format_id, source_mtime)
         return FileResponse(
-            path=str(cached_pdf),
+            path=str(pdf_path),
             media_type="application/pdf",
             content_disposition_type="inline",
+            headers=headers,
         )
 
     except Exception as e:

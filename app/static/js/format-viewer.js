@@ -8,8 +8,8 @@ Donde tocar si falla: Revisar fetchFormatJson, previewCover/previewIndex/preview
 */
 
 /**
- * LÃ³gica para visualizaciÃ³n y descarga de formatos.
- * Maneja: Word (Descarga), PDF (Preview), CarÃ¡tula (JSON), Ãndice (JSON) y CapÃ­tulos (JSON).
+ * Lógica para visualización y descarga de formatos.
+ * Maneja: Word (Descarga), PDF (Preview), Carátula (JSON), Índice (JSON) y Capítulos (JSON).
  */
 
 function buildJsonPath(formatId) {
@@ -63,7 +63,7 @@ async function downloadDocument(formatId) {
     window.URL.revokeObjectURL(url);
     a.remove();
     
-    btnText.textContent = 'Descargado âœ“';
+    btnText.textContent = 'Descargado ✓';
     setTimeout(() => {
       btnText.textContent = originalText;
       btn.disabled = false;
@@ -97,7 +97,7 @@ function closePdfModal() {
     viewer.src = ''; 
 }
 
-// --- 3. Visualizador de CarÃ¡tula (JSON) ---
+// --- 3. Visualizador de Carátula (JSON) ---
 async function previewCover(formatId) {
     const modal = document.getElementById('coverModal');
     const loader = document.getElementById('coverLoader');
@@ -110,15 +110,15 @@ async function previewCover(formatId) {
     try {
         const data = await fetchFormatJson(formatId);
         const c = data.caratula || {};
-        if (!Object.keys(c).length) throw new Error("No se encontrÃ³ configuraciÃ³n de carÃ¡tula.");
+        if (!Object.keys(c).length) throw new Error("No se encontró configuración de carátula.");
 
         document.getElementById('c-uni').textContent = c.universidad || "UNIVERSIDAD NACIONAL DEL CALLAO";
         document.getElementById('c-fac').textContent = c.facultad || "";
         document.getElementById('c-esc').textContent = c.escuela || "";
-        document.getElementById('c-titulo').textContent = c.titulo_placeholder || "TÃTULO DE INVESTIGACIÃ“N";
+        document.getElementById('c-titulo').textContent = c.titulo_placeholder || "TÍTULO DE INVESTIGACIÓN";
         document.getElementById('c-frase').textContent = c.frase_grado || "";
         document.getElementById('c-grado').textContent = c.grado_objetivo || "";
-        document.getElementById('c-lugar').textContent = (c.pais || "CALLAO, PERÃš");
+        document.getElementById('c-lugar').textContent = (c.pais || "CALLAO, PERÚ");
         document.getElementById('c-anio').textContent = (c.fecha || "2026");
         const guiaEl = document.getElementById('c-guia');
         if (guiaEl) {
@@ -132,7 +132,7 @@ async function previewCover(formatId) {
 
     } catch (error) {
         console.error(error);
-        alert("Error cargando carÃ¡tula: " + error.message);
+        alert("Error cargando carátula: " + error.message);
         closeCoverModal();
     }
 }
@@ -141,7 +141,7 @@ function closeCoverModal() {
     document.getElementById('coverModal').classList.add('hidden');
 }
 
-// --- 4. Visualizador de Ãndice (Inteligente) ---
+// --- 4. Visualizador de Índice (Inteligente) ---
 async function previewIndex(formatId) {
     const modal = document.getElementById('indexModal');
     const loader = document.getElementById('indexLoader');
@@ -198,7 +198,7 @@ async function previewIndex(formatId) {
 
     } catch (error) {
         console.error(error);
-        alert("Error cargando Ã­ndice: " + error.message);
+        alert("Error cargando índice: " + error.message);
         closeIndexModal();
     }
 }
@@ -207,7 +207,7 @@ function closeIndexModal() {
     document.getElementById('indexModal').classList.add('hidden');
 }
 
-// --- 5. Visualizador GenÃ©rico de CapÃ­tulos (I al VII) ---
+// --- 5. Visualizador Genérico de Capítulos (I al VII) ---
 async function previewChapter(formatId, searchPrefix) {
     const modal = document.getElementById('chapterModal');
     const loader = document.getElementById('chapterLoader');
@@ -223,7 +223,7 @@ async function previewChapter(formatId, searchPrefix) {
     try {
         const data = await fetchFormatJson(formatId);
 
-        // BÃšSQUEDA INTELIGENTE
+        // BÚSQUEDA INTELIGENTE
         let capitulo = null;
         // 1. Buscar en el cuerpo
         if (data.cuerpo) {
@@ -241,10 +241,10 @@ async function previewChapter(formatId, searchPrefix) {
             }
         }
 
-        if (!capitulo) throw new Error(`No se encontrÃ³ el CapÃ­tulo ${searchPrefix} en el JSON.`);
+        if (!capitulo) throw new Error(`No se encontró el Capítulo ${searchPrefix} en el JSON.`);
 
         // RENDERIZADO
-        titleContainer.textContent = capitulo.titulo || capitulo.titulo_seccion || "CapÃ­tulo";
+        titleContainer.textContent = capitulo.titulo || capitulo.titulo_seccion || "Capítulo";
 
         // Caso A: Lista de contenidos
         if (capitulo.contenido && Array.isArray(capitulo.contenido)) {
@@ -293,18 +293,18 @@ async function previewChapter(formatId, searchPrefix) {
 
     } catch (error) {
         console.error(error);
-        alert("InformaciÃ³n: " + error.message);
+        alert("Información: " + error.message);
         closeChapterModal();
     }
 }
 
-// ESTA ES LA FUNCIÃ“N QUE FALTABA O FALLABA
+// ESTA ES LA FUNCIÓN QUE FALTABA O FALLABA
 function closeChapterModal() {
     document.getElementById('chapterModal').classList.add('hidden');
 }
 
 /**
- * Genera dinÃ¡micamente la lista de requisitos desde el JSON
+ * Genera dinámicamente la lista de requisitos desde el JSON
  */
 async function hydrateRequirementsList() {
     const container = document.getElementById('formatRequirements');
@@ -320,30 +320,30 @@ async function hydrateRequirementsList() {
         // 2. Limpiar contenedor
         container.innerHTML = '';
         
-        // 3. Siempre agregar CarÃ¡tula e Ãndice
+        // 3. Siempre agregar Carátula e Índice
         container.appendChild(buildRequirementItem(
-            "CarÃ¡tula Institucional",
+            "Carátula Institucional",
             "Debe seguir estrictamente el modelo oficial.",
             () => previewCover(formatId)
         ));
         
         container.appendChild(buildRequirementItem(
-            "Ãndice General",
-            "Generado automÃ¡ticamente por Word con estilos aplicados.",
+            "Índice General",
+            "Generado automáticamente por Word con estilos aplicados.",
             () => previewIndex(formatId)
         ));
         
-        // 4. Agregar capÃ­tulos del cuerpo
+        // 4. Agregar capítulos del cuerpo
         if (data.cuerpo && Array.isArray(data.cuerpo)) {
             data.cuerpo.forEach((capitulo) => {
                 if (!capitulo.titulo) return;
                 
-                // Extraer nÃºmero romano del tÃ­tulo (I., II., III., etc.)
+                // Extraer número romano del título (I., II., III., etc.)
                 const match = capitulo.titulo.match(/^([IVXLCDM]+)\./);
                 const prefijo = match ? match[1] + '.' : '';
                 
-                // Obtener descripciÃ³n del capÃ­tulo
-                let descripcion = "Estructura principal del capÃ­tulo.";
+                // Obtener descripción del capítulo
+                let descripcion = "Estructura principal del capítulo.";
                 
                 if (capitulo.nota_capitulo) {
                     descripcion = capitulo.nota_capitulo;
@@ -365,7 +365,7 @@ async function hydrateRequirementsList() {
                         descripcion = primerContenido.texto;
                     }
                 }
-                // Truncar descripciÃ³n si es muy larga
+                // Truncar descripción si es muy larga
                 if (descripcion.length > 100) {
                     descripcion = descripcion.substring(0, 97) + '...';
                 }
@@ -383,13 +383,13 @@ async function hydrateRequirementsList() {
         let referenciasDescripcion = null;
         let referenciasPrefijo = null;
         
-        // OpciÃ³n A: Buscar en data.finales.referencias
+        // Opción A: Buscar en data.finales.referencias
         if (data.finales?.referencias?.titulo) {
             referenciasTitulo = data.finales.referencias.titulo;
-            referenciasDescripcion = data.finales.referencias.nota || "Normativa bibliogrÃ¡fica segÃºn corresponda.";
-            referenciasPrefijo = "REFERENCIAS"; // Palabra clave para bÃºsqueda
+            referenciasDescripcion = data.finales.referencias.nota || "Normativa bibliográfica según corresponda.";
+            referenciasPrefijo = "REFERENCIAS"; // Palabra clave para búsqueda
         } 
-        // OpciÃ³n B: Buscar en el cuerpo (por si estÃ¡ como capÃ­tulo)
+        // Opción B: Buscar en el cuerpo (por si está como capítulo)
         else if (data.cuerpo && Array.isArray(data.cuerpo)) {
             const capituloReferencias = data.cuerpo.find(cap => 
                 cap.titulo && (
@@ -400,13 +400,13 @@ async function hydrateRequirementsList() {
             
             if (capituloReferencias) {
                 referenciasTitulo = capituloReferencias.titulo;
-                referenciasDescripcion = capituloReferencias.nota_capitulo || capituloReferencias.nota || "Normativa bibliogrÃ¡fica segÃºn corresponda.";
+                referenciasDescripcion = capituloReferencias.nota_capitulo || capituloReferencias.nota || "Normativa bibliográfica según corresponda.";
                 const match = capituloReferencias.titulo.match(/^([IVXLCDM]+)\./);
                 referenciasPrefijo = match ? match[1] + '.' : 'REFERENCIAS';
             }
         }
         
-        // Agregar la tarjeta de Referencias si se encontrÃ³
+        // Agregar la tarjeta de Referencias si se encontró
         if (referenciasTitulo) {
             container.appendChild(buildRequirementItem(
                 referenciasTitulo,
@@ -419,12 +419,12 @@ async function hydrateRequirementsList() {
         if (data.finales?.anexos) {
             const anexos = data.finales.anexos;
             const anexosTitulo = anexos.titulo_seccion || "Anexos";
-            const anexosDescripcion = anexos.nota_general || anexos.nota || "DocumentaciÃ³n complementaria.";
+            const anexosDescripcion = anexos.nota_general || anexos.nota || "Documentación complementaria.";
             
             container.appendChild(buildRequirementItem(
                 anexosTitulo,
                 anexosDescripcion,
-                null // Sin preview por ahora, o puedes crear una funciÃ³n previewAnexos
+                null // Sin preview por ahora, o puedes crear una función previewAnexos
             ));
         }
         
@@ -462,7 +462,7 @@ function buildRequirementItem(title, description, onPreview) {
     h4.textContent = title;
     header.appendChild(h4);
     
-    // BotÃ³n de preview (si existe callback)
+    // Botón de preview (si existe callback)
     if (onPreview) {
         const btn = document.createElement('button');
         btn.className = "text-gray-400 hover:text-blue-600 transition-colors p-1 rounded-md hover:bg-blue-50";
@@ -474,7 +474,7 @@ function buildRequirementItem(title, description, onPreview) {
     
     body.appendChild(header);
     
-    // DescripciÃ³n
+    // Descripción
     if (description) {
         const p = document.createElement('p');
         p.className = "text-sm text-gray-600 mt-1";
@@ -486,7 +486,7 @@ function buildRequirementItem(title, description, onPreview) {
     return wrapper;
 }
 
-// Ejecutar al cargar la pÃ¡gina
+// Ejecutar al cargar la página
 document.addEventListener('DOMContentLoaded', hydrateRequirementsList);
 
 

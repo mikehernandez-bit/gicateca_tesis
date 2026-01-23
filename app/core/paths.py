@@ -51,3 +51,18 @@ def get_data_dir(code: str) -> Path:
 def get_exports_dir() -> Path:
     """Retorna el directorio de exports/documentos."""
     return get_project_root() / "docs"
+
+
+def get_cache_root() -> Path:
+    """Retorna la raiz de cache persistente dentro de app/."""
+    return get_app_root() / ".cache"
+
+
+def get_docx_cache_dir() -> Path:
+    """Retorna la carpeta de cache para DOCX."""
+    return get_cache_root() / "docx"
+
+
+def get_pdf_cache_dir() -> Path:
+    """Retorna la carpeta de cache para PDF."""
+    return get_cache_root() / "pdf"

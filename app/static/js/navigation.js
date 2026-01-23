@@ -7,7 +7,7 @@ Entradas/Salidas: Entradas = valor active_nav; Salidas = clases CSS en DOM.
 Donde tocar si falla: Revisar data-nav en templates y asignacion de __ACTIVE_NAV__.
 */
 
-// Activa el item del sidebar segÃºn `active_nav` inyectado por el backend (Jinja)
+// Activa el item del sidebar según `active_nav` inyectado por el backend (Jinja)
 // En este scaffold, se marca con un atributo data-nav, y el backend pasa `active_nav`.
 
 (function() {

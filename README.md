@@ -28,6 +28,9 @@ Luego abre:
 
 ## Reglas
 - No hacer push directo a `main`.
+
+## Verificacion de encoding
+- Ejecutar: `python scripts/check_mojibake.py`
   
 ## Mockup original
 Está guardado en `ui/mockup/index.html` como referencia visual.
