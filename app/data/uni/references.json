@@ -1,0 +1,11 @@
+{
+  "university": "uni",
+  "title": "Normas de citación (UNI)",
+  "enabled": ["ieee","apa7","iso690"],
+  "order": ["ieee","apa7","iso690"],
+  "notes": {
+    "ieee": "Preferido en áreas técnicas. Mantén la numeración consistente.",
+    "apa7": "Usar cuando la escuela lo solicite (citas autor-fecha).",
+    "iso690": "Útil si se acepta ISO como estándar institucional."
+  }
+}

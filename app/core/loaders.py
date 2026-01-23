@@ -25,6 +25,7 @@ Donde tocar si falla:
 """
 import json
 import re
+import unicodedata
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -69,6 +70,14 @@ _ENFOQUE_ALIASES = {
 
 _IGNORE_FILENAMES = {"alerts.json"}
 _HIDDEN_PREFIXES = ("_", "__")
+_REFERENCE_NAMES = {
+    "references",
+    "referencias",
+    "bibliografia",
+    "bibliografica",
+    "bibliograficas",
+}
+_REFERENCE_DIRS = {"references", "referencias"}
 _MOJIBAKE_PATTERNS = (
     "\u00c3",
     "\u00c2",
@@ -124,13 +133,30 @@ def _warn_if_mojibake(data: Any, format_id: str, source_path: Path) -> None:
         print(f"  - {location}: {snippet}")
 
 
+def _normalize_name(value: str) -> str:
+    """Normaliza nombres para comparaciones robustas (sin tildes)."""
+    cleaned = (value or "").strip().lower()
+    cleaned = unicodedata.normalize("NFKD", cleaned)
+    cleaned = "".join(ch for ch in cleaned if not unicodedata.combining(ch))
+    cleaned = re.sub(r"[^a-z0-9_-]+", "", cleaned)
+    return cleaned
+
+
 def _is_ignored_path(path: Path) -> bool:
     """Indica si un path debe excluirse del discovery."""
     if path.name in _IGNORE_FILENAMES:
         return True
     if path.name.endswith(".sample.json"):
         return True
+
+    # Excluir referencias (feature separada, no es formato).
+    stem_normalized = _normalize_name(path.stem)
+    if stem_normalized in _REFERENCE_NAMES:
+        return True
     for part in path.parts:
+        part_norm = _normalize_name(part)
+        if part_norm in _REFERENCE_DIRS:
+            return True
         if part.startswith(_HIDDEN_PREFIXES):
             return True
     return False
