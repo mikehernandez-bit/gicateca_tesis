@@ -176,7 +176,8 @@ function renderReferencesCards(items) {
         const btnLink = document.createElement("a");
         // Se mantiene el enlace normal por ahora
         // AHORA (Con la marca de origen)
-        btnLink.href = `/referencias?uni=${encodeURIComponent(uni)}&ref=${encodeURIComponent(item.id)}&source=catalog`;
+        // ANTES (Línea actual)
+btnLink.href = `/referencias?uni=${encodeURIComponent(uni)}&ref=${encodeURIComponent(item.id)}`;
         btnLink.className = "text-indigo-600 text-sm font-bold flex items-center gap-1 hover:underline mt-auto cursor-pointer";
         btnLink.innerHTML = `Ver guía <i data-lucide="arrow-right" class="w-4 h-4"></i>`;
         

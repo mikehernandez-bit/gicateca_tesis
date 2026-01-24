@@ -1,10 +1,7 @@
 /*
 Archivo: app/static/js/references.js
-Proposito: Gestiona la UX de referencias (grid -> detalle) sin recargar pagina.
-Responsabilidades: Cargar lista, renderizar cards, abrir detalle, sidebar y TOC.
-No hace: No modifica data source ni altera rutas del backend.
-Entradas/Salidas: Entradas = eventos UI/URL; Salidas = DOM + history.pushState.
-Donde tocar si falla: loadList, openDetail, renderDetail, setupScrollSpy.
+Propósito: Gestiona la vista de detalle de referencias.
+Cambio: El botón 'Volver' ahora redirige forzosamente al Catálogo principal.
 */
 
 (function () {
@@ -227,17 +224,9 @@ Donde tocar si falla: loadList, openDetail, renderDetail, setupScrollSpy.
     const etiqueta = item.etiqueta || "";
     const contenido = item.contenido || "";
 
-    if (tipo === "lista") {
-      return renderListBlock(item);
-    }
-
-    if (tipo === "checklist") {
-      return renderChecklist(item);
-    }
-
-    if (tipo === "muestra_cita_texto") {
-      return renderSampleText(item);
-    }
+    if (tipo === "lista") return renderListBlock(item);
+    if (tipo === "checklist") return renderChecklist(item);
+    if (tipo === "muestra_cita_texto") return renderSampleText(item);
 
     if (tipo === "formato") {
       const block = document.createElement("div");
@@ -285,13 +274,8 @@ Donde tocar si falla: loadList, openDetail, renderDetail, setupScrollSpy.
       return link;
     }
 
-    if (tipo === "referencias_formateadas") {
-      return renderFormattedReferences(item);
-    }
-
-    if (tipo === "referencias_numeradas") {
-      return renderNumericReferences(item);
-    }
+    if (tipo === "referencias_formateadas") return renderFormattedReferences(item);
+    if (tipo === "referencias_numeradas") return renderNumericReferences(item);
 
     const paragraph = document.createElement("p");
     paragraph.className = "ref-text";
@@ -620,7 +604,11 @@ Donde tocar si falla: loadList, openDetail, renderDetail, setupScrollSpy.
   sideSearchEl?.addEventListener("input", event => applySearch(event.target.value, sideSearchEl));
   drawerSearchEl?.addEventListener("input", event => applySearch(event.target.value, drawerSearchEl));
 
-  backBtn?.addEventListener("click", () => showGrid(true));
+  // --- AQUÍ ESTÁ EL CAMBIO IMPORTANTE ---
+  // Al hacer clic en "Volver", te saca de esta vista y te manda al catálogo.
+  backBtn?.addEventListener("click", () => {
+      window.location.href = "/catalog";
+  });
 
   openDrawerBtn?.addEventListener("click", () => toggleDrawer(true));
   closeDrawerBtn?.addEventListener("click", () => toggleDrawer(false));
@@ -632,7 +620,9 @@ Donde tocar si falla: loadList, openDetail, renderDetail, setupScrollSpy.
       if (ref) {
         openDetail(ref, false);
       } else {
-        showGrid(false);
+        // Si el usuario usa el botón "Atrás" del navegador y cae en el grid,
+        // también lo redirigimos al catálogo para ser consistentes.
+        window.location.href = "/catalog";
       }
     });
   }
