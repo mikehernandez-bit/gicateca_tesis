@@ -43,7 +43,7 @@ def _load_json(path: Path) -> Any:
 
 def _references_root() -> Path:
     """Retorna la carpeta de normas globales."""
-    return get_data_root() / "references"
+    return get_data_root() / "unac" / "references"
 
 
 def _iter_reference_files() -> List[Path]:

@@ -112,5 +112,42 @@ Donde tocar si falla: IDs usados por references.js y layout de vistas.
   </div>
 </div>
 
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // 1. Detectar si venimos del catálogo
+    const params = new URLSearchParams(window.location.search);
+    const source = params.get("source");
+
+    if (source === "catalog") {
+      // A) Arreglar el botón "Volver"
+      const backBtn = document.getElementById("refs-back-btn");
+      if (backBtn) {
+        // Cambiar texto y acción
+        backBtn.innerHTML = '<i data-lucide="arrow-left" class="w-4 h-4"></i> Volver al Catálogo';
+        backBtn.onclick = (e) => {
+          e.preventDefault();
+          window.location.href = "/catalog"; // Regresa forzosamente al catálogo
+        };
+      }
+
+      // B) Arreglar el Menú Lateral (Círculo azul de tu imagen)
+      // Buscamos el link del sidebar que apunta a /catalog y le ponemos la clase "active"
+      const sidebarLinks = document.querySelectorAll('aside a, nav a'); // Ajusta el selector según tu sidebar.html
+      
+      sidebarLinks.forEach(link => {
+        // Limpiar activos previos
+        link.classList.remove('bg-blue-50', 'text-blue-700', 'font-semibold'); 
+        link.classList.add('text-gray-600', 'hover:bg-gray-50');
+
+        // Activar el de catálogo
+        if (link.getAttribute('href') && link.getAttribute('href').includes('/catalog')) {
+           link.classList.remove('text-gray-600', 'hover:bg-gray-50');
+           link.classList.add('bg-blue-50', 'text-blue-700', 'font-semibold'); // Estilos de "activo"
+        }
+      });
+    }
+  });
+</script>
+
 <script src="/static/js/references.js?v=8"></script>
 {% endblock %}
