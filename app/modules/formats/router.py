@@ -15,7 +15,7 @@ Entradas/Salidas:
 - Salidas: HTMLResponse, FileResponse (DOCX/PDF) o JSONResponse.
 
 Dependencias:
-- fastapi, win32com (PDF), app.modules.formats.service, app.core.loaders.
+- fastapi, app.core.pdf_converter, app.modules.formats.service, app.core.loaders.
 
 Puntos de extension:
 - Agregar nuevos endpoints de formatos o variantes de exportacion.
@@ -23,33 +23,32 @@ Puntos de extension:
 Donde tocar si falla:
 - Revisar generacion en service y conversion PDF en _convert_docx_to_pdf.
 """
-import atexit
 import hashlib
 import json
 import os
 import shutil
-import threading
 import time
 from email.utils import formatdate, parsedate_to_datetime
 from pathlib import Path
 
-import pythoncom
-import win32com.client
+import logging
 from fastapi import APIRouter, Request, HTTPException, BackgroundTasks, Response
 from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
 
 from app.core.loaders import find_format_index, load_format_by_id
 from app.core.paths import get_docx_cache_dir, get_pdf_cache_dir
+from app.core.pdf_converter import convert_docx_to_pdf
 from app.core.registry import get_provider
 from app.core.templates import templates
 from app.modules.formats import service
 
 router = APIRouter(prefix="/formatos", tags=["formatos"])
 
-_WORD_LOCK = threading.Lock()
-_WORD_APP = None
 _PDF_CACHE_MAX_AGE = int(os.getenv("PDF_CACHE_MAX_AGE", "3600"))
 _PDF_PREWARM_ON_STARTUP = os.getenv("PDF_PREWARM_ON_STARTUP", "false").lower() in ("1", "true", "yes", "on")
+_PDF_CONVERSION_TIMEOUT = float(os.getenv("PDF_CONVERSION_TIMEOUT", "120"))
+
+logger = logging.getLogger(__name__)
 
 
 def _ensure_cache_dirs() -> tuple[Path, Path]:
@@ -83,8 +82,12 @@ def _get_manifest_path(format_id: str) -> Path:
 
 
 def _is_cache_fresh(path: Path, source_mtime: float) -> bool:
-    """Verifica si el cache es mas nuevo que la fuente."""
-    return path.exists() and path.stat().st_mtime >= source_mtime
+    """Verifica si el cache es mas nuevo que la fuente y no esta vacio."""
+    if not path.exists():
+        return False
+    if path.stat().st_size <= 0:
+        return False
+    return path.stat().st_mtime >= source_mtime
 
 
 def _calculate_sha256(path: Path) -> str:
@@ -175,69 +178,21 @@ def _write_manifest(
     manifest_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
 
-def _get_word_app():
-    """Retorna instancia singleton de Word (COM)."""
-    global _WORD_APP
-    if _WORD_APP is None:
-        _WORD_APP = win32com.client.DispatchEx("Word.Application")
-        _WORD_APP.Visible = False
-        _WORD_APP.DisplayAlerts = 0
-    return _WORD_APP
-
-
-def _reset_word_app() -> None:
-    """Reinicia la instancia singleton de Word."""
-    global _WORD_APP
-    if _WORD_APP is not None:
-        try:
-            _WORD_APP.Quit()
-        except Exception:
-            pass
-        _WORD_APP = None
-
-
-def _shutdown_word_app() -> None:
-    """Cierra Word al terminar el proceso."""
-    with _WORD_LOCK:
-        _reset_word_app()
-
-
-atexit.register(_shutdown_word_app)
-
-
 def _convert_docx_to_pdf(docx_path: str, pdf_path: str) -> None:
     """Convierte a PDF actualizando campos para que el indice salga completo."""
-    # Automatiza Word para actualizar indices y exportar a PDF.
-    with _WORD_LOCK:
-        pythoncom.CoInitialize()
-        doc = None
-        try:
-            word = _get_word_app()
-            doc = word.Documents.Open(docx_path, ReadOnly=0, AddToRecentFiles=False)
-            doc.Fields.Update()
-            for toc in doc.TablesOfContents:
-                toc.Update()
-            for tof in doc.TablesOfFigures:
-                tof.Update()
-            doc.SaveAs(pdf_path, FileFormat=17)
-        except Exception:
-            # Si Word falla, se reinicia el singleton para la proxima conversion.
-            _reset_word_app()
-            raise
-        finally:
-            if doc is not None:
-                doc.Close(False)
-            pythoncom.CoUninitialize()
+    convert_docx_to_pdf(docx_path, pdf_path, timeout=_PDF_CONVERSION_TIMEOUT)
 
 
 def _ensure_docx_cached(format_id: str, source_mtime: float) -> Path:
     """Genera o reutiliza el DOCX cacheado."""
     docx_path = _get_cached_docx_path(format_id)
     if _is_cache_fresh(docx_path, source_mtime):
+        logger.info("DOCX cache hit: %s", docx_path)
         return docx_path
 
     generated_path, _filename = service.generate_document(format_id)
     _replace_cached_file(Path(generated_path), docx_path)
+    logger.info("DOCX generado: %s", docx_path)
     return docx_path
 
 
@@ -245,6 +200,7 @@ def _ensure_pdf_cached(format_id: str, source_mtime: float) -> Path:
     """Genera o reutiliza el PDF cacheado."""
     pdf_path = _get_cached_pdf_path(format_id)
     if _is_cache_fresh(pdf_path, source_mtime):
+        logger.info("PDF cache hit: %s", pdf_path)
         return pdf_path
 
     docx_path = _ensure_docx_cached(format_id, source_mtime)
@@ -253,7 +209,9 @@ def _ensure_pdf_cached(format_id: str, source_mtime: float) -> Path:
             pdf_path.unlink()
         except Exception:
             pass
+    start = time.time()
     _convert_docx_to_pdf(str(docx_path), str(pdf_path))
+    logger.info("PDF generado: %s (%.2fs)", pdf_path, time.time() - start)
     return pdf_path
 
 
@@ -282,7 +240,7 @@ def prewarm_pdfs() -> None:
             source_mtime = _get_source_mtime(format_id)
             _ensure_pdf_cached(format_id, source_mtime)
         except Exception as exc:
-            print(f"[WARN] prewarm failed {format_id}: {exc}")
+            logger.warning("prewarm failed %s: %s", format_id, exc)
 
 
 def _resolve_generator_path(generator) -> Path | None:
@@ -413,6 +371,7 @@ async def get_format_pdf(format_id: str, request: Request):
 
         if _is_cache_fresh(cached_pdf, source_mtime):
             # Reutiliza PDF si el JSON y el generador no cambiaron.
+            logger.info("PDF cache hit (request): %s", cached_pdf)
             if _is_client_cache_valid(request, headers["ETag"], source_mtime):
                 return Response(status_code=304, headers=headers)
             return FileResponse(
@@ -444,8 +403,11 @@ async def get_format_pdf(format_id: str, request: Request):
         )
 
     except Exception as e:
-        print(f"Error generando PDF: {e}")
-        raise HTTPException(status_code=500, detail=f"Error al generar PDF: {str(e)}")
+        logger.error("Error generando PDF: %s", e)
+        raise HTTPException(
+            status_code=500,
+            detail="No se pudo generar la vista previa. Intenta nuevamente en unos segundos.",
+        )
 
 
 @router.get("/{format_id}/data")

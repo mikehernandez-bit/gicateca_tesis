@@ -1,13 +1,13 @@
 {#
 Archivo: app/templates/pages/references.html
-Proposito: Vista dedicada para normas de referencias bibliograficas.
-Bloques: content (grid de normas + detalle tipo docs).
-Donde tocar si falla: IDs usados por references.js y layout de vistas.
+Propósito: Vista principal de referencias.
+Cambio: Layout corregido usando CSS Grid. El contenido principal se estira y se elimina el sidebar izquierdo.
 #}
 {% extends "base.html" %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto" id="referencesApp" data-uni="{{ active_uni or 'unac' }}">
+<div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8" id="referencesApp" data-uni="{{ active_uni or 'unac' }}">
+  
   <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
     <div>
       <h1 class="text-3xl font-bold text-gray-900">Referencias Bibliográficas</h1>
@@ -19,98 +19,73 @@ Donde tocar si falla: IDs usados por references.js y layout de vistas.
     </div>
   </div>
 
-  <section id="refs-grid-view" class="space-y-6">
-    <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-      <div>
-        <h2 class="text-lg font-bold text-gray-900">Normas disponibles</h2>
-        <p class="text-xs text-gray-500">Selecciona una norma para ver la guía completa.</p>
-      </div>
-      <div class="relative w-full md:w-72">
-        <i data-lucide="search" class="absolute left-3 top-2.5 w-4 h-4 text-gray-400"></i>
-        <input id="refs-search" type="text" placeholder="Buscar norma..."
-               class="w-full bg-gray-100 border border-transparent rounded-lg pl-9 pr-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all">
-      </div>
-    </div>
-
-    <div id="refs-grid" class="refs-grid"></div>
-    <div id="refs-grid-empty" class="hidden text-sm text-gray-500">No hay normas disponibles.</div>
+  <section id="refs-grid-view" class="hidden">
+    <input type="text" id="refs-search">
+    <div id="refs-grid"></div>
+    <div id="refs-grid-empty"></div>
   </section>
 
   <section id="refs-detail-view" class="hidden">
-    <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
-      <div id="ref-breadcrumb" class="text-xs text-gray-500">Referencias</div>
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-gray-100">
+      <div id="ref-breadcrumb" class="text-sm font-medium text-gray-500">Referencias</div>
       <button id="refs-back-btn"
-              class="inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:text-indigo-800">
-        <i data-lucide="arrow-left" class="w-4 h-4"></i> Volver a normas
+              class="inline-flex items-center gap-2 text-sm font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-4 py-2 rounded-lg transition-colors">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i> Volver al Catálogo
       </button>
     </div>
 
-    <div class="flex items-center gap-3 mb-4 lg:hidden">
-      <button id="refs-open-drawer" class="inline-flex items-center gap-2 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-lg px-3 py-2 shadow-sm">
-        <i data-lucide="menu" class="w-4 h-4"></i> Normas
-      </button>
-    </div>
-
-    <div class="refs-layout">
-      <aside class="refs-sticky hidden lg:block">
-        <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-          <div class="text-xs uppercase tracking-wider text-gray-400">Normas</div>
-          <div class="relative mt-3">
-            <i data-lucide="search" class="absolute left-3 top-2.5 w-4 h-4 text-gray-400"></i>
-            <input id="refs-side-search" type="text" placeholder="Buscar norma..."
-                   class="w-full bg-gray-100 border border-transparent rounded-lg pl-9 pr-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all">
-          </div>
-          <div id="refs-side-list" class="space-y-2 mt-4"></div>
-        </div>
-      </aside>
-
-      <main>
-        <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-          <div id="ref-detail-header" class="space-y-3">
-            <div class="flex flex-wrap items-center gap-2">
-              <h2 id="ref-title" class="text-2xl font-bold text-gray-900"></h2>
-              <div id="ref-tags" class="flex flex-wrap gap-2"></div>
+    <div class="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-8 items-start">
+      
+      <main class="min-w-0">
+        <div class="bg-white border border-gray-200 rounded-2xl p-6 md:p-10 shadow-sm">
+          
+          <div id="ref-detail-header" class="space-y-4 mb-8">
+            <div class="flex flex-wrap items-start justify-between gap-4">
+               <div>
+                  <h2 id="ref-title" class="text-3xl font-extrabold text-gray-900 leading-tight mb-3"></h2>
+                  <div id="ref-tags" class="flex flex-wrap gap-2 mb-4"></div>
+               </div>
             </div>
-            <p id="ref-desc" class="text-sm text-gray-600"></p>
-            <div id="ref-note" class="hidden ref-note"></div>
+            <p id="ref-desc" class="text-lg text-gray-600 leading-relaxed"></p>
+            <div id="ref-note" class="hidden bg-yellow-50 border-l-4 border-yellow-400 p-4 text-sm text-yellow-800 rounded-r-lg"></div>
           </div>
 
-          <div id="ref-detail-loader" class="flex items-center justify-center py-16">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+          <div id="ref-detail-loader" class="flex flex-col items-center justify-center py-20">
+            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600 mb-4"></div>
+            <p class="text-gray-500 font-medium animate-pulse">Cargando la guía...</p>
           </div>
 
-          <div id="ref-content" class="hidden space-y-8 mt-6"></div>
-          <div id="ref-sources" class="hidden mt-8 border-t border-gray-100 pt-4 text-sm text-gray-500"></div>
+          <div id="ref-content" class="hidden space-y-10 mt-8"></div>
+          
+          <div id="ref-sources" class="hidden mt-12 border-t border-gray-100 pt-6 text-sm text-gray-500"></div>
         </div>
       </main>
 
-      <aside class="refs-sticky">
-        <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-          <div class="text-xs uppercase tracking-wider text-gray-400">En esta guía</div>
-          <div id="ref-toc" class="ref-toc">
-            <div id="ref-toc-list"></div>
+      <aside class="hidden xl:block sticky top-8">
+        <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+          <h3 class="text-xs uppercase tracking-wider font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <i data-lucide="list" class="w-4 h-4 text-indigo-500"></i>
+            En esta guía
+          </h3>
+          <div id="ref-toc" class="ref-toc overflow-y-auto max-h-[calc(100vh-200px)] pr-2">
+            <div id="ref-toc-list" class="space-y-1"></div>
           </div>
         </div>
       </aside>
+
     </div>
   </section>
 </div>
 
-<div id="refs-drawer" class="refs-drawer hidden lg:hidden" aria-hidden="true">
-  <div id="refs-drawer-backdrop" class="refs-drawer-backdrop"></div>
+<div class="hidden"><button id="refs-open-drawer"></button></div>
+<div id="refs-drawer" class="hidden" aria-hidden="true">
+  <div id="refs-drawer-backdrop"></div>
   <div class="refs-drawer-panel">
-    <div class="flex items-center justify-between mb-4">
-      <h3 class="text-sm font-bold text-gray-900">Normas</h3>
-      <button id="refs-close-drawer" class="text-xs font-semibold text-gray-500 hover:text-gray-800">Cerrar</button>
-    </div>
-    <div class="relative">
-      <i data-lucide="search" class="absolute left-3 top-2.5 w-4 h-4 text-gray-400"></i>
-      <input id="refs-drawer-search" type="text" placeholder="Buscar norma..."
-             class="w-full bg-gray-100 border border-transparent rounded-lg pl-9 pr-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all">
-    </div>
-    <div id="refs-drawer-list" class="space-y-2 mt-4"></div>
+    <input id="refs-drawer-search" type="hidden">
+    <div id="refs-drawer-list"></div>
+    <button id="refs-close-drawer" class="hidden"></button>
   </div>
 </div>
 
-<script src="/static/js/references.js?v=8"></script>
+<script src="/static/js/references.js?v=14"></script>
 {% endblock %}
