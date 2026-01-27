@@ -1,7 +1,7 @@
 /*
 Archivo: app/static/js/references.js
 Propósito: Gestiona la vista de detalle de referencias.
-Cambio: El botón 'Volver' ahora redirige forzosamente al Catálogo principal.
+Fix: Botones funcionando + Calibración matemática "Quirúrgica" (Scroll 100px vs Ojo 90px).
 */
 
 (function () {
@@ -38,6 +38,9 @@ Cambio: El botón 'Volver' ahora redirige forzosamente al Catálogo principal.
 
   const routingEnabled = app.dataset.routing !== "false";
   const basePath = app.dataset.base || window.location.pathname || "/referencias";
+
+  // Bandera para evitar conflictos visuales mientras viaja el scroll
+  let isManualScroll = false;
 
   const state = {
     uni: (app.dataset.uni || "unac").toLowerCase(),
@@ -115,204 +118,63 @@ Cambio: El botón 'Volver' ahora redirige forzosamente al Catálogo principal.
     });
   }
 
-  function renderListBlock(item) {
-    const block = document.createElement("div");
-    block.className = "ref-block";
-    if (item.titulo) {
-      const title = document.createElement("div");
-      title.className = "ref-block-title";
-      title.textContent = item.titulo;
-      block.appendChild(title);
-    }
-    const list = document.createElement("ul");
-    list.className = "ref-bullets";
-    (item.items || []).forEach(text => {
-      const li = document.createElement("li");
-      li.textContent = text;
-      list.appendChild(li);
-    });
-    block.appendChild(list);
-    return block;
-  }
-
-  function renderChecklist(item) {
-    const list = document.createElement("ul");
-    list.className = "ref-check";
-    (item.items || []).forEach(text => {
-      const li = document.createElement("li");
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.disabled = true;
-      const span = document.createElement("span");
-      span.textContent = text;
-      li.appendChild(checkbox);
-      li.appendChild(span);
-      list.appendChild(li);
-    });
-    return list;
-  }
-
-  function renderSampleText(item) {
-    const block = document.createElement("div");
-    block.className = "ref-sample";
-    const label = document.createElement("div");
-    label.className = "ref-sample-label";
-    label.textContent = item.etiqueta || "Ejemplo";
-    block.appendChild(label);
-    (item.items || []).forEach(line => {
-      const row = document.createElement("div");
-      row.className = "ref-sample-line";
-      row.innerHTML = applyItalicMarkup(line);
-      block.appendChild(row);
-    });
-    return block;
-  }
-
-  function renderFormattedReferences(item) {
-    const block = document.createElement("div");
-    block.className = "ref-block";
-    if (item.etiqueta) {
-      const title = document.createElement("div");
-      title.className = "ref-block-title";
-      title.textContent = item.etiqueta;
-      block.appendChild(title);
-    }
-    const list = document.createElement("ul");
-    list.className = "ref-apa7";
-    const lines = item.lineas || item.items || item.contenido || [];
-    lines.forEach(line => {
-      const li = document.createElement("li");
-      li.innerHTML = applyItalicMarkup(line);
-      list.appendChild(li);
-    });
-    block.appendChild(list);
-    return block;
-  }
-
-  function renderNumericReferences(item) {
-    const block = document.createElement("div");
-    block.className = "ref-block";
-    if (item.etiqueta) {
-      const title = document.createElement("div");
-      title.className = "ref-block-title";
-      title.textContent = item.etiqueta;
-      block.appendChild(title);
-    }
-    const container = document.createElement("div");
-    container.className = "ref-numeric";
-    const items = item.items || item.contenido || [];
-    items.forEach((entry, idx) => {
-      const row = document.createElement("div");
-      row.className = "ref-row";
-      const num = document.createElement("div");
-      num.className = "ref-num";
-      const label = entry.n || entry.numero || entry.indice || idx + 1;
-      num.textContent = `[${label}]`;
-      const text = document.createElement("div");
-      text.className = "ref-text";
-      text.innerHTML = applyItalicMarkup(entry.texto || entry.contenido || entry);
-      row.appendChild(num);
-      row.appendChild(text);
-      container.appendChild(row);
-    });
-    block.appendChild(container);
-    return block;
-  }
-
+  // --- RENDERIZADO DE BLOQUES ---
+  function renderListBlock(item) { const block = document.createElement("div"); block.className = "ref-block"; if (item.titulo) { const title = document.createElement("div"); title.className = "ref-block-title"; title.textContent = item.titulo; block.appendChild(title); } const list = document.createElement("ul"); list.className = "ref-bullets"; (item.items || []).forEach(text => { const li = document.createElement("li"); li.textContent = text; list.appendChild(li); }); block.appendChild(list); return block; }
+  function renderChecklist(item) { const list = document.createElement("ul"); list.className = "ref-check"; (item.items || []).forEach(text => { const li = document.createElement("li"); const checkbox = document.createElement("input"); checkbox.type = "checkbox"; checkbox.disabled = true; const span = document.createElement("span"); span.textContent = text; li.appendChild(checkbox); li.appendChild(span); list.appendChild(li); }); return list; }
+  function renderSampleText(item) { const block = document.createElement("div"); block.className = "ref-sample"; const label = document.createElement("div"); label.className = "ref-sample-label"; label.textContent = item.etiqueta || "Ejemplo"; block.appendChild(label); (item.items || []).forEach(line => { const row = document.createElement("div"); row.className = "ref-sample-line"; row.innerHTML = applyItalicMarkup(line); block.appendChild(row); }); return block; }
+  function renderFormattedReferences(item) { const block = document.createElement("div"); block.className = "ref-block"; if (item.etiqueta) { const title = document.createElement("div"); title.className = "ref-block-title"; title.textContent = item.etiqueta; block.appendChild(title); } const list = document.createElement("ul"); list.className = "ref-apa7"; (item.lineas || item.items || item.contenido || []).forEach(line => { const li = document.createElement("li"); li.innerHTML = applyItalicMarkup(line); list.appendChild(li); }); block.appendChild(list); return block; }
+  function renderNumericReferences(item) { const block = document.createElement("div"); block.className = "ref-block"; if (item.etiqueta) { const title = document.createElement("div"); title.className = "ref-block-title"; title.textContent = item.etiqueta; block.appendChild(title); } const container = document.createElement("div"); container.className = "ref-numeric"; (item.items || item.contenido || []).forEach((entry, idx) => { const row = document.createElement("div"); row.className = "ref-row"; const num = document.createElement("div"); num.className = "ref-num"; const label = entry.n || entry.numero || entry.indice || idx + 1; num.textContent = `[${label}]`; const text = document.createElement("div"); text.className = "ref-text"; text.innerHTML = applyItalicMarkup(entry.texto || entry.contenido || entry); row.appendChild(num); row.appendChild(text); container.appendChild(row); }); block.appendChild(container); return block; }
+  
   function renderItem(item) {
     const tipo = (item.tipo || "texto").toLowerCase();
     const etiqueta = item.etiqueta || "";
     const contenido = item.contenido || "";
-
     if (tipo === "lista") return renderListBlock(item);
     if (tipo === "checklist") return renderChecklist(item);
     if (tipo === "muestra_cita_texto") return renderSampleText(item);
-
-    if (tipo === "formato") {
-      const block = document.createElement("div");
-      block.className = "ref-format";
-      if (etiqueta) {
-        const label = document.createElement("div");
-        label.className = "label";
-        label.textContent = etiqueta;
-        block.appendChild(label);
-      }
-      const pre = document.createElement("pre");
-      pre.innerHTML = applyItalicMarkup(contenido);
-      block.appendChild(pre);
-      return block;
-    }
-
-    if (tipo === "ejemplo") {
-      const block = document.createElement("div");
-      block.className = "ref-example";
-      const label = document.createElement("div");
-      label.className = "label";
-      label.textContent = etiqueta || "Ejemplo";
-      block.appendChild(label);
-      const pre = document.createElement("pre");
-      pre.innerHTML = applyItalicMarkup(contenido);
-      block.appendChild(pre);
-      return block;
-    }
-
-    if (tipo === "nota") {
-      const block = document.createElement("div");
-      block.className = "ref-note";
-      block.textContent = contenido;
-      return block;
-    }
-
-    if (tipo === "link") {
-      const href = item.url || contenido;
-      const link = document.createElement("a");
-      link.href = href;
-      link.target = "_blank";
-      link.rel = "noopener";
-      link.className = "text-indigo-600 hover:underline text-sm";
-      link.textContent = `${etiqueta ? etiqueta + ": " : ""}${contenido}`;
-      return link;
-    }
-
+    if (tipo === "formato") { const block = document.createElement("div"); block.className = "ref-format"; if (etiqueta) { const label = document.createElement("div"); label.className = "label"; label.textContent = etiqueta; block.appendChild(label); } const pre = document.createElement("pre"); pre.innerHTML = applyItalicMarkup(contenido); block.appendChild(pre); return block; }
+    if (tipo === "ejemplo") { const block = document.createElement("div"); block.className = "ref-example"; const label = document.createElement("div"); label.className = "label"; label.textContent = etiqueta || "Ejemplo"; block.appendChild(label); const pre = document.createElement("pre"); pre.innerHTML = applyItalicMarkup(contenido); block.appendChild(pre); return block; }
+    if (tipo === "nota") { const block = document.createElement("div"); block.className = "ref-note"; block.textContent = contenido; return block; }
+    if (tipo === "link") { const href = item.url || contenido; const link = document.createElement("a"); link.href = href; link.target = "_blank"; link.rel = "noopener"; link.className = "text-indigo-600 hover:underline text-sm"; link.textContent = `${etiqueta ? etiqueta + ": " : ""}${contenido}`; return link; }
     if (tipo === "referencias_formateadas") return renderFormattedReferences(item);
     if (tipo === "referencias_numeradas") return renderNumericReferences(item);
-
-    const paragraph = document.createElement("p");
-    paragraph.className = "ref-text";
-    paragraph.textContent = contenido;
-    return paragraph;
+    const paragraph = document.createElement("p"); paragraph.className = "ref-text"; paragraph.textContent = contenido; return paragraph;
   }
 
+  // --- 1. SETUP DEL SCROLL SPY (EL OJO) ---
   function setupScrollSpy(sections) {
     if (!tocListEl) return;
     if (state.observer) {
       state.observer.disconnect();
       state.observer = null;
     }
-
     const links = new Map();
     tocListEl.querySelectorAll("a").forEach(link => {
       const id = link.getAttribute("href").replace("#", "");
       links.set(id, link);
     });
-
     if (!sections.length) return;
 
+    // >>> CALIBRACIÓN QUIRÚRGICA <<<
+    // -90px top: El observador empieza a detectar desde el pixel 90 hacia abajo.
     state.observer = new IntersectionObserver(
       entries => {
+        if (isManualScroll) return; // Pausa si estamos en viaje manual
+
         entries.forEach(entry => {
-          if (!entry.isIntersecting) return;
-          links.forEach((link, id) => {
-            link.classList.toggle("active", id === entry.target.id);
-          });
+          if (entry.isIntersecting) {
+            links.forEach(l => l.classList.remove("active"));
+            const activeLink = links.get(entry.target.id);
+            if (activeLink) activeLink.classList.add("active");
+          }
         });
       },
-      { rootMargin: "0px 0px -60% 0px", threshold: 0.15 }
+      { rootMargin: "-90px 0px -80% 0px", threshold: 0 }
     );
-
     sections.forEach(section => state.observer.observe(section));
   }
 
+  // --- 2. RENDER DETAIL ---
   function renderDetail(detail) {
     const title = detail.titulo || detail.id || "";
     detailTitle.textContent = title;
@@ -336,9 +198,15 @@ Cambio: El botón 'Volver' ahora redirige forzosamente al Catálogo principal.
     const sections = [];
     (detail.secciones || []).forEach((section, idx) => {
       const sectionId = `ref-section-${idx + 1}`;
+      
       const block = document.createElement("section");
       block.id = sectionId;
       block.className = "ref-section";
+      
+      // >>> CALIBRACIÓN QUIRÚRGICA EN EL ELEMENTO <<<
+      // 100px: Esto asegura que el título aterrice en el pixel 100.
+      // Como el ojo mira desde el 90, el título estará 10px DENTRO de la zona.
+      block.style.scrollMarginTop = "100px";
 
       const heading = document.createElement("h3");
       heading.textContent = section.titulo || "";
@@ -354,6 +222,27 @@ Cambio: El botón 'Volver' ahora redirige forzosamente al Catálogo principal.
       const anchor = document.createElement("a");
       anchor.href = `#${sectionId}`;
       anchor.textContent = section.titulo || `Sección ${idx + 1}`;
+      
+      // >>> LÓGICA DE CLIC (BOTONES FUNCIONALES) <<<
+      anchor.addEventListener("click", (e) => {
+          e.preventDefault();
+          
+          isManualScroll = true; // Bloqueo momentáneo
+
+          // 1. Feedback visual inmediato
+          tocListEl.querySelectorAll("a").forEach(a => a.classList.remove("active"));
+          anchor.classList.add("active");
+
+          // 2. Scroll Nativo Inteligente
+          // Gracias a scrollMarginTop="100px", esto lo dejará en el sitio exacto.
+          block.scrollIntoView({ behavior: "smooth", block: "start" });
+
+          // 3. Desbloqueo
+          setTimeout(() => {
+              isManualScroll = false;
+          }, 1000);
+      });
+
       tocListEl.appendChild(anchor);
     });
 
@@ -399,7 +288,6 @@ Cambio: El botón 'Volver' ahora redirige forzosamente al Catálogo principal.
     if (!preview) return null;
     const block = document.createElement("div");
     block.className = "ref-preview";
-
     if (typeof preview === "string") {
       const line = document.createElement("div");
       line.className = "ref-preview-line";
@@ -407,7 +295,6 @@ Cambio: El botón 'Volver' ahora redirige forzosamente al Catálogo principal.
       block.appendChild(line);
       return block;
     }
-
     if (preview.cita) {
       const line = document.createElement("div");
       line.className = "ref-preview-line";
@@ -432,7 +319,6 @@ Cambio: El botón 'Volver' ahora redirige forzosamente al Catálogo principal.
       line.textContent = `Numérica: ${preview.numerica}`;
       block.appendChild(line);
     }
-
     return block;
   }
 
@@ -584,31 +470,34 @@ Cambio: El botón 'Volver' ahora redirige forzosamente al Catálogo principal.
     } catch (error) {
       renderCards([]);
       renderSidebarList([]);
-      showGridError("No se pudieron cargar las normas. Intenta recargar la página.");
+      showGridError("No se pudieron cargar las normas.");
       return false;
     }
   }
 
   async function init() {
+    // Configurar botón Volver -> Ir al Catálogo
+    if (backBtn) {
+        backBtn.innerHTML = '<i data-lucide="arrow-left" class="w-4 h-4"></i> Volver al Catálogo';
+        backBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            window.location.href = "/catalog";
+        });
+    }
+
     const { ref } = parseQuery();
     const ok = await loadList();
 
     if (ref && ok) {
       await openDetail(ref, false);
     } else {
-      showGrid(false);
+      toggleViews(false);
     }
   }
 
   gridSearchEl?.addEventListener("input", event => applySearch(event.target.value, gridSearchEl));
   sideSearchEl?.addEventListener("input", event => applySearch(event.target.value, sideSearchEl));
   drawerSearchEl?.addEventListener("input", event => applySearch(event.target.value, drawerSearchEl));
-
-  // --- AQUÍ ESTÁ EL CAMBIO IMPORTANTE ---
-  // Al hacer clic en "Volver", te saca de esta vista y te manda al catálogo.
-  backBtn?.addEventListener("click", () => {
-      window.location.href = "/catalog";
-  });
 
   openDrawerBtn?.addEventListener("click", () => toggleDrawer(true));
   closeDrawerBtn?.addEventListener("click", () => toggleDrawer(false));
@@ -620,8 +509,6 @@ Cambio: El botón 'Volver' ahora redirige forzosamente al Catálogo principal.
       if (ref) {
         openDetail(ref, false);
       } else {
-        // Si el usuario usa el botón "Atrás" del navegador y cae en el grid,
-        // también lo redirigimos al catálogo para ser consistentes.
         window.location.href = "/catalog";
       }
     });
