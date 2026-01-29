@@ -13,67 +13,70 @@ Donde tocar si falla: Revisar fetchFormatJson, previewCover/previewIndex/preview
  */
 
 function buildJsonPath(formatId) {
-  return `/formatos/${formatId}/data`;
+    return `/formatos/${formatId}/data`;
 }
 
 async function fetchFormatJson(formatId) {
-  const jsonPath = buildJsonPath(formatId);
-  const response = await fetch(jsonPath + '?t=' + new Date().getTime());
-  if (!response.ok) {
-    throw new Error(`No se encontr\u00f3 el archivo (Error ${response.status}) en: ${jsonPath}`);
-  }
-  return response.json();
+    const jsonPath = buildJsonPath(formatId);
+    const response = await fetch(jsonPath + '?t=' + new Date().getTime());
+    if (!response.ok) {
+        throw new Error(`No se encontr\u00f3 el archivo (Error ${response.status}) en: ${jsonPath}`);
+    }
+    return response.json();
 }
 
 function shortGuide(text) {
-  if (!text) return 'Ver detalle en la vista previa.';
-  const line = text.split(/\n+/)[0].trim();
-  return line || 'Ver detalle en la vista previa.';
+    if (!text) return 'Ver detalle en la vista previa.';
+    const line = text.split(/\n+/)[0].trim();
+    return line || 'Ver detalle en la vista previa.';
 }
 
 // --- 1. Descargar DOCX ---
 async function downloadDocument(formatId) {
-  const btn = document.getElementById('download-btn');
-  const btnText = document.getElementById('download-text');
-  const originalText = btnText.textContent;
-  
-  try {
-    btn.disabled = true;
-    btnText.textContent = 'Generando...';
-    
-    const response = await fetch(`/formatos/${formatId}/generate`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.detail || 'Error al generar el documento');
+    const btn = document.getElementById('download-btn');
+    const btnText = document.getElementById('download-text');
+    const originalText = btnText.textContent;
+
+    try {
+        btn.disabled = true;
+        btnText.textContent = 'Generando...';
+
+        const response = await fetch(`/formatos/${formatId}/generate`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.detail || 'Error al generar el documento');
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const parts = formatId.split('-');
+        const university = parts[0].toUpperCase();
+        const rest = parts.slice(1).join('_').toUpperCase();
+        a.download = `${university}_${rest}.docx`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        a.remove();
+
+        btnText.textContent = 'Descargado ✓';
+        setTimeout(() => {
+            btnText.textContent = originalText;
+            btn.disabled = false;
+        }, 2000);
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error: ' + error.message);
+        btnText.textContent = originalText;
+        btn.disabled = false;
     }
-    
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `UNAC_${formatId.split('-').slice(1).join('_').toUpperCase()}.docx`;
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
-    a.remove();
-    
-    btnText.textContent = 'Descargado ✓';
-    setTimeout(() => {
-      btnText.textContent = originalText;
-      btn.disabled = false;
-    }, 2000);
-  } catch (error) {
-    console.error('Error:', error);
-    alert('Error: ' + error.message);
-    btnText.textContent = originalText;
-    btn.disabled = false;
-  }
 }
 
 // --- 2. Modal PDF (Vista Previa General) ---
@@ -81,20 +84,20 @@ function openPdfModal(formatId) {
     const modal = document.getElementById('pdfModal');
     const viewer = document.getElementById('pdfViewer');
     const title = document.getElementById('modal-title');
-    
-    if(title) title.innerText = "Vista de Lectura";
 
-    const pdfUrl = `/formatos/${formatId}/pdf`; 
-    
-    viewer.src = pdfUrl + "#page=1&view=Fit&toolbar=0&navpanes=0"; 
-    modal.classList.remove('hidden'); 
+    if (title) title.innerText = "Vista de Lectura";
+
+    const pdfUrl = `/formatos/${formatId}/pdf`;
+
+    viewer.src = pdfUrl + "#page=1&view=Fit&toolbar=0&navpanes=0";
+    modal.classList.remove('hidden');
 }
 
 function closePdfModal() {
     const modal = document.getElementById('pdfModal');
     const viewer = document.getElementById('pdfViewer');
-    modal.classList.add('hidden'); 
-    viewer.src = ''; 
+    modal.classList.add('hidden');
+    viewer.src = '';
 }
 
 // --- 3. Visualizador de Carátula (JSON) ---
@@ -102,7 +105,7 @@ async function previewCover(formatId) {
     const modal = document.getElementById('coverModal');
     const loader = document.getElementById('coverLoader');
     const content = document.getElementById('coverContent');
-    
+
     modal.classList.remove('hidden');
     loader.classList.remove('hidden');
     content.classList.add('hidden');
@@ -111,6 +114,16 @@ async function previewCover(formatId) {
         const data = await fetchFormatJson(formatId);
         const c = data.caratula || {};
         if (!Object.keys(c).length) throw new Error("No se encontró configuración de carátula.");
+
+        const logoImg = document.getElementById('cover-logo-img');
+        if (logoImg) {
+            // Lógica simple: si el ID empieza con 'uni-', usar logo UNI, sino UNAC (default)
+            if (formatId.toLowerCase().startsWith('uni')) {
+                logoImg.src = "/static/assets/LogoUNI.png";
+            } else {
+                logoImg.src = "/static/assets/LogoUNAC.png";
+            }
+        }
 
         document.getElementById('c-uni').textContent = c.universidad || "UNIVERSIDAD NACIONAL DEL CALLAO";
         document.getElementById('c-fac').textContent = c.facultad || "";
@@ -147,11 +160,11 @@ async function previewIndex(formatId) {
     const loader = document.getElementById('indexLoader');
     const content = document.getElementById('indexContent');
     const listContainer = document.getElementById('indexList');
-    
+
     modal.classList.remove('hidden');
     loader.classList.remove('hidden');
     content.classList.add('hidden');
-    listContainer.innerHTML = ''; 
+    listContainer.innerHTML = '';
 
     try {
         const data = await fetchFormatJson(formatId);
@@ -184,7 +197,7 @@ async function previewIndex(formatId) {
             row.className = "flex items-baseline w-full";
             const isMain = item.nivel === 1;
             const textClass = isMain ? "font-bold text-gray-900 uppercase mt-2" : "pl-6 text-gray-700";
-            
+
             row.innerHTML = `
                 <span class="${textClass} flex-shrink-0">${item.titulo}</span>
                 <span class="border-b border-dotted border-gray-400 flex-1 mx-2 relative top-[-4px]"></span>
@@ -214,11 +227,11 @@ async function previewChapter(formatId, searchPrefix) {
     const content = document.getElementById('chapterContent');
     const listContainer = document.getElementById('chapterList');
     const titleContainer = document.getElementById('chapterTitle');
-    
+
     modal.classList.remove('hidden');
     loader.classList.remove('hidden');
     content.classList.add('hidden');
-    listContainer.innerHTML = ''; 
+    listContainer.innerHTML = '';
 
     try {
         const data = await fetchFormatJson(formatId);
@@ -227,7 +240,7 @@ async function previewChapter(formatId, searchPrefix) {
         let capitulo = null;
         // 1. Buscar en el cuerpo
         if (data.cuerpo) {
-            capitulo = data.cuerpo.find(cap => 
+            capitulo = data.cuerpo.find(cap =>
                 cap.titulo && cap.titulo.trim().toUpperCase().startsWith(searchPrefix)
             );
         }
@@ -251,7 +264,7 @@ async function previewChapter(formatId, searchPrefix) {
             capitulo.contenido.forEach(item => {
                 const itemDiv = document.createElement('div');
                 itemDiv.className = "p-4 bg-gray-50 rounded-lg border border-gray-100 hover:border-blue-200 transition-colors";
-                
+
                 let html = `<h4 class="font-bold text-gray-800 text-base mb-1">${item.texto || ""}</h4>`;
 
                 const notes = [];
@@ -276,8 +289,45 @@ async function previewChapter(formatId, searchPrefix) {
                 itemDiv.innerHTML = html;
                 listContainer.appendChild(itemDiv);
             });
-        } 
-        // Caso B: Texto simple (Conclusiones, etc)
+        }
+        // Caso B: Estructura jerárquica (items/subitems) - Nuevo Formato Posgrado
+        else if (capitulo.items && Array.isArray(capitulo.items)) {
+            capitulo.items.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = "p-4 bg-gray-50 rounded-lg border border-gray-100 mt-2";
+
+                let html = `<h4 class="font-bold text-gray-800 text-base mb-2">${item.titulo || ""}</h4>`;
+
+                if (item.subitems && Array.isArray(item.subitems)) {
+                    html += `<ul class="list-disc pl-5 space-y-1">`;
+                    item.subitems.forEach(sub => {
+                        html += `<li class="text-gray-700 text-sm">${sub}</li>`;
+                    });
+                    html += `</ul>`;
+                }
+
+                itemDiv.innerHTML = html;
+                listContainer.appendChild(itemDiv);
+            });
+        }
+        // Caso C: Plan de Tesis (Instrucción + Lista opcional)
+        else if (capitulo.instruccion) {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = "p-6 bg-blue-50 rounded-lg border border-blue-100";
+
+            let html = `<p class="text-gray-800 text-lg font-medium italic mb-4">"${capitulo.instruccion}"</p>`;
+
+            if (capitulo.lista && Array.isArray(capitulo.lista)) {
+                html += `<ul class="list-disc pl-5 space-y-2">`;
+                capitulo.lista.forEach(li => {
+                    html += `<li class="text-gray-700">${li}</li>`;
+                });
+                html += `</ul>`;
+            }
+            itemDiv.innerHTML = html;
+            listContainer.appendChild(itemDiv);
+        }
+        // Caso D: Texto simple (Conclusiones, etc)
         else if (capitulo.nota_capitulo || capitulo.nota) {
             const texto = capitulo.nota_capitulo || capitulo.nota;
             const itemDiv = document.createElement('div');
@@ -298,7 +348,6 @@ async function previewChapter(formatId, searchPrefix) {
     }
 }
 
-// ESTA ES LA FUNCIÓN QUE FALTABA O FALLABA
 function closeChapterModal() {
     document.getElementById('chapterModal').classList.add('hidden');
 }
@@ -309,44 +358,51 @@ function closeChapterModal() {
 async function hydrateRequirementsList() {
     const container = document.getElementById('formatRequirements');
     if (!container) return;
-    
+
     const formatId = container.dataset.formatId;
     if (!formatId) return;
 
     try {
         // 1. Obtener datos del JSON
         const data = await fetchFormatJson(formatId);
-        
+
         // 2. Limpiar contenedor
         container.innerHTML = '';
-        
+
         // 3. Siempre agregar Carátula e Índice
         container.appendChild(buildRequirementItem(
             "Carátula Institucional",
             "Debe seguir estrictamente el modelo oficial.",
             () => previewCover(formatId)
         ));
-        
+
         container.appendChild(buildRequirementItem(
             "Índice General",
             "Generado automáticamente por Word con estilos aplicados.",
             () => previewIndex(formatId)
         ));
-        
-        // 4. Agregar capítulos del cuerpo
-        if (data.cuerpo && Array.isArray(data.cuerpo)) {
-            data.cuerpo.forEach((capitulo) => {
-                if (!capitulo.titulo) return;
-                
-                // Extraer número romano del título (I., II., III., etc.)
-                const match = capitulo.titulo.match(/^([IVXLCDM]+)\./);
+
+        // 4. Agregar capítulos del cuerpo (Soporte dual: cuerpo o secciones)
+        const chaptersList = data.cuerpo || data.secciones;
+
+        if (chaptersList && Array.isArray(chaptersList)) {
+            chaptersList.forEach((capitulo) => {
+                // Soporte para secciones simples (nuevo formato UNI)
+
+                // Extraer número romano o arábigo del título
+                const match = capitulo.titulo.match(/^([IVXLCDM0-9]+)[\.\s]/);
                 const prefijo = match ? match[1] + '.' : '';
-                
+
                 // Obtener descripción del capítulo
                 let descripcion = "Estructura principal del capítulo.";
-                
-                if (capitulo.nota_capitulo) {
+
+                if (capitulo.instruccion) {
+                    descripcion = capitulo.instruccion;
+                } else if (capitulo.nota_capitulo) {
                     descripcion = capitulo.nota_capitulo;
+                } else if (capitulo.contenido && typeof capitulo.contenido === 'string') {
+                    // Soporte para contenido simple string (nuevo formato UNI)
+                    descripcion = capitulo.contenido;
                 } else if (capitulo.contenido && Array.isArray(capitulo.contenido) && capitulo.contenido.length > 0) {
                     // Intentar obtener la primera nota disponible
                     const primerContenido = capitulo.contenido[0];
@@ -364,12 +420,19 @@ async function hydrateRequirementsList() {
                     } else if (primerContenido.texto) {
                         descripcion = primerContenido.texto;
                     }
+                } else if (capitulo.items && Array.isArray(capitulo.items) && capitulo.items.length > 0) {
+                    // Nuevo formato Posgrado con items
+                    const primerItem = capitulo.items[0];
+                    descripcion = primerItem.titulo || "Estructura del capítulo.";
+                    if (capitulo.items.length > 1) {
+                        descripcion += ` (+${capitulo.items.length - 1} sub-secciones)`;
+                    }
                 }
                 // Truncar descripción si es muy larga
                 if (descripcion.length > 100) {
                     descripcion = descripcion.substring(0, 97) + '...';
                 }
-                
+
                 container.appendChild(buildRequirementItem(
                     capitulo.titulo,
                     descripcion,
@@ -377,27 +440,27 @@ async function hydrateRequirementsList() {
                 ));
             });
         }
-        
+
         // 5. Agregar Referencias (buscar en finales o en cuerpo)
         let referenciasTitulo = null;
         let referenciasDescripcion = null;
         let referenciasPrefijo = null;
-        
+
         // Opción A: Buscar en data.finales.referencias
         if (data.finales?.referencias?.titulo) {
             referenciasTitulo = data.finales.referencias.titulo;
             referenciasDescripcion = data.finales.referencias.nota || "Normativa bibliográfica según corresponda.";
             referenciasPrefijo = "REFERENCIAS"; // Palabra clave para búsqueda
-        } 
+        }
         // Opción B: Buscar en el cuerpo (por si está como capítulo)
         else if (data.cuerpo && Array.isArray(data.cuerpo)) {
-            const capituloReferencias = data.cuerpo.find(cap => 
+            const capituloReferencias = data.cuerpo.find(cap =>
                 cap.titulo && (
                     cap.titulo.toUpperCase().includes('REFERENCIAS') ||
                     cap.titulo.toUpperCase().includes('BIBLIOGRAF')
                 )
             );
-            
+
             if (capituloReferencias) {
                 referenciasTitulo = capituloReferencias.titulo;
                 referenciasDescripcion = capituloReferencias.nota_capitulo || capituloReferencias.nota || "Normativa bibliográfica según corresponda.";
@@ -405,7 +468,7 @@ async function hydrateRequirementsList() {
                 referenciasPrefijo = match ? match[1] + '.' : 'REFERENCIAS';
             }
         }
-        
+
         // Agregar la tarjeta de Referencias si se encontró
         if (referenciasTitulo) {
             container.appendChild(buildRequirementItem(
@@ -414,25 +477,25 @@ async function hydrateRequirementsList() {
                 () => previewChapter(formatId, referenciasPrefijo)
             ));
         }
-        
+
         // 6. Agregar Anexos (si existen)
         if (data.finales?.anexos) {
             const anexos = data.finales.anexos;
             const anexosTitulo = anexos.titulo_seccion || "Anexos";
             const anexosDescripcion = anexos.nota_general || anexos.nota || "Documentación complementaria.";
-            
+
             container.appendChild(buildRequirementItem(
                 anexosTitulo,
                 anexosDescripcion,
                 null // Sin preview por ahora, o puedes crear una función previewAnexos
             ));
         }
-        
+
         // 7. Reinicializar iconos de Lucide
         if (window.lucide) {
             window.lucide.createIcons();
         }
-        
+
     } catch (error) {
         console.error("Error cargando requisitos:", error);
         container.innerHTML = `
@@ -449,19 +512,19 @@ async function hydrateRequirementsList() {
 function buildRequirementItem(title, description, onPreview) {
     const wrapper = document.createElement('div');
     wrapper.className = "flex items-start gap-4 p-4 rounded-lg bg-gray-50 border border-gray-200 group hover:border-blue-300 transition-colors";
-    
+
     // Contenido
     const body = document.createElement('div');
     body.className = "flex-1";
-    
+
     const header = document.createElement('div');
     header.className = "flex items-center justify-between";
-    
+
     const h4 = document.createElement('h4');
     h4.className = "font-semibold text-gray-900";
     h4.textContent = title;
     header.appendChild(h4);
-    
+
     // Botón de preview (si existe callback)
     if (onPreview) {
         const btn = document.createElement('button');
@@ -471,9 +534,9 @@ function buildRequirementItem(title, description, onPreview) {
         btn.addEventListener('click', onPreview);
         header.appendChild(btn);
     }
-    
+
     body.appendChild(header);
-    
+
     // Descripción
     if (description) {
         const p = document.createElement('p');
@@ -481,13 +544,10 @@ function buildRequirementItem(title, description, onPreview) {
         p.textContent = description;
         body.appendChild(p);
     }
-    
+
     wrapper.appendChild(body);
     return wrapper;
 }
 
 // Ejecutar al cargar la página
 document.addEventListener('DOMContentLoaded', hydrateRequirementsList);
-
-
-

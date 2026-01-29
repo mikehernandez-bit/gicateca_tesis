@@ -44,12 +44,14 @@ ALIASES = {
 TIPO_LABELS = {
     "informe": "Informe de Tesis",
     "maestria": "Tesis de Maestr\u00eda",
+    "posgrado": "Posgrado",
     "proyecto": "Proyecto de Tesis",
 }
 ENFOQUE_LABELS = {"cual": "Cualitativo", "cuant": "Cuantitativo"}
 TIPO_FILTRO = {
     "informe": "Inv. Formativa",
     "maestria": "Suficiencia",
+    "posgrado": "Suficiencia",
     "proyecto": "Tesis",
 }
 _REFERENCE_KEYWORDS = {
@@ -125,7 +127,7 @@ def _build_format_entry(item, data: Dict) -> Dict:
         "uni_code": item.uni,
         "tipo": TIPO_FILTRO.get(item.categoria, "Otros"),
         "titulo": titulo,
-        "facultad": (data.get("facultad") if isinstance(data, dict) and data.get("facultad") else "Centro de Formatos UNAC"),
+        "facultad": (data.get("facultad") if isinstance(data, dict) and data.get("facultad") else "Centro de Formatos UNI"),
         "escuela": (data.get("escuela") if isinstance(data, dict) and data.get("escuela") else "Direcci\u00f3n Acad\u00e9mica"),
         "estado": "VIGENTE",
         "version": data.get("version", "1.0.0") if isinstance(data, dict) else "1.0.0",
@@ -155,6 +157,11 @@ def build_catalog(uni: Optional[str] = None) -> Dict[str, Dict]:
         formatos.append(entry)
         grouped.setdefault(item.uni, {}).setdefault(item.categoria, {}).setdefault(item.enfoque, []).append(entry)
 
+    # Implement custom sorting for UNI
+    if uni == "uni" or uni is None:
+        PRIORITY = {"proyecto": 1, "informe": 2, "posgrado": 3, "maestria": 3}
+        formatos.sort(key=lambda x: PRIORITY.get(x.get("tipo_formato", ""), 99))
+    
     return {"formatos": formatos, "grouped": grouped}
 
 
@@ -215,7 +222,7 @@ def generate_document(fmt_type: str, sub_type: str, uni: str = "unac"):
         raise RuntimeError(f"JSON no encontrado: {json_path}")
 
     filename = f"{provider.code.upper()}_{fmt_type.upper()}_{sub_type.upper()}.docx"
-    tmp_file = tempfile.NamedTemporaryFile(prefix="unac_", suffix=".docx", delete=False)
+    tmp_file = tempfile.NamedTemporaryFile(prefix=f"{provider.code}_", suffix=".docx", delete=False)
     output_path = Path(tmp_file.name)
     tmp_file.close()
 
