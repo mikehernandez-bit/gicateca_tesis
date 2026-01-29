@@ -1,0 +1,82 @@
+{
+  "id": "vancouver",
+  "titulo": "Norma Vancouver",
+  "tags": ["Numérica", "Ciencias de la salud", "Biomédica"],
+  "descripcion": "Vancouver (ICMJE) es un estilo numérico usado en ciencias de la salud: citas en el texto por número según aparición y lista de referencias numerada en el mismo orden. Ideal para artículos biomédicos, reportes clínicos y tesis en salud.",
+  "preview": {
+    "cita": "El protocolo mejora la adherencia terapéutica [1].",
+    "referencia": "[1] Ramos JA, Castillo MR. Adherencia terapéutica... 2021;15(2):55-63."
+  },
+  "secciones": [
+    {
+      "titulo": "1) Qué es y cuándo usarlo",
+      "items": [
+        { "tipo": "texto", "contenido": "Vancouver utiliza numeración por orden de aparición. La primera fuente citada es [1], la segunda [2], etc. La lista final se presenta numerada en el mismo orden (no alfabética)." },
+        { "tipo": "lista", "titulo": "Úsalo cuando:", "items": [
+          "Tu programa de salud/biomédica exige Vancouver/ICMJE.",
+          "Redactas artículos clínicos, reportes biomédicos o tesis en salud.",
+          "Se requiere citación numérica compacta."
+        ] },
+        { "tipo": "nota", "contenido": "Algunas guías usan superíndice; en esta web se muestra como [n] para lectura clara." }
+      ]
+    },
+    {
+      "titulo": "2) Regla rápida",
+      "items": [
+        { "tipo": "lista", "titulo": "En el texto:", "items": [
+          "Primera vez que citas una fuente: [1].",
+          "Si la vuelves a citar: repites el mismo número [1].",
+          "Varias fuentes: [2], [3] o rango [2]–[5] (según guía)."
+        ] },
+        { "tipo": "lista", "titulo": "En la lista:", "items": [
+          "Numerada por aparición (NO alfabética).",
+          "Formato conciso: autores, título, revista/libro, año, volumen(número), páginas.",
+          "En web: incluye [Internet] y fecha de consulta [citado ...] cuando aplique."
+        ] }
+      ]
+    },
+    {
+      "titulo": "3) Cómo se ve (muestra del formato)",
+      "items": [
+        { "tipo": "muestra_cita_texto", "etiqueta": "En el texto", "items": [
+          "El protocolo mejora la adherencia terapéutica [1].",
+          "Resultados similares fueron reportados en [2], [3]."
+        ] },
+        { "tipo": "referencias_numeradas", "etiqueta": "Lista de referencias (Vancouver — numeración alineada)", "items": [
+          { "n": 1, "texto": "Ramos JA, Castillo MR. Adherencia terapéutica en pacientes crónicos. Rev Peru Salud. 2021;15(2):55-63." },
+          { "n": 2, "texto": "García JA. Metodología de investigación clínica. 3a ed. Lima: Editorial Médica; 2020." },
+          { "n": 3, "texto": "Organización Mundial de la Salud. Guía de prevención [Internet]. Ginebra: OMS; 2022 [citado 2026 Ene 20]. Disponible en: https://www.who.int/" }
+        ] }
+      ]
+    },
+    {
+      "titulo": "4) Plantillas por tipo",
+      "items": [
+        { "tipo": "formato", "etiqueta": "Artículo (básico)", "contenido": "Apellido Iniciales. Título del artículo. Abrev Rev. Año;vol(n):pp–pp." },
+        { "tipo": "formato", "etiqueta": "Libro (básico)", "contenido": "Apellido Iniciales. Título del libro. Edición. Ciudad: Editorial; Año." },
+        { "tipo": "formato", "etiqueta": "Web", "contenido": "Autor/Institución. Título [Internet]. Lugar: Editor; Año [citado AAAA Mon DD]. Disponible en: URL" }
+      ]
+    },
+    {
+      "titulo": "5) Checklist antes de entregar",
+      "items": [
+        { "tipo": "checklist", "items": [
+          "La lista está numerada por aparición (no alfabética).",
+          "La misma fuente mantiene el mismo número cuando se repite en el texto.",
+          "Las páginas web incluyen [Internet] y fecha de consulta [citado ...]."
+        ] }
+      ]
+    },
+    {
+      "titulo": "6) Errores comunes",
+      "items": [
+        { "tipo": "texto", "contenido": "Ordenar la bibliografía alfabéticamente (en Vancouver va por aparición)." },
+        { "tipo": "texto", "contenido": "Cambiar numeración en el texto sin actualizar la lista." },
+        { "tipo": "texto", "contenido": "Inconsistencia en abreviatura de revistas cuando la guía lo exige." }
+      ]
+    }
+  ],
+  "fuentes": [
+    { "label": "ICMJE Recommendations (Vancouver)", "nota": "Recomendaciones del International Committee of Medical Journal Editors." }
+  ]
+}

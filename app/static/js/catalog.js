@@ -48,16 +48,16 @@ function iniciarFlujo(modo, cardId) {
 
     // --- MODO REFERENCIAS ---
     if (modo === 'referencias') {
-        if(bloqueCats) bloqueCats.classList.add("hidden", "opacity-0", "translate-y-4");
-        if(bloqueRes) bloqueRes.classList.add("hidden", "opacity-0", "translate-y-4");
-        
+        if (bloqueCats) bloqueCats.classList.add("hidden", "opacity-0", "translate-y-4");
+        if (bloqueRes) bloqueRes.classList.add("hidden", "opacity-0", "translate-y-4");
+
         if (bloqueRefs) {
             bloqueRefs.classList.remove("hidden");
             setTimeout(() => {
                 bloqueRefs.classList.remove("opacity-0", "translate-y-4");
                 bloqueRefs.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }, 50);
-            
+
             if (!referencesState.loaded) {
                 loadReferencesGrid();
             }
@@ -69,20 +69,20 @@ function iniciarFlujo(modo, cardId) {
     if (bloqueRefs) bloqueRefs.classList.add("hidden", "opacity-0");
 
     // 1. Mostrar Categorías
-    if(bloqueCats) {
+    if (bloqueCats) {
         const titulo = document.getElementById('titulo-paso-2');
-        if(titulo) titulo.textContent = (modo === 'caratula') ? "¿Qué carátula deseas visualizar?" : "Selecciona qué documentos ver";
-        
+        if (titulo) titulo.textContent = (modo === 'caratula') ? "¿Qué carátula deseas visualizar?" : "Selecciona qué documentos ver";
+
         bloqueCats.classList.remove("hidden");
-        setTimeout(() => { 
+        setTimeout(() => {
             bloqueCats.classList.remove("opacity-0", "translate-y-4");
             bloqueCats.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 50);
     }
 
     // 2. Ocultar Resultados hasta selección
-    if(bloqueRes) bloqueRes.classList.add("hidden", "opacity-0");
-    
+    if (bloqueRes) bloqueRes.classList.add("hidden", "opacity-0");
+
     // Limpiar selección previa
     document.querySelectorAll('.cat-card').forEach(c => {
         c.classList.remove('ring-2', 'ring-offset-2', 'ring-blue-500', 'border-blue-500');
@@ -92,7 +92,7 @@ function iniciarFlujo(modo, cardId) {
 
 function seleccionarCategoriaFinal(filtro, cardId) {
     highlightCategoryCard(cardId);
-    
+
     const bloqueRefs = document.getElementById("bloque-referencias");
     if (bloqueRefs) bloqueRefs.classList.add("hidden");
 
@@ -102,7 +102,7 @@ function seleccionarCategoriaFinal(filtro, cardId) {
     const resultados = document.getElementById("bloque-resultados");
     if (resultados) {
         resultados.classList.remove("hidden");
-        setTimeout(() => { 
+        setTimeout(() => {
             resultados.classList.remove("opacity-0", "translate-y-4");
             resultados.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 50);
@@ -132,12 +132,12 @@ function renderReferencesCards(items) {
     if (!grid) return;
 
     grid.innerHTML = "";
-    
+
     if (!items || !items.length) {
-        if(empty) empty.classList.remove("hidden");
+        if (empty) empty.classList.remove("hidden");
         return;
     }
-    if(empty) empty.classList.add("hidden");
+    if (empty) empty.classList.add("hidden");
 
     const uni = getActiveUni();
 
@@ -159,10 +159,10 @@ function renderReferencesCards(items) {
         // 2. DESCRIPCIÓN (CORTADA AL PRIMER PUNTO)
         const desc = document.createElement("p");
         desc.className = "text-sm text-gray-600 mb-6 leading-relaxed flex-grow";
-        
+
         let fullDesc = item.descripcion || "";
         const dotIndex = fullDesc.indexOf('.');
-        
+
         if (dotIndex !== -1) {
             desc.textContent = fullDesc.substring(0, dotIndex + 1);
         } else {
@@ -177,10 +177,10 @@ function renderReferencesCards(items) {
         // Se mantiene el enlace normal por ahora
         // AHORA (Con la marca de origen)
         // ANTES (Línea actual)
-btnLink.href = `/referencias?uni=${encodeURIComponent(uni)}&ref=${encodeURIComponent(item.id)}`;
+        btnLink.href = `/referencias?uni=${encodeURIComponent(uni)}&ref=${encodeURIComponent(item.id)}`;
         btnLink.className = "text-indigo-600 text-sm font-bold flex items-center gap-1 hover:underline mt-auto cursor-pointer";
         btnLink.innerHTML = `Ver guía <i data-lucide="arrow-right" class="w-4 h-4"></i>`;
-        
+
         card.appendChild(btnLink);
         grid.appendChild(card);
     });
@@ -191,9 +191,9 @@ btnLink.href = `/referencias?uni=${encodeURIComponent(uni)}&ref=${encodeURICompo
 async function loadReferencesGrid() {
     const loader = document.getElementById("refs-loader");
     const empty = document.getElementById("refs-grid-empty-catalog");
-    
-    if(loader) loader.classList.remove("hidden");
-    if(empty) empty.classList.add("hidden");
+
+    if (loader) loader.classList.remove("hidden");
+    if (empty) empty.classList.add("hidden");
 
     try {
         const data = await fetchReferencesIndex();
@@ -207,7 +207,7 @@ async function loadReferencesGrid() {
             empty.classList.remove("hidden");
         }
     } finally {
-        if(loader) loader.classList.add("hidden");
+        if (loader) loader.classList.add("hidden");
     }
 }
 
@@ -216,11 +216,11 @@ async function loadReferencesGrid() {
    ========================================================================== */
 function filtrarGrid(categoria) {
     const cards = document.querySelectorAll(".formato-card");
-    const seenGroups = new Set(); 
+    const seenGroups = new Set();
 
     cards.forEach((card) => {
-        const cardType = card.getAttribute("data-tipo");      
-        const cardGroup = card.getAttribute("data-group");    
+        const cardType = card.getAttribute("data-tipo");
+        const cardGroup = card.getAttribute("data-group");
         const titleEl = card.querySelector(".card-title");
         const originalTitle = card.getAttribute("data-original-title");
 
@@ -249,7 +249,7 @@ function aplicarEstilosGrid() {
     document.querySelectorAll(".formato-card").forEach(card => {
         const badge = card.querySelector(".mode-badge");
         const actionText = card.querySelector(".action-text");
-        
+
         card.className = "formato-card group bg-white rounded-xl shadow-sm border border-gray-200 transition-all cursor-pointer flex flex-col h-full overflow-hidden relative hover:shadow-lg";
         card.querySelector(".original-badges").classList.remove("opacity-30");
         badge.classList.add("hidden");
@@ -262,13 +262,13 @@ function aplicarEstilosGrid() {
             badge.classList.remove("hidden");
             actionText.innerHTML = `Ver Carátula <i data-lucide="eye" class="w-4 h-4"></i>`;
             actionText.className = "action-text text-orange-600 text-sm font-semibold flex items-center gap-1 group-hover:translate-x-1 transition-transform";
-        } else { 
+        } else {
             card.classList.add("hover:border-blue-300");
             actionText.innerHTML = `Ver Estructura <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>`;
             actionText.className = "action-text text-blue-600 text-sm font-semibold flex items-center gap-1 group-hover:translate-x-1 transition-transform";
         }
     });
-    if(typeof lucide !== 'undefined') lucide.createIcons();
+    if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
 /* ==========================================================================
@@ -280,7 +280,7 @@ function handleCardClick(event, formatId) {
         previewCover(formatId);
         return false;
     }
-    return true; 
+    return true;
 }
 
 function closeModal(modalId) {
@@ -302,7 +302,7 @@ async function previewCover(formatId) {
     content.classList.add('hidden');
     try {
         const data = await fetchFormatData(formatId);
-        const c = data.caratula || {}; 
+        const c = data.caratula || {};
         document.getElementById('c-uni').textContent = c.universidad || "UNIVERSIDAD NACIONAL DEL CALLAO";
         document.getElementById('c-fac').textContent = c.facultad || "";
         document.getElementById('c-esc').textContent = c.escuela || "";
@@ -310,8 +310,21 @@ async function previewCover(formatId) {
         document.getElementById('c-frase').textContent = c.frase_grado || "";
         document.getElementById('c-grado').textContent = c.grado_objetivo || "";
         document.getElementById('c-lugar').textContent = (c.pais || "CALLAO, PERÚ");
+        document.getElementById('c-lugar').textContent = (c.pais || "CALLAO, PERÚ");
         document.getElementById('c-anio').textContent = (c.fecha || "2026");
-        
+
+        // Logo Logic
+        const config = data.configuracion || {};
+        const logoImg = document.getElementById('c-logo');
+        if (logoImg) {
+            let rutaLogo = config.ruta_logo || "/static/assets/LogoUNAC.png";
+            // Fix path if it starts with app/static
+            if (rutaLogo.startsWith("app/static")) {
+                rutaLogo = "/" + rutaLogo.substring(4); // remove "app"
+            }
+            logoImg.src = rutaLogo;
+        }
+
         const guiaEl = document.getElementById('c-guia');
         if (guiaEl) {
             const guia = (c.guia || c.nota || "").trim();
