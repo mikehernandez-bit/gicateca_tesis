@@ -15,7 +15,7 @@ Cambio: Layout corregido usando CSS Grid. El contenido principal se estira y se 
     </div>
     <div class="inline-flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-4 py-2 shadow-sm">
       <span class="text-xs uppercase tracking-wider text-gray-400">Universidad</span>
-      <span class="text-sm font-semibold text-gray-800">{{ uni_name or 'Universidad' }}</span>
+      <span id="ref-uni-badge" class="text-sm font-semibold text-gray-800">{{ uni_name or 'Universidad' }}</span>
     </div>
   </div>
 
@@ -87,5 +87,5 @@ Cambio: Layout corregido usando CSS Grid. El contenido principal se estira y se 
   </div>
 </div>
 
-<script src="/static/js/references.js?v=14"></script>
+<script src="/static/js/references.js?v=19"></script>
 {% endblock %}

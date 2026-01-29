@@ -30,6 +30,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List
 
 from app.core.paths import get_data_root
+from app.core.registry import get_provider, list_universities
 
 
 _HIDDEN_PREFIXES = ("_", "__")
@@ -43,7 +44,7 @@ def _load_json(path: Path) -> Any:
 
 def _references_root() -> Path:
     """Retorna la carpeta de normas globales."""
-    return get_data_root() / "unac" / "references"
+    return get_data_root() / "references"
 
 
 def _iter_reference_files() -> List[Path]:
@@ -102,7 +103,7 @@ def _default_config(uni: str, available: Iterable[str]) -> Dict[str, Any]:
 def get_uni_config(uni: str, available: Iterable[str]) -> Dict[str, Any]:
     """Carga configuracion por universidad o genera defaults."""
     code = (uni or "unac").strip().lower()
-    config_path = get_data_root() / code / "references.json"
+    config_path = get_data_root() / code / "references_config.json"
 
     if not config_path.exists():
         return _default_config(code, available)
@@ -135,7 +136,11 @@ def build_reference_index(uni: str) -> Dict[str, Any]:
     summaries: List[Dict[str, Any]] = []
     available_map = {item.get("id") or item.get("id_ref") or item.get("codigo"): item for item in list_references()}
 
-    ordered_ids = [ref_id for ref_id in config["order"] if ref_id in config["enabled"]]
+    ordered_ids = [ref_id for ref_id in config["order"] if ref_id in available]
+    # Asegura que se muestren todas las normas aunque no estén en order.
+    for ref_id in available:
+        if ref_id not in ordered_ids:
+            ordered_ids.append(ref_id)
     for ref_id in ordered_ids:
         item = available_map.get(ref_id)
         if not item:
@@ -168,9 +173,22 @@ def get_reference_detail(ref_id: str, uni: str) -> Dict[str, Any]:
     available = list_reference_ids()
     config = get_uni_config(uni, available)
     note = (config.get("notes") or {}).get(ref_id)
-
+    used_by: List[Dict[str, str]] = []
+    for code in list_universities():
+        try:
+            config_for_uni = get_uni_config(code, available)
+        except Exception:
+            continue
+        if ref_id not in (config_for_uni.get("enabled") or []):
+            continue
+        try:
+            provider = get_provider(code)
+            used_by.append({"code": provider.code, "name": provider.display_name})
+        except KeyError:
+            used_by.append({"code": code, "name": code.upper()})
     detail = dict(payload)
     if note:
         detail["nota_universidad"] = note
     detail["uni"] = config.get("university", (uni or "unac").strip().lower())
+    detail["usado_por"] = used_by
     return detail
