@@ -221,15 +221,17 @@ function filtrarGrid(categoria) {
     cards.forEach((card) => {
         const cardType = card.getAttribute("data-tipo");
         const cardGroup = card.getAttribute("data-group");
+        const cardUni = card.getAttribute("data-uni") || "";
+        const groupKey = `${cardGroup}-${cardUni}`;
         const titleEl = card.querySelector(".card-title");
         const originalTitle = card.getAttribute("data-original-title");
 
         const matchesCategory = (categoria === "todos" || cardType === categoria);
 
         if (currentMode === 'caratula') {
-            if (matchesCategory && !seenGroups.has(cardGroup)) {
+            if (matchesCategory && !seenGroups.has(groupKey)) {
                 card.style.display = "flex";
-                seenGroups.add(cardGroup);
+                seenGroups.add(groupKey);
                 if (titleEl && originalTitle) titleEl.textContent = originalTitle.split(" - ")[0];
             } else {
                 card.style.display = "none";
@@ -303,21 +305,43 @@ async function previewCover(formatId) {
     try {
         const data = await fetchFormatData(formatId);
         const c = data.caratula || {};
-        document.getElementById('c-uni').textContent = c.universidad || "UNIVERSIDAD NACIONAL DEL CALLAO";
+        const metaUni = (data && data._meta && data._meta.uni) ? String(data._meta.uni).toLowerCase() : "";
+        const uniFallback = metaUni === "uni" ? "UNIVERSIDAD NACIONAL DE INGENIERÍA" : "UNIVERSIDAD NACIONAL DEL CALLAO";
+        const titulo = c.titulo_placeholder || c.titulo || c.titulo_proyecto || c.titulo_tesis || "TÍTULO DEL PROYECTO";
+        const frase = c.frase_grado || c.frase || "";
+        const grado = c.grado_objetivo || c.carrera || c.grado || "";
+
+        const lugarFechaRaw = (c.lugar_fecha || c.lugar || "").toString();
+        let lugar = c.pais || "";
+        let anio = c.fecha || "";
+        if ((!lugar || !anio) && lugarFechaRaw) {
+            const parts = lugarFechaRaw.split(/\n+/).map(p => p.trim()).filter(Boolean);
+            if (parts.length > 1) {
+                lugar = lugar || parts[0];
+                anio = anio || parts[parts.length - 1];
+            } else if (parts.length === 1) {
+                lugar = lugar || parts[0];
+            }
+        }
+
+        document.getElementById('c-uni').textContent = c.universidad || uniFallback;
         document.getElementById('c-fac').textContent = c.facultad || "";
         document.getElementById('c-esc').textContent = c.escuela || "";
-        document.getElementById('c-titulo').textContent = c.titulo_placeholder || "TÍTULO DEL PROYECTO";
-        document.getElementById('c-frase').textContent = c.frase_grado || "";
-        document.getElementById('c-grado').textContent = c.grado_objetivo || "";
-        document.getElementById('c-lugar').textContent = (c.pais || "CALLAO, PERÚ");
-        document.getElementById('c-lugar').textContent = (c.pais || "CALLAO, PERÚ");
-        document.getElementById('c-anio').textContent = (c.fecha || "2026");
+        document.getElementById('c-titulo').textContent = titulo;
+        document.getElementById('c-frase').textContent = frase;
+        document.getElementById('c-grado').textContent = grado;
+        document.getElementById('c-lugar').textContent = (lugar || "CALLAO, PERÚ");
+        document.getElementById('c-anio').textContent = (anio || "2026");
 
         // Logo Logic
         const config = data.configuracion || {};
         const logoImg = document.getElementById('c-logo');
         if (logoImg) {
-            let rutaLogo = config.ruta_logo || "/static/assets/LogoUNAC.png";
+            let rutaLogo = config.ruta_logo;
+            if (!rutaLogo) {
+                const uniCode = metaUni ? metaUni.toUpperCase() : "UNAC";
+                rutaLogo = `/static/assets/Logo${uniCode}.png`;
+            }
             // Fix path if it starts with app/static
             if (rutaLogo.startsWith("app/static")) {
                 rutaLogo = "/" + rutaLogo.substring(4); // remove "app"

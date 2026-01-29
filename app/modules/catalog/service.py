@@ -115,6 +115,22 @@ def _build_format_entry(item, data: Dict) -> Dict:
     resumen = None
     if isinstance(data, dict):
         resumen = data.get("descripcion")
+    caratula = data.get("caratula", {}) if isinstance(data, dict) else {}
+    facultad = None
+    escuela = None
+    if isinstance(data, dict):
+        facultad = data.get("facultad")
+        escuela = data.get("escuela")
+    if not facultad and isinstance(caratula, dict):
+        facultad = caratula.get("facultad")
+        escuela = escuela or caratula.get("escuela")
+    # Forzar leyenda uniforme y escalable por universidad.
+    if item.uni:
+        facultad = f"Centro de Formatos {item.uni.upper()}"
+    if not facultad:
+        facultad = "Centro de Formatos"
+    if not escuela:
+        escuela = "Dirección Académica"
     if not resumen:
         if enfoque_label:
             resumen = f"Plantilla oficial de {cat_label} con enfoque {enfoque_label}"
@@ -127,8 +143,8 @@ def _build_format_entry(item, data: Dict) -> Dict:
         "uni_code": item.uni,
         "tipo": TIPO_FILTRO.get(item.categoria, "Otros"),
         "titulo": titulo,
-        "facultad": (data.get("facultad") if isinstance(data, dict) and data.get("facultad") else "Centro de Formatos UNI"),
-        "escuela": (data.get("escuela") if isinstance(data, dict) and data.get("escuela") else "Direcci\u00f3n Acad\u00e9mica"),
+        "facultad": facultad,
+        "escuela": escuela,
         "estado": "VIGENTE",
         "version": data.get("version", "1.0.0") if isinstance(data, dict) else "1.0.0",
         "fecha": (data.get("fecha") if isinstance(data, dict) and data.get("fecha") else "2026-01-17"),

@@ -35,6 +35,7 @@ Fix: Botones funcionando + Calibración matemática "Quirúrgica" (Scroll 100px 
   const detailSources = document.getElementById("ref-sources");
   const tocContainer = document.getElementById("ref-toc");
   const tocListEl = document.getElementById("ref-toc-list");
+  const uniBadge = document.getElementById("ref-uni-badge");
 
   const routingEnabled = app.dataset.routing !== "false";
   const basePath = app.dataset.base || window.location.pathname || "/referencias";
@@ -49,6 +50,7 @@ Fix: Botones funcionando + Calibración matemática "Quirúrgica" (Scroll 100px 
     order: [],
     activeId: null,
     observer: null,
+    defaultBadge: uniBadge ? uniBadge.textContent.trim() : "",
   };
 
   function parseQuery() {
@@ -183,6 +185,16 @@ Fix: Botones funcionando + Calibración matemática "Quirúrgica" (Scroll 100px 
 
     if (breadcrumbEl) {
       breadcrumbEl.textContent = title ? `Referencias > ${title}` : "Referencias";
+    }
+
+    if (uniBadge) {
+      const usedBy = Array.isArray(detail.usado_por) ? detail.usado_por : [];
+      const codes = usedBy.map(item => (item.code || "").toUpperCase()).filter(Boolean);
+      if (codes.length) {
+        uniBadge.textContent = codes.join(" • ");
+      } else {
+        uniBadge.textContent = state.defaultBadge || "";
+      }
     }
 
     if (detail.nota_universidad) {
@@ -431,13 +443,17 @@ Fix: Botones funcionando + Calibración matemática "Quirúrgica" (Scroll 100px 
         history.pushState({ ref: refId, uni: state.uni }, "", url);
       }
     } catch (error) {
-      detailContent.innerHTML = "<p class='text-sm text-red-600'>No se pudo cargar la norma.</p>";
       setDetailLoading(false);
+      showGrid(true);
+      showGridError("La norma no está habilitada para esta universidad.");
     }
   }
 
   function showGrid(pushState = false) {
     toggleViews(false);
+    if (uniBadge) {
+      uniBadge.textContent = state.defaultBadge || "";
+    }
     if (pushState && routingEnabled) {
       const url = `${basePath}?uni=${encodeURIComponent(state.uni)}`;
       history.pushState({ ref: null, uni: state.uni }, "", url);

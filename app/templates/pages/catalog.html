@@ -131,7 +131,7 @@
       {% for f in formatos %}
       <a href="/formatos/{{ f.id }}" onclick="return handleCardClick(event, '{{ f.id }}')"
         class="formato-card group bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer flex flex-col h-full overflow-hidden relative"
-        data-tipo="{{ f.tipo }}" data-group="{{ f.tipo_formato }}" data-original-title="{{ f.titulo }}">
+        data-tipo="{{ f.tipo }}" data-group="{{ f.tipo_formato }}" data-uni="{{ f.uni_code }}" data-original-title="{{ f.titulo }}">
 
         <div
           class="hidden mode-badge absolute top-3 right-3 z-10 text-[10px] font-bold px-2 py-1 rounded shadow-sm border flex items-center gap-1">
@@ -211,5 +211,5 @@
   </div>
 </div>
 
-<script src="/static/js/catalog.js?v=25"></script>
+<script src="/static/js/catalog.js?v=28"></script>
 {% endblock %}
