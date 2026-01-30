@@ -1,6 +1,6 @@
 {
   "caratula": {
-    "universidad": "UNIVERSIDAD NACIONAL DEL CALLAO",
+    "universidad": "UNIVERSIDAD NACIONAL DE INGENIERÍA",
     "facultad": "FACULTAD DE [NOMBRE DE LA FACULTAD]",
     "escuela": "ESCUELA PROFESIONAL DE [NOMBRE DE LA ESCUELA]",
     "tipo_documento": "INFORME DE TESIS",
@@ -10,7 +10,7 @@
     "label_autor": "AUTOR: [NOMBRES Y APELLIDOS]",
     "label_asesor": "ASESOR: [NOMBRES Y APELLIDOS]",
     "label_linea": "LÍNEA DE INVESTIGACIÓN: [NOMBRE DE LA LÍNEA]",
-    "fecha": "Callao, 2026",
+    "fecha": "Lima, 2026",
     "pais": "PERÚ"
   },
   "preliminares": {
@@ -257,11 +257,18 @@
     "variables": {
       "independiente": {
         "nombre": "PLAN DE MANTENIMIENTO",
-        "dimensiones": ["Criticidad", "AMEF", "Programación"]
+        "dimensiones": [
+          "Criticidad",
+          "AMEF",
+          "Programación"
+        ]
       },
       "dependiente": {
         "nombre": "TIEMPO PERDIDO",
-        "dimensiones": ["Disponibilidad", "Confiabilidad"]
+        "dimensiones": [
+          "Disponibilidad",
+          "Confiabilidad"
+        ]
       }
     },
     "metodologia": {
@@ -276,6 +283,9 @@
       "procesamiento": "SPSS v25"
     }
   },
-  "version": "2.0.0",
-  "descripcion": "Plantilla Oficial Informe de Tesis UNAC - Enfoque Cuantitativo (Directiva 004-2022-R)"
+  "titulo": "Formato de Informe de Tesis",
+  "descripcion": "Plantilla para informe de tesis siguiendo normas APA, aplicable a facultades generales.",
+  "facultad": "Centro de Formatos UNI",
+  "version": "1.0",
+  "fecha": "14 Enero, 2026"
 }

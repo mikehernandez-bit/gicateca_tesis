@@ -1,0 +1,116 @@
+{
+  "caratula": {
+    "facultad": "FACULTAD DE [NOMBRE DE LA FACULTAD]",
+    "tipo_documento": "TESIS",
+    "titulo": "“TÍTULO DE LA TESIS”",
+    "frase_grado": "PARA OBTENER EL GRADO ACADÉMICO DE",
+    "grado": "MAESTRO/DOCTOR EN CIENCIAS CON MENCIÓN EN:\n(colocar el nombre de la mención)",
+    "label_autor": "ELABORADO POR:",
+    "autor": "Bs. [NOMBRE Y APELLIDOS COMPLETOS]",
+    "label_asesor": "ASESOR",
+    "asesor": "Dr. Ing. [NOMBRES Y APELLIDOS COMPLETOS]",
+    "lugar_fecha": "LIMA – PERÚ\n2026"
+  },
+  "preliminares": {
+    "dedicatoria": {
+      "titulo": "Dedicatoria",
+      "texto": "(Mención breve y afectiva a personas a quienes se ofrenda el esfuerzo del trabajo)."
+    },
+    "agradecimientos": {
+      "titulo": "Agradecimientos",
+      "texto": "(Reconocimiento a instituciones o personas que contribuyeron académica o financieramente a la tesis)."
+    },
+    "indices": {
+      "contenido": "Índice de Contenidos",
+      "tablas": "Lista de Tablas, Ilustraciones y Cuadros"
+    },
+    "resumen": {
+      "titulo": "Resumen – Abstract",
+      "texto": "(Síntesis del trabajo (objetivo, método, resultados y conclusión) en español e inglés, generalmente no mayor a 250 palabras)."
+    },
+    "introduccion": {
+      "titulo": "Introducción",
+      "texto": "(Visión general que contextualiza el tema, justifica su importancia y describe la estructura del documento)."
+    }
+  },
+  "cuerpo": [
+    {
+      "titulo": "CAPÍTULO I. PROTOCOLO DE LA INVESTIGACIÓN",
+      "items": [
+        {
+          "titulo": "1.1. Identificación y Descripción del Problema de estudio",
+          "subitems": [
+            "1.1.1. Formulación del Problema General",
+            "1.1.2. Formulación de los Problemas Específicos"
+          ]
+        },
+        {
+          "titulo": "1.2. Objetivos",
+          "subitems": [
+            "1.2.1. Formulación del Objetivo General",
+            "1.2.2. Formulación de los Objetivos Específicos"
+          ]
+        },
+        {
+          "titulo": "1.3. Hipótesis y variables",
+          "subitems": [
+            "1.3.1. Formulación de la Hipótesis General",
+            "1.3.2. Formulación de las Hipótesis Específicas",
+            "1.3.3. Variables"
+          ]
+        },
+        {
+          "titulo": "1.4. Metodología"
+        }
+      ]
+    },
+    {
+      "titulo": "CAPÍTULO II. MARCO TEÓRICO",
+      "items": [
+        {
+          "titulo": "2.1. Antecedentes de la investigación"
+        },
+        {
+          "titulo": "2.2. Bases Teóricas"
+        },
+        {
+          "titulo": "2.3. Definición de Términos"
+        }
+      ]
+    },
+    {
+      "titulo": "CAPÍTULO III. DESARROLLO DEL TRABAJO DE INVESTIGACIÓN",
+      "items": [
+        {
+          "titulo": "3.1. Análisis de los Datos y Resultados"
+        },
+        {
+          "titulo": "3.2. Discusión e interpretación de los Resultados"
+        },
+        {
+          "titulo": "3.3. Contrastación de la Hipótesis (Si Aplica)"
+        }
+      ]
+    },
+    {
+      "titulo": "CAPÍTULO IV. CONCLUSIONES Y RECOMENDACIONES",
+      "items": [
+        {
+          "titulo": "4.1. Conclusiones"
+        },
+        {
+          "titulo": "4.2. Recomendaciones"
+        }
+      ]
+    }
+  ],
+  "finales": {
+    "referencias": "REFERENCIAS",
+    "anexos": "ANEXOS"
+  },
+  "titulo": "Plantilla de Informe de Tesis Posgrado",
+  "descripcion": "Plantilla oficial de Posgrado",
+  "facultad": "Centro de Formatos UNI",
+  "version": "1.0",
+  "fecha": "2026"
+}

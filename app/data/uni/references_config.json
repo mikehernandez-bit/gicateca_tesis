@@ -1,0 +1,7 @@
+{
+  "university": "uni",
+  "title": "Normas de citación (UNI)",
+  "enabled": ["ieee","apa7","iso690"],
+  "order": ["ieee","apa7","iso690"],
+  "notes": {}
+}

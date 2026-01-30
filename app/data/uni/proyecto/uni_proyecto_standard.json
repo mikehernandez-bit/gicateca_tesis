@@ -1,0 +1,103 @@
+{
+  "caratula": {
+    "facultad": "FACULTAD DE [NOMBRE DE LA FACULTAD]",
+    "tipo_documento": "PLAN DE TRABAJO DE TESIS",
+    "titulo": "“TÍTULO DE PROYECTO DE TESIS”",
+    "frase_grado": "PARA OBTENER EL TÍTULO PROFESIONAL DE:",
+    "carrera": "[CARRERA PROFESIONAL]",
+    "label_autor": "ELABORADO POR:",
+    "autor": "Bs. [NOMBRE Y APELLIDOS COMPLETOS]",
+    "label_asesor": "ASESOR",
+    "asesor": "Dr. Ing. [NOMBRES Y APELLIDOS COMPLETOS]",
+    "lugar_fecha": "LIMA – PERÚ\n2026"
+  },
+  "secciones": [
+    {
+      "numero": "1",
+      "titulo": "TÍTULO",
+      "instruccion": "El título del proyecto de investigación deberá ser claro, conciso y transmitir una idea completa del trabajo a realizar."
+    },
+    {
+      "numero": "2",
+      "titulo": "RESUMEN DEL PROYECTO",
+      "instruccion": "Se describirán brevemente las características generales del proyecto, sin incluir objetivos, metas, alcances o referencias bibliográficas."
+    },
+    {
+      "numero": "3",
+      "titulo": "ANTECEDENTES",
+      "instruccion": "En este capítulo se plasmarán la evolución del conocimiento científico o tecnológico y el estado del arte relacionado con el área correspondiente... Es obligatorio la inclusión de bibliografía debidamente citada (libros y revistas internacionales). Evitar información anecdótica."
+    },
+    {
+      "numero": "4",
+      "titulo": "JUSTIFICACIÓN",
+      "instruccion": "Se deberá señalar las consideraciones científicas, académicas, técnicas, económicas, sociales, culturales o políticas. Se describirá el problema a resolver, identificado como resultado de un análisis sistemático de causa y efecto."
+    },
+    {
+      "numero": "5",
+      "titulo": "OBJETIVOS Y METAS",
+      "instruccion": "Se deberá plantear un objetivo general y objetivos específicos (claros y concisos). Las metas deberán ser indicadas en términos cuantitativos a corto, mediano y largo plazo."
+    },
+    {
+      "numero": "6",
+      "titulo": "METODOLOGÍA",
+      "instruccion": "Se indicará la metodología, técnicas, instrumentos e infraestructura requeridos. Debe incluir la descripción de las etapas teórico/experimentales.\n\nRequisito: Exponer por medio de un diagrama de flujo que incluya los pasos a seguir."
+    },
+    {
+      "numero": "7",
+      "titulo": "POTENCIALES BENEFICIARIOS",
+      "instruccion": "Indicar el o los usuarios finales del producto de la investigación. En proyectos vinculados con el sector productivo, este requisito es indispensable y deberá ser comprobado."
+    },
+    {
+      "numero": "8",
+      "titulo": "APORTES ESPERADOS",
+      "instruccion": "Se indicarán los aportes que se esperan obtener en los ámbitos de:",
+      "lista": [
+        "a) La universidad",
+        "b) La sociedad",
+        "c) El sector productivo",
+        "Productos tangibles: patentes, prototipos, hardware, software."
+      ]
+    },
+    {
+      "numero": "9",
+      "titulo": "DESCRIPCIÓN TÉCNICA DEL PROYECTO",
+      "instruccion": "Se indicará en forma detallada:",
+      "lista": [
+        "El planteamiento del problema.",
+        "La Hipótesis.",
+        "Los procedimientos y metodologías.",
+        "El cronograma de actividades detalladas (incluyendo informes de avance).",
+        "Los recursos humanos (calificación, función y dedicación).",
+        "Recursos materiales (instrumentos, equipos y ubicación)."
+      ]
+    },
+    {
+      "numero": "10",
+      "titulo": "PRESUPUESTO",
+      "instruccion": "El proyecto deberá formular al nivel de las partidas especificadas en el presupuesto fiscal de la UNI, adjuntándose un calendario de gastos:",
+      "lista": [
+        "Subvenciones.",
+        "Bienes.",
+        "Servicios.",
+        "Equipos e instrumentos.",
+        "Gastos de administración.",
+        "Gastos de imprevistos."
+      ]
+    },
+    {
+      "numero": "11",
+      "titulo": "REFERENCIAS BIBLIOGRÁFICAS",
+      "instruccion": "[Insertar referencias según norma]"
+    },
+    {
+      "numero": "12",
+      "titulo": "ANEXOS",
+      "instruccion": "[Adjuntar planos, datasheets, códigos, etc.]"
+    }
+  ],
+  "titulo": "Plan de Trabajo de Tesis",
+  "descripcion": "Formato para Proyecto de Tesis (Pregrado UNI)",
+  "facultad": "Centro de Formatos UNI",
+  "version": "1.0",
+  "fecha": "2026"
+}

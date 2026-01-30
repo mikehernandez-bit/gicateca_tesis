@@ -82,7 +82,7 @@ def _build_format_entry(item, data: Dict) -> Dict:
         "uni_code": item.uni,
         "tipo": TIPO_FILTRO.get(item.categoria, "Otros"),
         "titulo": titulo,
-        "facultad": (data.get("facultad") if isinstance(data, dict) and data.get("facultad") else "Centro de Formatos UNAC"),
+        "facultad": (data.get("facultad") if isinstance(data, dict) and data.get("facultad") else "Centro de Formatos UNI"),
         "escuela": (data.get("escuela") if isinstance(data, dict) and data.get("escuela") else "Direcci\u00f3n Acad\u00e9mica"),
         "estado": "VIGENTE",
         "version": data.get("version", "1.0.0") if isinstance(data, dict) else "1.0.0",
@@ -185,7 +185,7 @@ def generate_document(format_id: str, section_filter: Optional[str] = None) -> T
     # =========================================================
 
     filename = f"{provider.code.upper()}_{tipo.upper()}_{enfoque.upper()}.docx"
-    tmp_file = tempfile.NamedTemporaryFile(prefix="unac_", suffix=".docx", delete=False)
+    tmp_file = tempfile.NamedTemporaryFile(prefix=f"{provider.code}_", suffix=".docx", delete=False)
     output_path = Path(tmp_file.name)
     tmp_file.close()
 

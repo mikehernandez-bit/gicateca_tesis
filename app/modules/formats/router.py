@@ -67,10 +67,12 @@ def _get_cached_docx_path(format_id: str) -> Path:
     return docx_dir / f"{safe_name}.docx"
 
 
-def _get_cached_pdf_path(format_id: str) -> Path:
-    """Ruta de cache PDF para un format_id."""
+def _get_cached_pdf_path(format_id: str, content_hash: str | None = None) -> Path:
+    """Ruta de cache PDF para un format_id (opcionalmente con hash de contenido)."""
     _, pdf_dir = _ensure_cache_dirs()
     safe_name = format_id.replace("/", "_")
+    if content_hash:
+        return pdf_dir / f"{safe_name}-{content_hash[:12]}.pdf"
     return pdf_dir / f"{safe_name}.pdf"
 
 
@@ -140,14 +142,24 @@ def _is_client_cache_valid(request: Request, etag: str, source_mtime: float) -> 
     return False
 
 
-def _build_cache_headers(format_id: str, source_mtime: float) -> dict[str, str]:
+def _build_cache_headers(
+    format_id: str,
+    source_mtime: float,
+    etag: str | None = None,
+    no_store: bool = False,
+) -> dict[str, str]:
     """Construye headers HTTP para cache del navegador."""
-    etag = _build_etag(format_id, source_mtime)
-    return {
-        "Cache-Control": f"public, max-age={_PDF_CACHE_MAX_AGE}",
-        "ETag": etag,
+    etag_value = etag or _build_etag(format_id, source_mtime)
+    headers = {
+        "ETag": etag_value,
         "Last-Modified": _http_date(source_mtime),
     }
+    if no_store:
+        headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+        headers["Pragma"] = "no-cache"
+    else:
+        headers["Cache-Control"] = f"public, max-age={_PDF_CACHE_MAX_AGE}"
+    return headers
 
 
 def _write_manifest(
@@ -158,6 +170,7 @@ def _write_manifest(
     generator_mtime: float,
     docx_path: Path,
     pdf_path: Path,
+    docx_sha256: str | None = None,
 ) -> None:
     """Escribe un manifest JSON para depuracion de cache."""
     manifest_path = _get_manifest_path(format_id)
@@ -170,6 +183,7 @@ def _write_manifest(
         "created_at": _http_date(time.time()),
         "docx_path": str(docx_path),
         "pdf_path": str(pdf_path),
+        "docx_sha256": docx_sha256,
     }
     try:
         payload["sha256_pdf"] = _calculate_sha256(pdf_path)
@@ -196,14 +210,16 @@ def _ensure_docx_cached(format_id: str, source_mtime: float) -> Path:
     return docx_path
 
 
-def _ensure_pdf_cached(format_id: str, source_mtime: float) -> Path:
-    """Genera o reutiliza el PDF cacheado."""
-    pdf_path = _get_cached_pdf_path(format_id)
-    if _is_cache_fresh(pdf_path, source_mtime):
-        logger.info("PDF cache hit: %s", pdf_path)
-        return pdf_path
-
+def _ensure_pdf_cached(format_id: str, source_mtime: float) -> tuple[Path, Path, str]:
+    """Genera o reutiliza el PDF cacheado (por hash del DOCX)."""
     docx_path = _ensure_docx_cached(format_id, source_mtime)
+    docx_sha256 = _calculate_sha256(docx_path)
+    pdf_path = _get_cached_pdf_path(format_id, docx_sha256)
+
+    if pdf_path.exists() and pdf_path.stat().st_size > 0:
+        logger.info("PDF cache hit (hash): %s", pdf_path)
+        return pdf_path, docx_path, docx_sha256
+
     if pdf_path.exists():
         try:
             pdf_path.unlink()
@@ -212,7 +228,7 @@ def _ensure_pdf_cached(format_id: str, source_mtime: float) -> Path:
     start = time.time()
     _convert_docx_to_pdf(str(docx_path), str(pdf_path))
     logger.info("PDF generado: %s (%.2fs)", pdf_path, time.time() - start)
-    return pdf_path
+    return pdf_path, docx_path, docx_sha256
 
 
 def prewarm_pdfs() -> None:
@@ -366,23 +382,8 @@ async def get_format_pdf(format_id: str, request: Request):
     """Genera el DOCX, lo convierte a PDF y lo devuelve."""
     try:
         item, json_path, json_mtime, script_path, script_mtime, source_mtime = _get_source_info(format_id)
-        headers = _build_cache_headers(format_id, source_mtime)
-        cached_pdf = _get_cached_pdf_path(format_id)
-
-        if _is_cache_fresh(cached_pdf, source_mtime):
-            # Reutiliza PDF si el JSON y el generador no cambiaron.
-            logger.info("PDF cache hit (request): %s", cached_pdf)
-            if _is_client_cache_valid(request, headers["ETag"], source_mtime):
-                return Response(status_code=304, headers=headers)
-            return FileResponse(
-                path=str(cached_pdf),
-                media_type="application/pdf",
-                content_disposition_type="inline",
-                headers=headers,
-            )
-
-        pdf_path = _ensure_pdf_cached(format_id, source_mtime)
-        docx_path = _get_cached_docx_path(format_id)
+        pdf_path, docx_path, docx_sha256 = _ensure_pdf_cached(format_id, source_mtime)
+        etag = f"\"{docx_sha256[:16]}\"" if docx_sha256 else None
         if item and json_path:
             _write_manifest(
                 format_id=format_id,
@@ -392,9 +393,19 @@ async def get_format_pdf(format_id: str, request: Request):
                 generator_mtime=script_mtime,
                 docx_path=docx_path,
                 pdf_path=pdf_path,
+                docx_sha256=docx_sha256,
             )
-
-        headers = _build_cache_headers(format_id, source_mtime)
+        # Logs claros de fuente usada
+        try:
+            logger.info(
+                "PDF preview DOCX fuente: %s (size=%s, sha256=%s)",
+                docx_path,
+                docx_path.stat().st_size,
+                docx_sha256,
+            )
+        except Exception:
+            pass
+        headers = _build_cache_headers(format_id, source_mtime, etag=etag, no_store=True)
         return FileResponse(
             path=str(pdf_path),
             media_type="application/pdf",
