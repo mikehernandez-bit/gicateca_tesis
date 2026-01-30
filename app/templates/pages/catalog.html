@@ -11,6 +11,16 @@
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       
+      <div id="quick-todos"
+           onclick="iniciarFlujo('normal', 'quick-todos')" 
+           class="quick-card group bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer h-full">
+        <div class="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-green-100 transition-colors">
+          <i data-lucide="layers" class="w-7 h-7 text-green-600"></i>
+        </div>
+        <h3 class="font-bold text-gray-900 text-xl mb-2">Estructura</h3>
+        <p class="text-sm text-gray-500 leading-relaxed">Modo estándar: Estructura completa y descargas.</p>
+      </div>
+
       <div id="quick-caratulas"
            onclick="iniciarFlujo('caratula', 'quick-caratulas')" 
            class="quick-card group bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer h-full">
@@ -29,16 +39,6 @@
         </div>
         <h3 class="font-bold text-gray-900 text-xl mb-2">Referencias Bibliográficas</h3>
         <p class="text-sm text-gray-500 leading-relaxed">Modo consulta: Normativas de citación.</p>
-      </div>
-
-      <div id="quick-todos"
-           onclick="iniciarFlujo('normal', 'quick-todos')" 
-           class="quick-card group bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer h-full">
-        <div class="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-green-100 transition-colors">
-          <i data-lucide="layers" class="w-7 h-7 text-green-600"></i>
-        </div>
-        <h3 class="font-bold text-gray-900 text-xl mb-2">Ver Todo</h3>
-        <p class="text-sm text-gray-500 leading-relaxed">Modo estándar: Estructura completa y descargas.</p>
       </div>
 
     </div>
