@@ -88,8 +88,8 @@ function openPdfModal(formatId) {
     if (title) title.innerText = "Vista de Lectura";
 
     const pdfUrl = `/formatos/${formatId}/pdf`;
-
-    viewer.src = pdfUrl + "#page=1&view=Fit&toolbar=0&navpanes=0";
+    const cacheBust = `t=${Date.now()}`;
+    viewer.src = `${pdfUrl}?${cacheBust}#page=1&view=Fit&toolbar=0&navpanes=0`;
     modal.classList.remove('hidden');
 }
 
@@ -125,14 +125,58 @@ async function previewCover(formatId) {
             }
         }
 
-        document.getElementById('c-uni').textContent = c.universidad || "UNIVERSIDAD NACIONAL DEL CALLAO";
-        document.getElementById('c-fac').textContent = c.facultad || "";
-        document.getElementById('c-esc').textContent = c.escuela || "";
-        document.getElementById('c-titulo').textContent = c.titulo_placeholder || "TÍTULO DE INVESTIGACIÓN";
-        document.getElementById('c-frase').textContent = c.frase_grado || "";
-        document.getElementById('c-grado').textContent = c.grado_objetivo || "";
-        document.getElementById('c-lugar').textContent = (c.pais || "CALLAO, PERÚ");
-        document.getElementById('c-anio').textContent = (c.fecha || "2026");
+        const isUni = formatId.toLowerCase().startsWith('uni');
+        const defaultUni = isUni ? "UNIVERSIDAD NACIONAL DE INGENIERÍA" : "UNIVERSIDAD NACIONAL DEL CALLAO";
+        const uniText = c.universidad || data.universidad || defaultUni;
+        document.getElementById('c-uni').textContent = uniText;
+
+        document.getElementById('c-fac').textContent = c.facultad || data.facultad || "";
+
+        const escEl = document.getElementById('c-esc');
+        const escuelaText = c.escuela || "";
+        if (escEl) {
+            escEl.textContent = escuelaText;
+            escEl.classList.toggle('hidden', !escuelaText);
+        }
+
+        const tituloText = c.titulo_placeholder || c.titulo || "TÍTULO DE INVESTIGACIÓN";
+        document.getElementById('c-titulo').textContent = tituloText;
+
+        document.getElementById('c-frase').textContent = c.frase_grado || c.frase || "";
+        document.getElementById('c-grado').textContent = c.grado_objetivo || c.grado || "";
+
+        // Autor / Asesor (si existen en JSON)
+        const labelAutorEl = document.getElementById('c-label-autor');
+        const autorEl = document.getElementById('c-autor');
+        const labelAsesorEl = document.getElementById('c-label-asesor');
+        const asesorEl = document.getElementById('c-asesor');
+        if (labelAutorEl) labelAutorEl.textContent = c.label_autor || labelAutorEl.textContent;
+        if (autorEl) autorEl.textContent = c.autor || autorEl.textContent;
+        if (labelAsesorEl) labelAsesorEl.textContent = c.label_asesor || labelAsesorEl.textContent;
+        if (asesorEl) asesorEl.textContent = c.asesor || asesorEl.textContent;
+
+        // Lugar y año (soporte para lugar_fecha posgrado)
+        let lugar = c.pais || "";
+        let anio = c.fecha || "";
+        const lugarFecha = (c.lugar_fecha || c.lugarFecha || "").trim();
+        if (lugarFecha) {
+            const parts = lugarFecha.split(/\n+/).map(p => p.trim()).filter(Boolean);
+            if (parts.length === 1) {
+                const match = parts[0].match(/(\\d{4})$/);
+                if (match) {
+                    anio = match[1];
+                    lugar = parts[0].replace(match[0], "").trim();
+                } else {
+                    lugar = parts[0];
+                    anio = "";
+                }
+            } else {
+                lugar = parts[0];
+                anio = parts[1] || "";
+            }
+        }
+        document.getElementById('c-lugar').textContent = lugar || (isUni ? "LIMA - PERÚ" : "CALLAO, PERÚ");
+        document.getElementById('c-anio').textContent = anio || "2026";
         const guiaEl = document.getElementById('c-guia');
         if (guiaEl) {
             const guia = (c.guia || c.nota || "").trim();
@@ -160,6 +204,7 @@ async function previewIndex(formatId) {
     const loader = document.getElementById('indexLoader');
     const content = document.getElementById('indexContent');
     const listContainer = document.getElementById('indexList');
+    const footer = document.getElementById('indexFooter');
 
     modal.classList.remove('hidden');
     loader.classList.remove('hidden');
@@ -170,49 +215,159 @@ async function previewIndex(formatId) {
         const data = await fetchFormatJson(formatId);
         let structure = [];
 
-        if (data.estructura) {
-            structure = data.estructura;
+        const sanitizeTitle = (value) => {
+            if (!value) return null;
+            const text = String(value).trim();
+            if (!text) return null;
+            if (text.toUpperCase() === "UNDEFINED") return null;
+            return text;
+        };
+
+        const makeTitle = (num, title) => {
+            const cleanTitle = sanitizeTitle(title);
+            const cleanNum = sanitizeTitle(num);
+            if (!cleanTitle && !cleanNum) return null;
+            if (cleanTitle && cleanNum) {
+                const lowerTitle = cleanTitle.toLowerCase();
+                const lowerNum = cleanNum.toLowerCase();
+                if (lowerTitle.startsWith(lowerNum)) return cleanTitle;
+                return `${cleanNum}. ${cleanTitle}`;
+            }
+            return cleanTitle || cleanNum;
+        };
+
+        const inferLevel = (title, fallback = 1) => {
+            const raw = String(title || "").trim();
+            if (!raw) return fallback;
+            if (/^CAP[ÍI]TULO/i.test(raw)) return 1;
+            if (/^[IVXLCDM]+\./i.test(raw)) return 1;
+            const match = raw.match(/^(\d+(?:\.\d+)+)/);
+            if (match && match[1]) {
+                return match[1].split(".").length;
+            }
+            return fallback;
+        };
+
+        const pushItem = (title, level) => {
+            const clean = sanitizeTitle(title);
+            if (!clean) return;
+            structure.push({ titulo: clean, nivel: inferLevel(clean, level || 1) });
+        };
+
+        if (Array.isArray(data.estructura)) {
+            data.estructura.forEach(item => {
+                const title = item?.titulo || item?.title || item?.texto;
+                const lvl = item?.nivel || item?.level;
+                pushItem(title, lvl || 1);
+            });
         } else {
             if (data.preliminares && data.preliminares.introduccion) {
-                structure.push({ titulo: data.preliminares.introduccion.titulo, nivel: 1 });
+                pushItem(data.preliminares.introduccion.titulo, 1);
             }
-            if (data.cuerpo) {
+            if (Array.isArray(data.cuerpo)) {
                 data.cuerpo.forEach(cap => {
-                    if (cap.titulo) structure.push({ titulo: cap.titulo, nivel: 1 });
-                    if (cap.contenido && Array.isArray(cap.contenido)) {
+                    pushItem(cap.titulo, 1);
+                    if (Array.isArray(cap.contenido)) {
                         cap.contenido.forEach(sub => {
-                            if (sub.texto) structure.push({ titulo: sub.texto, nivel: 2 });
+                            pushItem(sub.texto, 2);
+                        });
+                    }
+                    if (Array.isArray(cap.items)) {
+                        cap.items.forEach(item => {
+                            pushItem(item.titulo, 2);
+                            if (Array.isArray(item.subitems)) {
+                                item.subitems.forEach(sub => {
+                                    pushItem(sub, 3);
+                                });
+                            }
+                        });
+                    }
+                });
+            } else if (Array.isArray(data.secciones)) {
+                data.secciones.forEach(sec => {
+                    const title = makeTitle(sec.numero || sec.romano || sec.id, sec.titulo || sec.title);
+                    pushItem(title, 1);
+                    if (Array.isArray(sec.items)) {
+                        sec.items.forEach(item => {
+                            pushItem(makeTitle(null, item.titulo || item.title), 2);
+                            if (Array.isArray(item.subitems)) {
+                                item.subitems.forEach(sub => {
+                                    pushItem(sub, 3);
+                                });
+                            }
+                        });
+                    }
+                    if (Array.isArray(sec.subitems)) {
+                        sec.subitems.forEach(sub => {
+                            pushItem(sub, 2);
                         });
                     }
                 });
             }
             if (data.finales) {
-                if (data.finales.referencias) structure.push({ titulo: data.finales.referencias.titulo, nivel: 1 });
-                if (data.finales.anexos) structure.push({ titulo: data.finales.anexos.titulo_seccion, nivel: 1 });
+                const refTitle = typeof data.finales.referencias === "string"
+                    ? data.finales.referencias
+                    : data.finales.referencias?.titulo;
+                const anexTitle = typeof data.finales.anexos === "string"
+                    ? data.finales.anexos
+                    : data.finales.anexos?.titulo_seccion || data.finales.anexos?.titulo;
+                pushItem(refTitle, 1);
+                pushItem(anexTitle, 1);
             }
         }
 
-        structure.forEach(item => {
-            const row = document.createElement('div');
-            row.className = "flex items-baseline w-full";
-            const isMain = item.nivel === 1;
-            const textClass = isMain ? "font-bold text-gray-900 uppercase mt-2" : "pl-6 text-gray-700";
+        if (!structure.length) {
+            const empty = document.createElement('div');
+            empty.className = "text-sm text-gray-500";
+            empty.textContent = "Sin estructura referencial disponible.";
+            listContainer.appendChild(empty);
+        } else {
+            structure.forEach(item => {
+                const row = document.createElement('div');
+                row.className = "flex items-baseline w-full";
+                const level = inferLevel(item.titulo, item.nivel || 1);
+                let textClass = "text-gray-700";
+                if (level === 1) {
+                    textClass = "font-bold text-gray-900 uppercase mt-2";
+                } else if (level === 2) {
+                    textClass = "pl-6 text-gray-700";
+                } else if (level === 3) {
+                    textClass = "pl-12 text-gray-700";
+                } else {
+                    textClass = "pl-16 text-gray-700";
+                }
 
-            row.innerHTML = `
-                <span class="${textClass} flex-shrink-0">${item.titulo}</span>
-                <span class="border-b border-dotted border-gray-400 flex-1 mx-2 relative top-[-4px]"></span>
-                <span class="text-gray-500 text-xs">00</span>
-            `;
-            listContainer.appendChild(row);
-        });
+                row.innerHTML = `
+                    <span class="${textClass} flex-shrink-0">${item.titulo}</span>
+                    <span class="border-b border-dotted border-gray-400 flex-1 mx-2 relative top-[-4px]"></span>
+                    <span class="text-gray-500 text-xs">∞</span>
+                `;
+                listContainer.appendChild(row);
+            });
+        }
+
+        if (footer) {
+            const lower = (formatId || "").toLowerCase();
+            if (lower.startsWith("uni")) {
+                footer.textContent = "Estructura referencial basada en normativa UNI";
+            } else if (lower.startsWith("unac")) {
+                footer.textContent = "Estructura referencial basada en normativa UNAC";
+            } else {
+                footer.textContent = "Estructura referencial basada en normativa académica";
+            }
+        }
 
         loader.classList.add('hidden');
         content.classList.remove('hidden');
 
     } catch (error) {
         console.error(error);
-        alert("Error cargando índice: " + error.message);
-        closeIndexModal();
+        const errorRow = document.createElement('div');
+        errorRow.className = "text-sm text-red-600";
+        errorRow.textContent = "No se pudo cargar el índice.";
+        listContainer.appendChild(errorRow);
+        loader.classList.add('hidden');
+        content.classList.remove('hidden');
     }
 }
 
@@ -221,7 +376,7 @@ function closeIndexModal() {
 }
 
 // --- 5. Visualizador Genérico de Capítulos (I al VII) ---
-async function previewChapter(formatId, searchPrefix) {
+async function previewChapter(formatId, searchPrefix, sectionObj = null) {
     const modal = document.getElementById('chapterModal');
     const loader = document.getElementById('chapterLoader');
     const content = document.getElementById('chapterContent');
@@ -236,15 +391,39 @@ async function previewChapter(formatId, searchPrefix) {
     try {
         const data = await fetchFormatJson(formatId);
 
+        const normalizeKey = (value) => {
+            return String(value || "")
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/[^a-zA-Z0-9]+/g, " ")
+                .trim()
+                .toLowerCase()
+                .replace(/\s+/g, "_");
+        };
+
+        const targetKey = normalizeKey(searchPrefix);
+
         // BÚSQUEDA INTELIGENTE
-        let capitulo = null;
+        let capitulo = sectionObj || null;
         // 1. Buscar en el cuerpo
-        if (data.cuerpo) {
-            capitulo = data.cuerpo.find(cap =>
-                cap.titulo && cap.titulo.trim().toUpperCase().startsWith(searchPrefix)
-            );
+        if (!capitulo && Array.isArray(data.cuerpo)) {
+            capitulo = data.cuerpo.find(cap => {
+                const titleKey = normalizeKey(cap.titulo || cap.title);
+                if (!targetKey) return false;
+                return titleKey.startsWith(targetKey) || titleKey.includes(targetKey) || targetKey.includes(titleKey);
+            });
         }
-        // 2. Buscar en finales (Referencias/Anexos)
+        // 2. Buscar en secciones (UNI pregrado)
+        if (!capitulo && Array.isArray(data.secciones)) {
+            capitulo = data.secciones.find(sec => {
+                const title = sec.titulo || sec.title;
+                const displayTitle = sec.numero ? `${sec.numero}. ${title || ""}` : (title || "");
+                const secKey = normalizeKey(displayTitle || title || sec.numero);
+                if (!targetKey) return false;
+                return secKey.startsWith(targetKey) || secKey.includes(targetKey) || targetKey.includes(secKey);
+            });
+        }
+        // 3. Buscar en finales (Referencias/Anexos)
         if (!capitulo && data.finales) {
             const prefix = (searchPrefix || "").toUpperCase();
             if ((prefix.includes("REFERENCIAS") || prefix.includes("BIBLIOGRAF")) && data.finales.referencias) {
@@ -254,10 +433,27 @@ async function previewChapter(formatId, searchPrefix) {
             }
         }
 
-        if (!capitulo) throw new Error(`No se encontró el Capítulo ${searchPrefix} en el JSON.`);
+        if (typeof capitulo === "string") {
+            capitulo = { titulo: capitulo };
+        }
+
+        if (!capitulo) {
+            titleContainer.textContent = searchPrefix || "Sección";
+            const empty = document.createElement('div');
+            empty.className = "p-6 bg-gray-50 rounded-lg border border-gray-200 text-center text-gray-600";
+            empty.textContent = "Sin vista previa disponible para esta sección.";
+            listContainer.appendChild(empty);
+            loader.classList.add('hidden');
+            content.classList.remove('hidden');
+            return;
+        }
 
         // RENDERIZADO
-        titleContainer.textContent = capitulo.titulo || capitulo.titulo_seccion || "Capítulo";
+        if (capitulo.numero && capitulo.titulo && !capitulo.titulo.trim().startsWith(String(capitulo.numero))) {
+            titleContainer.textContent = `${capitulo.numero}. ${capitulo.titulo}`;
+        } else {
+            titleContainer.textContent = capitulo.titulo || capitulo.titulo_seccion || capitulo.title || "Capítulo";
+        }
 
         // Caso A: Lista de contenidos
         if (capitulo.contenido && Array.isArray(capitulo.contenido)) {
@@ -327,6 +523,18 @@ async function previewChapter(formatId, searchPrefix) {
             itemDiv.innerHTML = html;
             listContainer.appendChild(itemDiv);
         }
+        // Caso extra: solo lista sin instrucción
+        else if (capitulo.lista && Array.isArray(capitulo.lista)) {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = "p-6 bg-blue-50 rounded-lg border border-blue-100";
+            let html = `<ul class="list-disc pl-5 space-y-2">`;
+            capitulo.lista.forEach(li => {
+                html += `<li class="text-gray-700">${li}</li>`;
+            });
+            html += `</ul>`;
+            itemDiv.innerHTML = html;
+            listContainer.appendChild(itemDiv);
+        }
         // Caso D: Texto simple (Conclusiones, etc)
         else if (capitulo.nota_capitulo || capitulo.nota) {
             const texto = capitulo.nota_capitulo || capitulo.nota;
@@ -337,14 +545,24 @@ async function previewChapter(formatId, searchPrefix) {
             `;
             listContainer.appendChild(itemDiv);
         }
+        else {
+            const empty = document.createElement('div');
+            empty.className = "p-6 bg-gray-50 rounded-lg border border-gray-200 text-center text-gray-600";
+            empty.textContent = "Sin vista previa disponible para esta sección.";
+            listContainer.appendChild(empty);
+        }
 
         loader.classList.add('hidden');
         content.classList.remove('hidden');
 
     } catch (error) {
         console.error(error);
-        alert("Información: " + error.message);
-        closeChapterModal();
+        const empty = document.createElement('div');
+        empty.className = "p-6 bg-gray-50 rounded-lg border border-gray-200 text-center text-gray-600";
+        empty.textContent = "Sin vista previa disponible para esta sección.";
+        listContainer.appendChild(empty);
+        loader.classList.add('hidden');
+        content.classList.remove('hidden');
     }
 }
 
@@ -385,13 +603,24 @@ async function hydrateRequirementsList() {
         // 4. Agregar capítulos del cuerpo (Soporte dual: cuerpo o secciones)
         const chaptersList = data.cuerpo || data.secciones;
 
+        const buildDisplayTitle = (capitulo) => {
+            const rawTitle = capitulo?.titulo || capitulo?.title || "";
+            const num = capitulo?.numero || capitulo?.romano || "";
+            if (num && rawTitle && !rawTitle.trim().startsWith(String(num))) {
+                return `${num}. ${rawTitle}`.trim();
+            }
+            return rawTitle || String(num || "");
+        };
+
         if (chaptersList && Array.isArray(chaptersList)) {
             chaptersList.forEach((capitulo) => {
                 // Soporte para secciones simples (nuevo formato UNI)
 
                 // Extraer número romano o arábigo del título
-                const match = capitulo.titulo.match(/^([IVXLCDM0-9]+)[\.\s]/);
-                const prefijo = match ? match[1] + '.' : '';
+                const rawTitle = capitulo?.titulo || capitulo?.title || "";
+                const match = rawTitle.match(/^([IVXLCDM0-9]+)[\.\s]/);
+                const prefijo = capitulo?.numero ? `${capitulo.numero}.` : (match ? match[1] + '.' : '');
+                const displayTitle = buildDisplayTitle(capitulo);
 
                 // Obtener descripción del capítulo
                 let descripcion = "Estructura principal del capítulo.";
@@ -434,9 +663,9 @@ async function hydrateRequirementsList() {
                 }
 
                 container.appendChild(buildRequirementItem(
-                    capitulo.titulo,
+                    displayTitle,
                     descripcion,
-                    () => previewChapter(formatId, prefijo || capitulo.titulo)
+                    () => previewChapter(formatId, prefijo || displayTitle, capitulo)
                 ));
             });
         }

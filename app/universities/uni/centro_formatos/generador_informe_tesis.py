@@ -208,7 +208,7 @@ def crear_tabla_matriz_consistencia(doc, matriz_data, es_cualitativo=False):
 # ==========================================
 
 def crear_caratula_dinamica(doc, data):
-    """Carátula distribuida en toda la hoja."""
+    """Car?tula distribuida en toda la hoja."""
     c = data.get('caratula', {})
     agregar_bloque(doc, c.get('universidad', ''), negrita=True, tamano=16, despues=4)
     agregar_bloque(doc, c.get('facultad', ''), negrita=True, tamano=13, despues=4)
@@ -225,12 +225,27 @@ def crear_caratula_dinamica(doc, data):
     agregar_bloque(doc, c.get('grado_objetivo', ''), negrita=True, tamano=12, despues=50)
     agregar_bloque(doc, c.get('label_autor', ''), negrita=True, tamano=11, despues=5)
     agregar_bloque(doc, c.get('label_asesor', ''), negrita=True, tamano=11, despues=30)
-    agregar_bloque(doc, c.get('label_linea', ''), tamano=10, despues=60)
-    
-    # Empujar pie al final
-    
-    agregar_bloque(doc, c.get('fecha', ''), tamano=11)
-    agregar_bloque(doc, c.get('pais', ''), negrita=True, tamano=11)
+    p_linea = agregar_bloque(doc, c.get('label_linea', ''), tamano=10, despues=60)
+    if p_linea:
+        p_linea.paragraph_format.space_after = Pt(2)
+
+    # Pie de p?gina: fecha + pa?s en el mismo p?rrafo para evitar salto de p?gina.
+    fecha = c.get('fecha', '')
+    pais = c.get('pais', '')
+    if fecha or pais:
+        p = doc.add_paragraph()
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p.paragraph_format.space_before = Pt(2)
+        p.paragraph_format.space_after = Pt(0)
+        p.paragraph_format.line_spacing = 1.0
+        p.paragraph_format.keep_together = True
+        if fecha:
+            r_fecha = p.add_run(str(fecha))
+            r_fecha.font.size = Pt(11)
+        if pais:
+            r_pais = p.add_run(("\n" if fecha else "") + str(pais))
+            r_pais.bold = True
+            r_pais.font.size = Pt(11)
 
 def agregar_indice_automatico(doc):
     """Inserta el indice de contenido automatico."""
