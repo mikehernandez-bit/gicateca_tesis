@@ -5,6 +5,7 @@ Proposito:
 
 Responsabilidades:
 - Configurar code/display_name/data_dir.
+- Fase 2: Definir defaults y default_logo_url para view-models.
 No hace:
 - No define generadores (se espera error si se solicita).
 
@@ -39,5 +40,12 @@ PROVIDER = SimpleUniversityProvider(
         "maestria": MODULE_DIR / "centro_formatos" / "generador_maestria.py",
         "posgrado": MODULE_DIR / "centro_formatos" / "generador_maestria.py",
         "proyecto": MODULE_DIR / "centro_formatos" / "generador_proyecto_tesis.py",
+    },
+    # Fase 2: Defaults para view-models de carátula
+    default_logo_url="/static/assets/LogoUNI.png",
+    defaults={
+        "universidad": "UNIVERSIDAD NACIONAL DE INGENIERÍA",
+        "lugar": "LIMA - PERÚ",
+        "anio": "2026",
     },
 )

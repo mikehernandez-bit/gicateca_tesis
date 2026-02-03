@@ -5,6 +5,7 @@ Proposito:
 
 Responsabilidades:
 - Configurar code/display_name/data_dir y mapa de generadores.
+- Fase 2: Definir defaults y default_logo_url para view-models.
 No hace:
 - No contiene logica de generacion ni lectura de formatos.
 
@@ -39,5 +40,12 @@ PROVIDER = SimpleUniversityProvider(
         "informe": BASE_DIR / "generador_informe_tesis.py",
         "maestria": BASE_DIR / "generador_maestria.py",
         "proyecto": BASE_DIR / "generador_proyecto_tesis.py",
+    },
+    # Fase 2: Defaults para view-models de carátula
+    default_logo_url="/static/assets/LogoUNAC.png",
+    defaults={
+        "universidad": "UNIVERSIDAD NACIONAL DEL CALLAO",
+        "lugar": "CALLAO, PERÚ",
+        "anio": "2026",
     },
 )
