@@ -42,6 +42,28 @@ Devuelve el contenido JSON completo del formato.
 
 ---
 
+## Vista previa de carátula (HTML)
+
+En la vista de detalle, el botón **“Carátula Institucional”** abre el **modal unificado** de carátula (HTML), controlado por `cover-preview.js`.
+
+Flujo:
+1. `detail.html` incluye `components/cover_modal.html`.
+2. `cover-preview.js` expone `window.GicaCover.open(formatId)`.
+3. `format-viewer.js` delega el preview al controlador unificado.
+
+**Archivos involucrados**
+- `app/templates/pages/detail.html`
+- `app/templates/components/cover_modal.html`
+- `app/static/js/cover-preview.js`
+- `app/static/js/format-viewer.js`
+
+**Cómo probar**
+1) Abrir `/formatos/{id}`.  
+2) Click en “Carátula Institucional”.  
+3) Confirmar que el modal muestra datos del JSON del formato.
+
+---
+
 ## Cache de DOCX y PDF
 
 El sistema cachea los archivos generados en:

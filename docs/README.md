@@ -1,4 +1,4 @@
-# Documentación del Sistema GicaTesis (Formatoteca)
+﻿# Documentación del Sistema GicaTesis (Formatoteca)
 
 Esta carpeta contiene la documentación técnica completa del sistema **GicaTesis/Formatoteca**.
 
@@ -48,3 +48,9 @@ py -m uvicorn app.main:app --reload
 | [13_troubleshooting.md](manual/13_troubleshooting.md) | Problemas comunes |
 | [14_contribucion_y_estandares.md](manual/14_contribucion_y_estandares.md) | Cómo contribuir |
 | [15_glosario.md](manual/15_glosario.md) | Términos técnicos |
+
+## Propuestas Técnicas
+
+| Archivo | Contenido |
+|---------|-----------|
+| [architecture-scalability.md](proposals/architecture-scalability.md) | Propuesta: Universidad como Plugin (escalabilidad) |

@@ -436,3 +436,55 @@ async def get_format_data_json(format_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
+@router.get("/{format_id}/cover-model")
+async def get_format_cover_model(format_id: str):
+    """
+    Devuelve el view-model de carátula listo para renderizar.
+    Fase 2: El frontend consume este endpoint sin lógica de uni/logos.
+    """
+    from app.core.view_models import build_cover_view_model
+    from app.core.settings import get_default_uni_code
+    
+    try:
+        data = load_format_by_id(format_id)
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="Formato no encontrado")
+    except Exception as e:
+        logger.error("Error cargando formato %s: %s", format_id, e)
+        raise HTTPException(status_code=500, detail=str(e))
+    
+    # Determinar uni_code desde _meta.uni
+    meta = data.get("_meta") or {}
+    uni_code = (meta.get("uni") or "").strip().lower()
+    
+    if not uni_code:
+        uni_code = get_default_uni_code()
+        logger.warning(
+            "Formato %s sin _meta.uni, usando default: %s", 
+            format_id, uni_code
+        )
+    
+    # Obtener provider
+    try:
+        provider = get_provider(uni_code)
+    except KeyError:
+        # uni_code no registrado, usar default
+        default_uni = get_default_uni_code()
+        logger.warning(
+            "Universidad %s no registrada, usando fallback: %s",
+            uni_code, default_uni
+        )
+        try:
+            provider = get_provider(default_uni)
+        except KeyError:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Universidad no registrada: {uni_code}"
+            )
+    
+    # Construir view-model
+    view_model = build_cover_view_model(data, provider)
+    return JSONResponse(content=view_model)
+
+

@@ -5,7 +5,7 @@ Proposito:
 
 Responsabilidades:
 - Especificar metodos requeridos por el core (data_dir, generators, alerts).
-- Proveer una implementacion simple reutilizable.
+- Proveer una implementacion simple reutilizable con defaults para view-models.
 No hace:
 - No descubre providers ni carga formatos directamente.
 
@@ -24,7 +24,7 @@ Donde tocar si falla:
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import json
 from pathlib import Path
 from typing import Dict, Optional, Protocol, Sequence, Union, runtime_checkable
@@ -54,12 +54,20 @@ class UniversityProvider(Protocol):
 
 @dataclass(frozen=True)
 class SimpleUniversityProvider:
-    """Implementacion simple del contrato UniversityProvider."""
+    """
+    Implementacion simple del contrato UniversityProvider.
+    
+    Fase 2: Incluye default_logo_url y defaults para view-models de carátula.
+    """
     code: str
     display_name: str
     data_dir: Path
     generator_map: Dict[str, GeneratorCommand]
     name: Optional[str] = None
+    
+    # Fase 2: Nuevos campos para view-models
+    default_logo_url: str = "/static/assets/LogoGeneric.png"
+    defaults: Dict[str, str] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         # Normaliza name para templates legacy que esperan provider.name.
@@ -86,3 +94,7 @@ class SimpleUniversityProvider:
         """Carga formatos legacy desde formatos.json si existe."""
         path = self.data_dir / "formatos.json"
         return json.loads(path.read_text(encoding="utf-8")) if path.exists() else []
+    
+    def get_default(self, key: str, fallback: str = "") -> str:
+        """Obtiene un valor de defaults con fallback."""
+        return self.defaults.get(key, fallback)

@@ -5,36 +5,38 @@
 
   <div class="mb-10">
     <div class="flex items-center gap-2 mb-6">
-      <svg class="w-8 h-8 text-yellow-500 fill-current" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+      <svg class="w-8 h-8 text-yellow-500 fill-current" viewBox="0 0 24 24">
+        <path d="M13 10V3L4 14h7v7l9-11h-7z" />
+      </svg>
       <h1 class="text-3xl font-bold text-gray-900">Accesos Rápidos</h1>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      
-      <div id="quick-todos"
-           onclick="iniciarFlujo('normal', 'quick-todos')" 
-           class="quick-card group bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer h-full">
-        <div class="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-green-100 transition-colors">
+
+      <div id="quick-todos" onclick="iniciarFlujo('normal', 'quick-todos')"
+        class="quick-card group bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer h-full">
+        <div
+          class="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-green-100 transition-colors">
           <i data-lucide="layers" class="w-7 h-7 text-green-600"></i>
         </div>
         <h3 class="font-bold text-gray-900 text-xl mb-2">Estructura</h3>
         <p class="text-sm text-gray-500 leading-relaxed">Modo estándar: Estructura completa y descargas.</p>
       </div>
 
-      <div id="quick-caratulas"
-           onclick="iniciarFlujo('caratula', 'quick-caratulas')" 
-           class="quick-card group bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer h-full">
-        <div class="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-orange-100 transition-colors">
+      <div id="quick-caratulas" onclick="iniciarFlujo('caratula', 'quick-caratulas')"
+        class="quick-card group bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer h-full">
+        <div
+          class="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-orange-100 transition-colors">
           <i data-lucide="layout-template" class="w-7 h-7 text-orange-600"></i>
         </div>
         <h3 class="font-bold text-gray-900 text-xl mb-2">Carátulas</h3>
         <p class="text-sm text-gray-500 leading-relaxed">Modo visual: Explora las portadas oficiales.</p>
       </div>
 
-      <div id="quick-referencias"
-           onclick="iniciarFlujo('referencias', 'quick-referencias')" 
-           class="quick-card group bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer h-full">
-        <div class="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-indigo-100 transition-colors">
+      <div id="quick-referencias" onclick="iniciarFlujo('referencias', 'quick-referencias')"
+        class="quick-card group bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer h-full">
+        <div
+          class="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-indigo-100 transition-colors">
           <i data-lucide="book-open-check" class="w-7 h-7 text-indigo-600"></i>
         </div>
         <h3 class="font-bold text-gray-900 text-xl mb-2">Referencias Bibliográficas</h3>
@@ -44,18 +46,21 @@
     </div>
   </div>
 
-  <div id="bloque-referencias" class="hidden transition-all duration-500 ease-in-out opacity-0 translate-y-4 mb-8" data-uni="{{ active_uni or 'unac' }}">
-    <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+  <div id="bloque-referencias" class="hidden transition-all duration-500 ease-in-out opacity-0 translate-y-4 mb-8"
+    data-uni="{{ active_uni or 'unac' }}">
+    <div
+      class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-3">
       <div>
         <h2 class="text-lg font-bold text-gray-900">Normas disponibles</h2>
         <p class="text-xs text-gray-500">Selecciona una norma para ver la guía completa.</p>
       </div>
     </div>
     <div id="refs-loader" class="hidden flex justify-center py-8">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
     </div>
     <div id="refs-grid-catalog" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6"></div>
-    <div id="refs-grid-empty-catalog" class="hidden text-center py-8 text-sm text-gray-500">No hay normas disponibles.</div>
+    <div id="refs-grid-empty-catalog" class="hidden text-center py-8 text-sm text-gray-500">No hay normas disponibles.
+    </div>
   </div>
 
   <div id="bloque-categorias" class="hidden transition-all duration-500 ease-in-out opacity-0 translate-y-4 mb-12">
@@ -65,9 +70,9 @@
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-      
-      <div id="cat-todos" onclick="seleccionarCategoriaFinal('todos', 'cat-todos')" 
-           class="cat-card bg-white p-4 rounded-xl border border-gray-200 hover:border-gray-400 hover:shadow-md transition-all cursor-pointer flex flex-col items-center text-center gap-3">
+
+      <div id="cat-todos" onclick="seleccionarCategoriaFinal('todos', 'cat-todos')"
+        class="cat-card bg-white p-4 rounded-xl border border-gray-200 hover:border-gray-400 hover:shadow-md transition-all cursor-pointer flex flex-col items-center text-center gap-3">
         <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600">
           <i data-lucide="grid" class="w-5 h-5"></i>
         </div>
@@ -77,8 +82,8 @@
         </div>
       </div>
 
-      <div id="cat-tesis" onclick="seleccionarCategoriaFinal('Tesis', 'cat-tesis')" 
-           class="cat-card bg-white p-4 rounded-xl border border-gray-200 hover:border-blue-400 hover:shadow-md transition-all cursor-pointer flex flex-col items-center text-center gap-3">
+      <div id="cat-tesis" onclick="seleccionarCategoriaFinal('Tesis', 'cat-tesis')"
+        class="cat-card bg-white p-4 rounded-xl border border-gray-200 hover:border-blue-400 hover:shadow-md transition-all cursor-pointer flex flex-col items-center text-center gap-3">
         <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600">
           <i data-lucide="folder-kanban" class="w-5 h-5"></i>
         </div>
@@ -88,8 +93,8 @@
         </div>
       </div>
 
-      <div id="cat-info" onclick="seleccionarCategoriaFinal('Inv. Formativa', 'cat-info')" 
-           class="cat-card bg-white p-4 rounded-xl border border-gray-200 hover:border-purple-400 hover:shadow-md transition-all cursor-pointer flex flex-col items-center text-center gap-3">
+      <div id="cat-info" onclick="seleccionarCategoriaFinal('Inv. Formativa', 'cat-info')"
+        class="cat-card bg-white p-4 rounded-xl border border-gray-200 hover:border-purple-400 hover:shadow-md transition-all cursor-pointer flex flex-col items-center text-center gap-3">
         <div class="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center text-purple-600">
           <i data-lucide="file-text" class="w-5 h-5"></i>
         </div>
@@ -99,8 +104,8 @@
         </div>
       </div>
 
-      <div id="cat-maestria" onclick="seleccionarCategoriaFinal('Suficiencia', 'cat-maestria')" 
-           class="cat-card bg-white p-4 rounded-xl border border-gray-200 hover:border-orange-400 hover:shadow-md transition-all cursor-pointer flex flex-col items-center text-center gap-3">
+      <div id="cat-maestria" onclick="seleccionarCategoriaFinal('Suficiencia', 'cat-maestria')"
+        class="cat-card bg-white p-4 rounded-xl border border-gray-200 hover:border-orange-400 hover:shadow-md transition-all cursor-pointer flex flex-col items-center text-center gap-3">
         <div class="w-10 h-10 bg-orange-50 rounded-lg flex items-center justify-center text-orange-600">
           <i data-lucide="graduation-cap" class="w-5 h-5"></i>
         </div>
@@ -114,40 +119,43 @@
   </div>
 
   <div id="bloque-resultados" class="hidden transition-all duration-500 ease-in-out opacity-0 translate-y-4">
-    
+
     <div class="mb-6 mt-8 border-t border-gray-100 pt-6">
-        <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-            <span class="w-2 h-6 bg-blue-600 rounded-full"></span>
-            Formatos Disponibles
-        </h2>
+      <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+        <span class="w-2 h-6 bg-blue-600 rounded-full"></span>
+        Formatos Disponibles
+      </h2>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="formatos-grid">
       {% for f in formatos %}
-      <a href="/formatos/{{ f.id }}" 
-         onclick="return handleCardClick(event, '{{ f.id }}')"
-         class="formato-card group bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer flex flex-col h-full overflow-hidden relative" 
-         data-tipo="{{ f.tipo }}"
-         data-group="{{ f.tipo_formato }}"
-         data-uni="{{ f.uni_code }}"
-         data-original-title="{{ f.titulo }}">
-        
-        <div class="hidden mode-badge absolute top-3 right-3 z-10 text-[10px] font-bold px-2 py-1 rounded shadow-sm border flex items-center gap-1"></div>
+      <a href="/formatos/{{ f.id }}" onclick="return handleCardClick(event, '{{ f.id }}')"
+        class="formato-card group bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer flex flex-col h-full overflow-hidden relative"
+        data-tipo="{{ f.tipo }}" data-group="{{ f.tipo_formato }}" data-uni="{{ f.uni_code }}"
+        data-original-title="{{ f.titulo }}">
+
+        <div
+          class="hidden mode-badge absolute top-3 right-3 z-10 text-[10px] font-bold px-2 py-1 rounded shadow-sm border flex items-center gap-1">
+        </div>
 
         <div class="p-6 flex-1 flex flex-col">
           <div class="flex justify-between items-start gap-3 mb-4 original-badges transition-opacity duration-300">
-            <span class="inline-block text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider
+            <span
+              class="inline-block text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider
               {% if f.uni == 'UNAC' %} bg-blue-50 text-blue-700 border border-blue-100 {% else %} bg-red-50 text-red-700 {% endif %}">
               {{ f.uni }}
             </span>
-            <span class="flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1 rounded-full border
+            <span
+              class="flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1 rounded-full border
               {% if f.estado == 'VIGENTE' %} bg-green-50 text-green-700 border-green-100 {% else %} bg-orange-50 text-orange-700 border-orange-100 {% endif %}">
-              <span class="w-1.5 h-1.5 rounded-full {% if f.estado == 'VIGENTE' %} bg-green-500 {% else %} bg-orange-500 {% endif %}"></span>
+              <span
+                class="w-1.5 h-1.5 rounded-full {% if f.estado == 'VIGENTE' %} bg-green-500 {% else %} bg-orange-500 {% endif %}"></span>
               {{ f.estado }}
             </span>
           </div>
 
-          <h3 class="card-title font-bold text-lg text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">{{ f.titulo }}</h3>
+          <h3 class="card-title font-bold text-lg text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">{{
+            f.titulo }}</h3>
           <p class="text-sm text-gray-500 line-clamp-2">{{ f.facultad }}</p>
         </div>
 
@@ -155,7 +163,8 @@
           <span class="text-xs text-gray-400 font-medium flex items-center gap-1.5">
             <i data-lucide="clock" class="w-3.5 h-3.5"></i> v{{ f.version }}
           </span>
-          <span class="action-text text-blue-600 text-sm font-semibold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+          <span
+            class="action-text text-blue-600 text-sm font-semibold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
             Ver Estructura <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
           </span>
         </div>
@@ -166,7 +175,8 @@
 
 </div>
 
-<div id="coverModal" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true"><div class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm" onclick="closeModal('coverModal')"></div><div class="fixed inset-0 z-10 overflow-y-auto"><div class="flex min-h-full items-center justify-center p-4"><div class="relative bg-white shadow-2xl sm:max-w-3xl w-full flex flex-col rounded-sm" style="aspect-ratio: 210/297; max-height: 90vh;"><button onclick="closeModal('coverModal')" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 z-20 bg-white rounded-full p-2 shadow-md"><i data-lucide="x" class="w-5 h-5"></i></button><div id="coverLoader" class="absolute inset-0 flex items-center justify-center bg-white z-10"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div></div><div id="coverContent" class="hidden flex-1 flex flex-col items-center text-center px-16 py-12 font-serif text-gray-900 h-full overflow-y-auto border-2 border-gray-100 m-2"><h2 id="c-uni" class="text-xl font-bold uppercase mb-2"></h2><h3 id="c-fac" class="text-lg font-bold uppercase mb-2"></h3><h3 id="c-esc" class="text-lg font-bold uppercase mb-8"></h3><div class="mb-8"><img id="c-logo" src="/static/assets/LogoUNAC.png" class="h-80 w-auto object-contain mx-auto opacity-90"></div><div class="w-full flex-1 flex flex-col justify-center my-4"><h2 id="c-titulo" class="text-xl font-bold uppercase leading-snug"></h2><p class="text-sm italic mt-2 text-gray-500">(Título del proyecto)</p><p id="c-guia" class="mt-3 text-xs italic text-gray-500 whitespace-pre-line hidden"></p></div><div class="mb-8 w-full"><p id="c-frase" class="text-base mb-1"></p><h3 id="c-grado" class="text-lg font-bold uppercase"></h3></div><div class="mb-12 w-full text-center space-y-2"><p class="text-sm font-bold">PRESENTADO POR:</p><p class="text-base uppercase text-gray-400">[Nombres]</p><p class="text-sm font-bold mt-4">ASESOR:</p><p class="text-base uppercase text-gray-400">[Grado y Nombre]</p></div><div class="mt-auto"><p id="c-lugar" class="text-base font-bold uppercase">CALLAO, PERÚ</p><p id="c-anio" class="text-base font-bold">2026</p></div></div></div></div></div></div>
+{% include "components/cover_modal.html" %}
 
-<script src="/static/js/catalog.js?v=25"></script>
+<script src="/static/js/cover-preview.js?v=1"></script>
+<script src="/static/js/catalog.js?v=26"></script>
 {% endblock %}
