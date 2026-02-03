@@ -1,6 +1,37 @@
 """
-Tests para build_cover_view_model.
-Verifica que el view-model se construye correctamente para UNAC, UNI y casos edge.
+=============================================================================
+ARCHIVO: tests/test_cover_view_model.py
+FASE: 3 - Calidad y Validación
+=============================================================================
+
+PROPÓSITO:
+Tests unitarios para build_cover_view_model y funciones relacionadas.
+Verifica que el view-model se construye correctamente para diferentes casos.
+
+TESTS INCLUIDOS:
+- test_unac_view_model(): Formato UNAC genera campos correctos
+- test_uni_view_model(): Formato UNI genera campos correctos
+- test_fallback_without_meta_uni(): Sin _meta.uni usa defaults del provider
+- test_logo_path_normalization(): Normalización de rutas de logo
+
+CÓMO EJECUTAR:
+    python tests/test_cover_view_model.py
+    # o con pytest:
+    py -m pytest tests/test_cover_view_model.py -v
+
+COMUNICACIÓN CON OTROS MÓDULOS:
+- IMPORTA:
+  - app/core/view_models.py (build_cover_view_model, normalize_logo_path)
+  - app/core/registry.py (get_provider)
+  - app/core/settings.py (get_default_uni_code)
+- LEE:
+  - app/data/unac/*.json (formatos reales para testing)
+  - app/data/uni/*.json
+
+REQUISITOS:
+- Carpetas app/data/unac y app/data/uni deben existir con al menos un formato.
+
+=============================================================================
 """
 import json
 import sys

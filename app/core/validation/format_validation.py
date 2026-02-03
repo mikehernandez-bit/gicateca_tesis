@@ -1,6 +1,38 @@
 """
-Archivo: app/core/validation/format_validation.py
-Validación de formatos JSON contra schema y reglas de negocio.
+=============================================================================
+ARCHIVO: app/core/validation/format_validation.py
+FASE: 3 - Calidad y Validación
+=============================================================================
+
+PROPÓSITO:
+Valida formatos JSON contra el schema y reglas de negocio.
+Detecta problemas como _meta faltante, mismatch de universidad, logos inválidos.
+
+FUNCIONES PRINCIPALES:
+- validate_format_schema(format_data, file_path) -> List[Issue]
+  Valida contra app/data/schemas/format.schema.json
+  Usa jsonschema si disponible, sino validación manual básica.
+  
+- validate_format_rules(format_data, expected_uni_code, file_path) -> List[Issue]
+  Valida reglas de negocio:
+  1. _meta.id existe y no vacío
+  2. _meta.uni existe y minúsculas
+  3. _meta.uni coincide con carpeta (expected_uni_code)
+  4. ruta_logo tiene formato válido
+
+COMUNICACIÓN CON OTROS MÓDULOS:
+- LEE: app/data/schemas/format.schema.json
+- IMPORTA: issue.py (Issue, Severity)
+- Es CONSUMIDO por:
+  - scripts/validate_data.py
+  - tests/test_repo_validation.py
+
+CÓDIGOS DE ERROR QUE GENERA:
+- SCHEMA_INVALID, META_MISSING, META_ID_MISSING, META_UNI_MISSING
+- META_ID_EMPTY, META_UNI_EMPTY, META_UNI_CASE
+- UNI_MISMATCH, LOGO_PATH_INVALID, LOGO_EXT_INVALID
+
+=============================================================================
 """
 from __future__ import annotations
 

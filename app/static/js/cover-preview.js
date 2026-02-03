@@ -1,11 +1,44 @@
-/*
-Archivo: app/static/js/cover-preview.js
-Propósito: Controlador unificado para el modal de carátula institucional.
-API global: window.GicaCover = { open(formatId), close() }
-Compatibilidad: window.previewCover(formatId) = alias de GicaCover.open
-Dependencias: GicaDom, GicaApi (deben cargarse antes)
-Fase 2: Consume /formatos/{id}/cover-model, sin hardcodes UNI/UNAC.
-*/
+/**
+ * =============================================================================
+ * ARCHIVO: app/static/js/cover-preview.js
+ * FASE: 1 (refactor) + FASE 2 (view-model)
+ * =============================================================================
+ * 
+ * PROPÓSITO:
+ * Controlador unificado para el modal de carátula institucional.
+ * Muestra una vista previa de la carátula con logo, universidad, título, etc.
+ * 
+ * API GLOBAL:
+ * window.GicaCover = {
+ *   open(formatId)  -> Abre el modal y carga datos del formato
+ *   close()         -> Cierra el modal
+ * }
+ * window.previewCover(formatId) -> Alias de GicaCover.open (compatibilidad)
+ * window.closeCoverModal()      -> Alias de GicaCover.close (compatibilidad)
+ * 
+ * DEPENDENCIAS (deben cargarse ANTES):
+ * - window.GicaDom (gica-dom.js) -> Para manipulación DOM
+ * - window.GicaApi (gica-api.js) -> Para peticiones HTTP
+ * 
+ * COMUNICACIÓN CON BACKEND:
+ * - Consume: GET /formatos/{id}/cover-model
+ *   Retorna view-model con todos los datos ya resueltos:
+ *   { logo_url, universidad, facultad, escuela, titulo, frase,
+ *     grado, lugar, anio, autor, asesor, guia }
+ * 
+ * COMUNICACIÓN CON HTML:
+ * - Requiere: templates/components/cover_modal.html incluido en la página
+ * - IDs esperados: coverModal, coverLoader, coverContent
+ * - IDs de campos: c-logo, c-uni, c-fac, c-esc, c-titulo, c-frase,
+ *                  c-grado, c-lugar, c-anio, c-autor, c-asesor, c-guia
+ * 
+ * IMPORTANTE (Fase 2):
+ * Este módulo es "tonto" - NO contiene lógica de negocio.
+ * Solo renderiza los datos que recibe del backend.
+ * La resolución de universidad, logos y defaults ocurre en el servidor.
+ * 
+ * =============================================================================
+ */
 
 (function () {
     'use strict';

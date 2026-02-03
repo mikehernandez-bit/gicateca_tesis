@@ -1,6 +1,38 @@
 """
-Archivo: app/core/validation/repo_checks.py
-Verificaciones a nivel repositorio: colisiones, providers, assets.
+=============================================================================
+ARCHIVO: app/core/validation/repo_checks.py
+FASE: 3 - Calidad y Validación
+=============================================================================
+
+PROPÓSITO:
+Verificaciones a nivel repositorio que no dependen de un archivo individual.
+Detecta problemas globales como IDs duplicados, providers faltantes, assets.
+
+FUNCIONES PRINCIPALES:
+- check_id_collisions(format_files) -> List[Issue]
+  Verifica que no haya _meta.id duplicados entre todos los formatos.
+  
+- check_providers_registered(uni_folders, registered_codes) -> List[Issue]
+  Verifica que cada carpeta en app/data/ tenga provider registrado.
+  
+- check_assets_exist(app_root, required_assets) -> List[Issue]
+  Verifica que existan assets requeridos (ej: LogoGeneric.png).
+  
+- run_all_repo_checks(app_root) -> List[Issue]
+  Ejecuta todas las verificaciones de repositorio.
+
+COMUNICACIÓN CON OTROS MÓDULOS:
+- IMPORTA:
+  - issue.py (Issue, Severity)
+  - app/core/registry.py (list_universities)
+- Es CONSUMIDO por:
+  - scripts/validate_data.py
+
+CÓDIGOS DE ERROR QUE GENERA:
+- ID_COLLISION, PROVIDER_MISSING (warn), ASSET_MISSING
+- JSON_INVALID, REGISTRY_ERROR
+
+=============================================================================
 """
 from __future__ import annotations
 

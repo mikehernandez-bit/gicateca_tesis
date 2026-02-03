@@ -1,20 +1,44 @@
 """
-Archivo: app/core/view_models.py
-Propósito:
-- Construye view-models listos para renderizar en frontend.
+=============================================================================
+ARCHIVO: app/core/view_models.py
+FASE: 2 - Backend View-Models
+=============================================================================
 
-Responsabilidades:
-- build_cover_view_model(): genera datos de carátula resueltos.
-- normalize_logo_path(): normaliza rutas de logo.
-No hace:
-- No carga formatos ni providers, recibe datos ya cargados.
+PROPÓSITO:
+Construye view-models (datos listos para renderizar) a partir de datos crudos.
+Este módulo contiene la lógica de negocio que antes estaba en el frontend,
+permitiendo que el cliente sea "tonto" y solo renderice lo que recibe.
 
-Dependencias:
-- re (stdlib), logging.
-- app.universities.contracts (para tipo UniversityProvider).
+FUNCIONES PRINCIPALES:
+- build_cover_view_model(format_data, provider) -> dict
+  Construye el view-model de carátula con todos los campos resueltos:
+  logo_url, universidad, facultad, escuela, titulo, frase, grado,
+  lugar, anio, autor, asesor, guia.
+  
+- normalize_logo_path(ruta_logo) -> str | None
+  Normaliza rutas de logo para que comiencen con /static/.
+  Ej: "app/static/assets/Logo.png" -> "/static/assets/Logo.png"
 
-Donde tocar si falla:
-- Revisar lógica de fallbacks y normalización de rutas.
+COMUNICACIÓN CON OTROS MÓDULOS:
+- RECIBE datos de:
+  - app/core/loaders.py (format_data via load_format_by_id)
+  - app/core/registry.py (provider via get_provider)
+  
+- Es CONSUMIDO por:
+  - app/modules/formats/router.py (endpoint GET /cover-model)
+  - tests/test_cover_view_model.py
+
+CADENA DE FALLBACKS PARA LOGO:
+1. format_data["configuracion"]["ruta_logo"] (normalizado)
+2. provider.default_logo_url
+3. "/static/assets/LogoGeneric.png"
+
+CADENA DE FALLBACKS PARA OTROS CAMPOS:
+1. format_data["caratula"][campo]
+2. provider.defaults[campo]
+3. String vacío ""
+
+=============================================================================
 """
 from __future__ import annotations
 
