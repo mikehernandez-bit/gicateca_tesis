@@ -1,19 +1,56 @@
 #!/usr/bin/env python
 """
-Script: scripts/validate_data.py
-Valida la integridad de los datos en app/data/.
+=============================================================================
+ARCHIVO: scripts/validate_data.py
+FASE: 3 - Calidad y Validación
+=============================================================================
 
-Uso:
+PROPÓSITO:
+Script CLI para validar la integridad de los datos en app/data/.
+Diseñado para ejecutarse en CI/CD o manualmente durante desarrollo.
+
+USO:
     python scripts/validate_data.py [opciones]
 
-Opciones:
-    --strict    Warnings también cuentan como fallo
-    --uni CODE  Validar solo una universidad
-    --path DIR  Validar solo un directorio
+OPCIONES:
+    --strict    Warnings también cuentan como fallo (para CI)
+    --uni CODE  Validar solo una universidad (ej: --uni unac)
+    --path DIR  Usar directorio alternativo a app/data/
 
-Exit codes:
+EXIT CODES:
     0: Sin errores
-    1: Errores encontrados
+    1: Errores encontrados (o warnings en modo --strict)
+
+QUÉ VALIDA:
+1. Formatos JSON (por archivo):
+   - Schema válido (format.schema.json)
+   - _meta.id y _meta.uni presentes
+   - _meta.uni coincide con carpeta
+   
+2. Referencias config (por universidad):
+   - Schema válido
+   - default está en enabled
+   
+3. Checks globales:
+   - Sin colisiones de IDs
+   - Providers registrados
+   - Assets requeridos existen
+
+COMUNICACIÓN CON OTROS MÓDULOS:
+- IMPORTA:
+  - app/core/validation/* (todos los validadores)
+- LEE:
+  - app/data/**/*.json (formatos)
+  - app/data/*/references_config.json
+
+EJEMPLO:
+    # Validar todo
+    python scripts/validate_data.py
+    
+    # Solo UNAC en modo estricto
+    python scripts/validate_data.py --strict --uni unac
+
+=============================================================================
 """
 from __future__ import annotations
 

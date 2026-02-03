@@ -1,9 +1,37 @@
-/*
-Archivo: app/static/js/gica-dom.js
-Propósito: Helpers DOM puros para GicaTesis.
-API global: window.GicaDom = { byId, setText, setImgSrc, show, hide }
-Fase 1: Extracción de helpers sin cambiar comportamiento.
-*/
+/**
+ * =============================================================================
+ * ARCHIVO: app/static/js/gica-dom.js
+ * FASE: 1 - Limpieza JS
+ * =============================================================================
+ * 
+ * PROPÓSITO:
+ * Módulo de helpers DOM puros para manipulación de elementos HTML.
+ * Centraliza operaciones comunes para evitar duplicación en otros módulos.
+ * 
+ * API GLOBAL:
+ * window.GicaDom = {
+ *   byId(id)           -> Obtiene elemento por ID (null-safe)
+ *   setText(id, value) -> Establece textContent de un elemento
+ *   setImgSrc(id, src) -> Establece src de una imagen
+ *   show(elOrId)       -> Remueve clase 'hidden' (muestra elemento)
+ *   hide(elOrId)       -> Agrega clase 'hidden' (oculta elemento)
+ * }
+ * 
+ * COMUNICACIÓN CON OTROS MÓDULOS:
+ * - Este módulo NO tiene dependencias (es la base del stack JS).
+ * - Es CONSUMIDO por:
+ *   - gica-api.js (opcional, para mostrar errores)
+ *   - cover-preview.js (manipulación del modal de carátula)
+ *   - Cualquier módulo futuro que necesite manipular DOM
+ * 
+ * ORDEN DE CARGA (en base.html):
+ * 1. gica-dom.js    <- ESTE ARCHIVO (primero)
+ * 2. gica-api.js
+ * 3. cover-preview.js
+ * 4. navigation.js
+ * 
+ * =============================================================================
+ */
 
 (function () {
     'use strict';

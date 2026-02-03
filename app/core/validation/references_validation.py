@@ -1,6 +1,39 @@
 """
-Archivo: app/core/validation/references_validation.py
-Validación de references_config.json por universidad.
+=============================================================================
+ARCHIVO: app/core/validation/references_validation.py
+FASE: 3 - Calidad y Validación
+=============================================================================
+
+PROPÓSITO:
+Valida archivos references_config.json de cada universidad.
+Estos archivos configuran qué normas de citación están habilitadas.
+
+FUNCIONES PRINCIPALES:
+- validate_references_config_schema(config_data, file_path) -> List[Issue]
+  Valida contra app/data/schemas/references_config.schema.json
+  
+- validate_references_rules(config_data, file_path) -> List[Issue]
+  Valida reglas de negocio:
+  1. enabled no vacío (warning)
+  2. default está en enabled (error si no)
+
+COMUNICACIÓN CON OTROS MÓDULOS:
+- LEE: app/data/schemas/references_config.schema.json
+- IMPORTA: issue.py (Issue, Severity)
+- Es CONSUMIDO por:
+  - scripts/validate_data.py
+
+ESTRUCTURA ESPERADA DE references_config.json:
+{
+  "enabled": ["apa7", "ieee", "vancouver"],
+  "default": "apa7"
+}
+
+CÓDIGOS DE ERROR QUE GENERA:
+- REFS_ENABLED_MISSING, REFS_SCHEMA_INVALID
+- REFS_ENABLED_EMPTY (warn), REFS_DEFAULT_NOT_ENABLED
+
+=============================================================================
 """
 from __future__ import annotations
 

@@ -1,6 +1,37 @@
 """
-Tests para validación de repositorio.
-Verifica schemas, reglas y detección de errores.
+=============================================================================
+ARCHIVO: tests/test_repo_validation.py
+FASE: 3 - Calidad y Validación
+=============================================================================
+
+PROPÓSITO:
+Tests unitarios para el módulo de validación app/core/validation/.
+Verifica que los validadores detectan correctamente errores y warnings.
+
+TESTS INCLUIDOS:
+- test_format_schema_valid(): Formato válido pasa validación
+- test_format_schema_missing_meta(): Detecta _meta faltante
+- test_format_rules_uni_mismatch(): Detecta mismatch carpeta vs _meta.uni
+- test_id_collision_detection(): Detecta IDs duplicados
+- test_references_config_valid(): Config válido pasa validación
+- test_references_default_not_in_enabled(): Detecta default inválido
+
+CÓMO EJECUTAR:
+    python tests/test_repo_validation.py
+    # o con pytest:
+    py -m pytest tests/test_repo_validation.py -v
+
+COMUNICACIÓN CON OTROS MÓDULOS:
+- IMPORTA:
+  - app/core/validation/format_validation.py
+  - app/core/validation/references_validation.py
+  - app/core/validation/repo_checks.py
+
+NOTAS:
+- Tests usan datos sintéticos (dicts), no dependen de archivos reales.
+- Son determinísticos y no tienen side effects.
+
+=============================================================================
 """
 import json
 import sys
