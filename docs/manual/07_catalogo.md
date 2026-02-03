@@ -91,6 +91,28 @@ El usuario puede filtrar por:
 
 ---
 
+## Carátulas (modo visual)
+
+En modo **Carátulas**, el botón “Ver Carátula” abre el **modal unificado** de carátula, usando el mismo HTML/JS que el detalle.
+
+Flujo:
+1. `catalog.html` incluye `components/cover_modal.html`.
+2. `cover-preview.js` controla la apertura del modal (`window.GicaCover.open`).
+3. `catalog.js` delega a `GicaCover` mediante `previewCover(formatId)`.
+
+**Archivos involucrados**
+- `app/templates/pages/catalog.html`
+- `app/templates/components/cover_modal.html`
+- `app/static/js/cover-preview.js`
+- `app/static/js/catalog.js`
+
+**Cómo probar**
+1) Abrir `/catalog` y activar “Carátulas”.  
+2) Click en “Ver Carátula”.  
+3) Confirmar que el modal muestra datos del JSON del formato.
+
+---
+
 ## Generación de Documentos
 
 ### Flujo

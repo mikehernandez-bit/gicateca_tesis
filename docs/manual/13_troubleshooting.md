@@ -78,6 +78,7 @@
 - Los campos están vacíos o tienen valores por defecto.
 
 ### Causas Posibles
+0. **El modal de carátula no está unificado o el script no carga en orden.**
 1. **El JSON no tiene la sección `caratula`.**
 2. **Los campos tienen nombres diferentes a los esperados.**
 3. **El logo no existe o la ruta es incorrecta.**
@@ -91,22 +92,37 @@
    ```
    Buscar la sección `"caratula": {...}`.
 
-2. **Verificar campos esperados:**
+2. **Verificar que el modal unificado esté incluido:**
+   - `catalog.html` y `detail.html` deben incluir `components/cover_modal.html`.
+   - `cover-preview.js` debe cargarse **antes** de `catalog.js` / `format-viewer.js`.
+   - En consola: `window.GicaCover` debe existir.
+
+3. **Verificar campos esperados:**
    - `universidad`, `facultad`, `escuela`
    - `titulo_placeholder` o `titulo`
    - `frase_grado`, `grado_objetivo`
    - `autor`, `asesor`
    - `pais` o `lugar_fecha`, `fecha`
-   - **Fuente:** `app/static/js/format-viewer.js` L128-179
+   - **Fuente:** `app/static/js/cover-preview.js`
 
-3. **Verificar logo:**
-   - UNAC: `/static/assets/LogoUNAC.png`
-   - UNI: `/static/assets/LogoUNI.png`
-   - La selección depende del prefijo del `format_id`.
-   - **Fuente:** `app/static/js/format-viewer.js` L121-125
+4. **Verificar logo:**
+   - Prioridad: `data.configuracion.ruta_logo`
+   - Fallback: `/static/assets/LogoUNAC.png` o `/static/assets/LogoUNI.png`
+   - **Fuente:** `app/static/js/cover-preview.js`
 
-4. **Limpiar cache del navegador:**
+5. **Limpiar cache del navegador:**
    - Ctrl+Shift+R (hard refresh).
+
+**Archivos involucrados**
+- `app/templates/components/cover_modal.html`
+- `app/static/js/cover-preview.js`
+- `app/templates/pages/catalog.html`
+- `app/templates/pages/detail.html`
+
+**Cómo probar**
+1) Abrir `/catalog` → modo Carátulas → “Ver Carátula”.  
+2) Abrir `/formatos/{id}` → “Carátula Institucional”.  
+3) Confirmar que ambos modales muestran los mismos datos y logo.
 
 ---
 

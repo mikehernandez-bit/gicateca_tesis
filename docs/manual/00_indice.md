@@ -35,3 +35,10 @@
 13. [Troubleshooting](13_troubleshooting.md)
 14. [Contribución y Estándares](14_contribucion_y_estandares.md)
 15. [Glosario](15_glosario.md)
+
+---
+
+## Propuestas
+
+- [Propuesta de arquitectura escalable](../proposalsCODEX/architecture-scalability.md)
+

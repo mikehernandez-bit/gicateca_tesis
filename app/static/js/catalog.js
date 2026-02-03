@@ -286,7 +286,14 @@ function handleCardClick(event, formatId) {
 }
 
 function closeModal(modalId) {
-    document.getElementById(modalId).classList.add('hidden');
+    // Si es coverModal, delegar a GicaCover para cierre centralizado
+    if (modalId === 'coverModal' && window.GicaCover && window.GicaCover.close) {
+        window.GicaCover.close();
+        return;
+    }
+    // Para otros modales, usar lógica estándar
+    var modal = document.getElementById(modalId);
+    if (modal) modal.classList.add('hidden');
 }
 
 async function fetchFormatData(formatId) {
@@ -296,69 +303,13 @@ async function fetchFormatData(formatId) {
 }
 
 async function previewCover(formatId) {
-    const modal = document.getElementById('coverModal');
-    const loader = document.getElementById('coverLoader');
-    const content = document.getElementById('coverContent');
-    modal.classList.remove('hidden');
-    loader.classList.remove('hidden');
-    content.classList.add('hidden');
-    try {
-        const data = await fetchFormatData(formatId);
-        const c = data.caratula || {};
-        const metaUni = (data && data._meta && data._meta.uni) ? String(data._meta.uni).toLowerCase() : "";
-        const uniFallback = metaUni === "uni" ? "UNIVERSIDAD NACIONAL DE INGENIERÍA" : "UNIVERSIDAD NACIONAL DEL CALLAO";
-        const titulo = c.titulo_placeholder || c.titulo || c.titulo_proyecto || c.titulo_tesis || "TÍTULO DEL PROYECTO";
-        const frase = c.frase_grado || c.frase || "";
-        const grado = c.grado_objetivo || c.carrera || c.grado || "";
-
-        const lugarFechaRaw = (c.lugar_fecha || c.lugar || "").toString();
-        let lugar = c.pais || "";
-        let anio = c.fecha || "";
-        if ((!lugar || !anio) && lugarFechaRaw) {
-            const parts = lugarFechaRaw.split(/\n+/).map(p => p.trim()).filter(Boolean);
-            if (parts.length > 1) {
-                lugar = lugar || parts[0];
-                anio = anio || parts[parts.length - 1];
-            } else if (parts.length === 1) {
-                lugar = lugar || parts[0];
-            }
-        }
-
-        document.getElementById('c-uni').textContent = c.universidad || uniFallback;
-        document.getElementById('c-fac').textContent = c.facultad || "";
-        document.getElementById('c-esc').textContent = c.escuela || "";
-        document.getElementById('c-titulo').textContent = titulo;
-        document.getElementById('c-frase').textContent = frase;
-        document.getElementById('c-grado').textContent = grado;
-        document.getElementById('c-lugar').textContent = (lugar || "CALLAO, PERÚ");
-        document.getElementById('c-anio').textContent = (anio || "2026");
-
-        // Logo Logic
-        const config = data.configuracion || {};
-        const logoImg = document.getElementById('c-logo');
-        if (logoImg) {
-            let rutaLogo = config.ruta_logo;
-            if (!rutaLogo) {
-                const uniCode = metaUni ? metaUni.toUpperCase() : "UNAC";
-                rutaLogo = `/static/assets/Logo${uniCode}.png`;
-            }
-            // Fix path if it starts with app/static
-            if (rutaLogo.startsWith("app/static")) {
-                rutaLogo = "/" + rutaLogo.substring(4); // remove "app"
-            }
-            logoImg.src = rutaLogo;
-        }
-
-        const guiaEl = document.getElementById('c-guia');
-        if (guiaEl) {
-            const guia = (c.guia || c.nota || "").trim();
-            guiaEl.textContent = guia;
-            guiaEl.classList.toggle('hidden', !guia);
-        }
-        loader.classList.add('hidden');
-        content.classList.remove('hidden');
-    } catch (error) {
-        closeModal('coverModal');
-        alert("Error cargando carátula.");
+    // Delegar a la lógica unificada en cover-preview.js
+    if (window.GicaCover && window.GicaCover.open) {
+        return window.GicaCover.open(formatId);
+    } else {
+        console.error('[catalog.js] GicaCover no está disponible.');
     }
 }
+
+// === FIN DE FUNCIONES DE CARÁTULA ===
+// La lógica completa de previewCover está en cover-preview.js

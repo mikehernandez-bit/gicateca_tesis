@@ -101,101 +101,22 @@ function closePdfModal() {
 }
 
 // --- 3. Visualizador de Carátula (JSON) ---
+// WRAPPER: Toda la lógica vive en cover-preview.js para evitar divergencias
 async function previewCover(formatId) {
-    const modal = document.getElementById('coverModal');
-    const loader = document.getElementById('coverLoader');
-    const content = document.getElementById('coverContent');
-
-    modal.classList.remove('hidden');
-    loader.classList.remove('hidden');
-    content.classList.add('hidden');
-
-    try {
-        const data = await fetchFormatJson(formatId);
-        const c = data.caratula || {};
-        if (!Object.keys(c).length) throw new Error("No se encontró configuración de carátula.");
-
-        const logoImg = document.getElementById('cover-logo-img');
-        if (logoImg) {
-            // Lógica simple: si el ID empieza con 'uni-', usar logo UNI, sino UNAC (default)
-            if (formatId.toLowerCase().startsWith('uni')) {
-                logoImg.src = "/static/assets/LogoUNI.png";
-            } else {
-                logoImg.src = "/static/assets/LogoUNAC.png";
-            }
-        }
-
-        const isUni = formatId.toLowerCase().startsWith('uni');
-        const defaultUni = isUni ? "UNIVERSIDAD NACIONAL DE INGENIERÍA" : "UNIVERSIDAD NACIONAL DEL CALLAO";
-        const uniText = c.universidad || data.universidad || defaultUni;
-        document.getElementById('c-uni').textContent = uniText;
-
-        document.getElementById('c-fac').textContent = c.facultad || data.facultad || "";
-
-        const escEl = document.getElementById('c-esc');
-        const escuelaText = c.escuela || "";
-        if (escEl) {
-            escEl.textContent = escuelaText;
-            escEl.classList.toggle('hidden', !escuelaText);
-        }
-
-        const tituloText = c.titulo_placeholder || c.titulo || "TÍTULO DE INVESTIGACIÓN";
-        document.getElementById('c-titulo').textContent = tituloText;
-
-        document.getElementById('c-frase').textContent = c.frase_grado || c.frase || "";
-        document.getElementById('c-grado').textContent = c.grado_objetivo || c.grado || "";
-
-        // Autor / Asesor (si existen en JSON)
-        const labelAutorEl = document.getElementById('c-label-autor');
-        const autorEl = document.getElementById('c-autor');
-        const labelAsesorEl = document.getElementById('c-label-asesor');
-        const asesorEl = document.getElementById('c-asesor');
-        if (labelAutorEl) labelAutorEl.textContent = c.label_autor || labelAutorEl.textContent;
-        if (autorEl) autorEl.textContent = c.autor || autorEl.textContent;
-        if (labelAsesorEl) labelAsesorEl.textContent = c.label_asesor || labelAsesorEl.textContent;
-        if (asesorEl) asesorEl.textContent = c.asesor || asesorEl.textContent;
-
-        // Lugar y año (soporte para lugar_fecha posgrado)
-        let lugar = c.pais || "";
-        let anio = c.fecha || "";
-        const lugarFecha = (c.lugar_fecha || c.lugarFecha || "").trim();
-        if (lugarFecha) {
-            const parts = lugarFecha.split(/\n+/).map(p => p.trim()).filter(Boolean);
-            if (parts.length === 1) {
-                const match = parts[0].match(/(\\d{4})$/);
-                if (match) {
-                    anio = match[1];
-                    lugar = parts[0].replace(match[0], "").trim();
-                } else {
-                    lugar = parts[0];
-                    anio = "";
-                }
-            } else {
-                lugar = parts[0];
-                anio = parts[1] || "";
-            }
-        }
-        document.getElementById('c-lugar').textContent = lugar || (isUni ? "LIMA - PERÚ" : "CALLAO, PERÚ");
-        document.getElementById('c-anio').textContent = anio || "2026";
-        const guiaEl = document.getElementById('c-guia');
-        if (guiaEl) {
-            const guia = (c.guia || c.nota || "").trim();
-            guiaEl.textContent = guia;
-            guiaEl.classList.toggle('hidden', !guia);
-        }
-
-        loader.classList.add('hidden');
-        content.classList.remove('hidden');
-
-    } catch (error) {
-        console.error(error);
-        alert("Error cargando carátula: " + error.message);
-        closeCoverModal();
+    if (window.GicaCover && window.GicaCover.open) {
+        return window.GicaCover.open(formatId);
     }
+    console.error('[format-viewer.js] ERROR: GicaCover no está disponible. Verifica que cover-preview.js esté cargado antes de format-viewer.js');
+    return;
 }
 
+// WRAPPER: Cierre centralizado en GicaCover
 function closeCoverModal() {
-    document.getElementById('coverModal').classList.add('hidden');
+    if (window.GicaCover && window.GicaCover.close) {
+        window.GicaCover.close();
+    } else {
+        console.error('[format-viewer.js] ERROR: GicaCover.close no disponible');
+    }
 }
 
 // --- 4. Visualizador de Índice (Inteligente) ---

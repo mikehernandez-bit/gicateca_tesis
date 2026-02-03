@@ -5,3 +5,6 @@ pydantic
 python-docx
 docx2pdf
 pywin32
+pytest>=7.0
+jsonschema>=4.0
+

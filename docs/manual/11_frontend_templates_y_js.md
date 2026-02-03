@@ -40,16 +40,60 @@ app/templates/
 ```
 app/static/js/
 ├── catalog.js          # UI del catálogo (~16KB)
+├── cover-preview.js    # Modal unificado de carátula (~8.5KB)
 ├── format-viewer.js    # Vista detalle (~33KB)
 ├── navigation.js       # Navegación (~1KB)
 └── references.js       # UI de referencias (~22KB)
 ```
 
-**Fuente:** `app/static/js/` (4 archivos)
+**Fuente:** `app/static/js/` (5 archivos)
 
 ---
 
-## format-viewer.js — Vista Previa de Carátula ("Ojo")
+## Carátula unificada (modal + JS único)
+
+### Componente: `components/cover_modal.html`
+- Fuente única del modal HTML de carátula.
+- IDs esperados por el controlador: `c-uni`, `c-fac`, `c-esc`, `c-logo`, `c-titulo`, `c-guia`, `c-frase`, `c-grado`,
+  `c-label-autor`, `c-autor`, `c-label-asesor`, `c-asesor`, `c-lugar`, `c-anio`.
+
+**Fuente:** `app/templates/components/cover_modal.html`
+
+### Controlador: `cover-preview.js`
+- API pública global:
+  - `window.GicaCover.open(formatId)`
+  - `window.GicaCover.close()`
+- Compatibilidad: `window.previewCover(formatId)` es alias de `GicaCover.open`.
+- Reglas de logo:
+  1) `data.configuracion.ruta_logo` (si existe y se normaliza)
+  2) fallback a `/static/assets/LogoUNI.png` o `/static/assets/LogoUNAC.png` según universidad.
+- Universidad se resuelve con prioridad:
+  1) `data._meta.uni`
+  2) prefijo del `formatId`
+  3) default `unac`
+- Cache-buster en JSON de formato: `/formatos/{id}/data?t=...`
+
+**Fuente:** `app/static/js/cover-preview.js`
+
+### Integraciones
+- `catalog.html` y `detail.html` **incluyen** el componente `components/cover_modal.html`.
+- `catalog.html` y `detail.html` **cargan** `cover-preview.js` antes de sus JS específicos.
+- `catalog.js` y `format-viewer.js` delegan a `GicaCover`.
+
+**Archivos involucrados**
+- `app/templates/components/cover_modal.html`
+- `app/static/js/cover-preview.js`
+- `app/templates/pages/catalog.html`
+- `app/templates/pages/detail.html`
+- `app/static/js/catalog.js`
+- `app/static/js/format-viewer.js`
+
+**Cómo probar**
+1) Abrir `/catalog` → modo Carátulas → “Ver Carátula”.
+2) Abrir `/formatos/{id}` → “Carátula Institucional”.
+3) Verificar que ambos modales muestran el mismo contenido y logo.
+
+## format-viewer.js — Vista Detalle (PDF/Índice/Capítulos)
 
 ### Descripción
 
@@ -63,34 +107,18 @@ Este archivo maneja toda la lógica de la vista de detalle de formatos, incluyen
 
 ### Carátula (previewCover)
 
-Cuando el usuario hace clic en el "ojo" de carátula:
-
-1. Se abre un modal.
-2. Se llama a `/formatos/{format_id}/data` para obtener el JSON.
-3. Se extraen los campos de `data.caratula`.
-4. Se renderiza la carátula con:
-   - Logo (según universidad: UNAC o UNI).
-   - Universidad, facultad, escuela.
-   - Título, frase de grado, autor, asesor.
-   - Lugar y año.
-
-**Fuente:** `app/static/js/format-viewer.js` L104-195
+`format-viewer.js` **ya no renderiza** la carátula por sí mismo. En su lugar, delega la apertura del modal al controlador unificado `cover-preview.js`:
 
 ```javascript
 async function previewCover(formatId) {
-    const data = await fetchFormatJson(formatId);
-    const c = data.caratula || {};
-    
-    // Selección de logo
-    if (formatId.toLowerCase().startsWith('uni')) {
-        logoImg.src = "/static/assets/LogoUNI.png";
-    } else {
-        logoImg.src = "/static/assets/LogoUNAC.png";
+    if (window.GicaCover && window.GicaCover.open) {
+        return window.GicaCover.open(formatId);
     }
-    
-    // Renderizado de campos...
+    console.error('GicaCover no disponible');
 }
 ```
+
+**Fuente:** `app/static/js/format-viewer.js` (función `previewCover`)
 
 ### Índice (previewIndex)
 
@@ -100,7 +128,7 @@ Construye una tabla de contenidos inteligente:
 2. Si no, infiere desde `data.cuerpo` o `data.secciones`.
 3. Renderiza con niveles jerárquicos (Capítulo, Sección, Subsección).
 
-**Fuente:** `app/static/js/format-viewer.js` L202-372
+**Fuente:** `app/static/js/format-viewer.js` (función `previewIndex`)
 
 ### Capítulos (previewChapter)
 
@@ -113,7 +141,7 @@ Muestra el detalle de un capítulo específico:
    - Instrucción + lista.
    - Texto simple.
 
-**Fuente:** `app/static/js/format-viewer.js` L379-567
+**Fuente:** `app/static/js/format-viewer.js` (función `previewChapter`)
 
 ---
 
@@ -123,8 +151,9 @@ Maneja:
 - Filtros por universidad.
 - Filtros por tipo de formato.
 - Búsqueda por texto.
+- Vista previa de carátula en modo Carátulas delegando a `window.GicaCover`.
 
-**Fuente:** `app/static/js/catalog.js` (~16KB)
+**Fuente:** `app/static/js/catalog.js` (~13KB)
 
 ---
 

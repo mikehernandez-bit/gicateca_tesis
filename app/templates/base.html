@@ -6,9 +6,10 @@ Donde tocar si falla: Includes de header/sidebar, active_nav y assets globales.
 #}
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{{ title or "Formatoteca" }}</title>
 
   <!-- Tailwind CDN (cáscarón) -->
@@ -39,11 +40,25 @@ Donde tocar si falla: Includes de header/sidebar, active_nav y assets globales.
     </div>
   </main>
 
-  {# Scripts base y estado de navegacion #}
+  {# =========================================================================
+  SCRIPTS BASE (orden crítico para Fase 1)
+  1. Helpers (gica-dom, gica-api) - sin dependencias
+  2. Módulos (cover-preview) - dependen de helpers
+  3. Navegación - independiente
+  ========================================================================= #}
+  <script src="/static/js/gica-dom.js"></script>
+  <script src="/static/js/gica-api.js"></script>
+  <script src="/static/js/cover-preview.js"></script>
+
+  {# Estado de navegacion y script de navegacion #}
   <script>window.__ACTIVE_NAV__ = "{{ active_nav or "" }}";</script>
   <script src="/static/js/navigation.js"></script>
   <script>
     lucide.createIcons();
   </script>
+
+  {# Bloque para scripts adicionales de páginas específicas #}
+  {% block scripts %}{% endblock %}
 </body>
+
 </html>
