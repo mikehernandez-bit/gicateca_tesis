@@ -1,4 +1,13 @@
 {
+  "_meta": {
+    "entity": "format",
+    "publish": true,
+    "id": "unac-proyecto-cual",
+    "university": "unac",
+    "category": "Proyecto de Tesis",
+    "documentType": "cual",
+    "title": "Proyecto de Tesis UNAC - Enfoque Cualitativo"
+  },
   "configuracion": {
     "fuente_normal": "Times New Roman",
     "tamano_normal": 12,
@@ -18,8 +27,6 @@
     "label_linea": "LÍNEA DE INVESTIGACIÓN:\n[Unidad de Investigación]",
     "fecha": "Callao, [AÑO]",
     "pais": "PERÚ\n"
-
-
   },
   "pagina_respeto": {
     "titulo": "PÁGINA DE RESPETO",
@@ -58,7 +65,8 @@
         "valor": ""
       },
       {
-        "label": "ESCENARIO Y PARTICIPANTES:", "valor": "[Lugar y personas claves]"
+        "label": "ESCENARIO Y PARTICIPANTES:",
+        "valor": "[Lugar y personas claves]"
       },
       {
         "label": "TIPO:",
@@ -243,7 +251,7 @@
         }
       ]
     },
-   {
+    {
       "titulo": "II. REVISIÓN DE LITERATURA",
       "contenido": [
         {
@@ -379,7 +387,7 @@
       ]
     }
   ],
-   "finales": {
+  "finales": {
     "referencias": {
       "titulo": "VII. REFERENCIAS BIBLIOGRÁFICAS",
       "nota": "Liste todas las fuentes citadas en el texto. Use un estilo de citación consistente (según norma indicada por su programa).\n\nVerifique: autor, año, título, editorial/revista, volumen(número), páginas, DOI/URL.",
@@ -440,14 +448,17 @@
       "especificos": []
     },
     "variables": {
-  "independiente": {
-    "nombre": "CATEGORÍA PRINCIPAL",
-    "dimensiones": ["Subcategoría 1", "Subcategoría 2"]
-  },
-  "dependiente": {
-    "nombre": "CATEGORÍA SECUNDARIA (Si aplica)",
-    "dimensiones": []
-  }
+      "independiente": {
+        "nombre": "CATEGORÍA PRINCIPAL",
+        "dimensiones": [
+          "Subcategoría 1",
+          "Subcategoría 2"
+        ]
+      },
+      "dependiente": {
+        "nombre": "CATEGORÍA SECUNDARIA (Si aplica)",
+        "dimensiones": []
+      }
     },
     "metodologia": {
       "tipo": "Aplicada",

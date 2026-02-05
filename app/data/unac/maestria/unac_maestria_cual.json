@@ -1,4 +1,13 @@
 {
+  "_meta": {
+    "entity": "format",
+    "publish": true,
+    "id": "unac-maestria-cual",
+    "university": "unac",
+    "category": "Tesis de Postgrado",
+    "documentType": "cual",
+    "title": "Tesis de Maestría UNAC - Enfoque Cualitativo"
+  },
   "caratula": {
     "universidad": "UNIVERSIDAD NACIONAL DEL CALLAO",
     "facultad": "ESCUELA DE POSGRADO",

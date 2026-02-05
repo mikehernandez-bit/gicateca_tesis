@@ -1,4 +1,13 @@
 {
+  "_meta": {
+    "entity": "format",
+    "publish": true,
+    "id": "uni-posgrado-standard",
+    "university": "uni",
+    "category": "Tesis de Postgrado",
+    "documentType": "standard",
+    "title": "Tesis de Posgrado UNI - Formato Estándar"
+  },
   "caratula": {
     "facultad": "FACULTAD DE [NOMBRE DE LA FACULTAD]",
     "tipo_documento": "TESIS",

@@ -53,7 +53,7 @@ def test_unac_view_model():
         print("⚠️ test_unac_view_model SKIPPED (no hay carpeta unac)")
         return
     
-    json_files = list(unac_dir.glob("*.json"))
+    json_files = list(unac_dir.rglob("*.json"))
     
     # Filtrar archivos especiales
     format_files = [f for f in json_files if f.name not in (
@@ -93,7 +93,7 @@ def test_uni_view_model():
     from app.core.registry import get_provider
     
     uni_dir = ROOT / "app" / "data" / "uni"
-    json_files = list(uni_dir.glob("*.json"))
+    json_files = list(uni_dir.rglob("*.json"))
     
     format_files = [f for f in json_files if f.name not in (
         "alerts.json", "references_config.json", "formatos.json"

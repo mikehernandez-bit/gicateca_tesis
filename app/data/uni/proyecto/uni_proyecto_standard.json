@@ -1,4 +1,13 @@
 {
+  "_meta": {
+    "entity": "format",
+    "publish": true,
+    "id": "uni-proyecto-standard",
+    "university": "uni",
+    "category": "Proyecto de Tesis",
+    "documentType": "standard",
+    "title": "Plan de Trabajo de Tesis UNI - Formato Estándar"
+  },
   "caratula": {
     "facultad": "FACULTAD DE [NOMBRE DE LA FACULTAD]",
     "tipo_documento": "PLAN DE TRABAJO DE TESIS",

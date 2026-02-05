@@ -1,4 +1,13 @@
 {
+  "_meta": {
+    "entity": "format",
+    "publish": true,
+    "id": "unac-maestria-cuant",
+    "university": "unac",
+    "category": "Tesis de Postgrado",
+    "documentType": "cuant",
+    "title": "Tesis de Maestría UNAC - Enfoque Cuantitativo"
+  },
   "caratula": {
     "universidad": "UNIVERSIDAD NACIONAL DEL CALLAO",
     "facultad": "ESCUELA DE POSGRADO",

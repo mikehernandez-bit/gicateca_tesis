@@ -1,4 +1,13 @@
 {
+  "_meta": {
+    "entity": "format",
+    "publish": true,
+    "id": "uni-informe-apa",
+    "university": "uni",
+    "category": "Informe de Tesis",
+    "documentType": "apa",
+    "title": "Informe de Tesis UNI - Formato APA"
+  },
   "caratula": {
     "universidad": "UNIVERSIDAD NACIONAL DE INGENIERÍA",
     "facultad": "FACULTAD DE [NOMBRE DE LA FACULTAD]",

@@ -49,10 +49,11 @@ TIPO_LABELS = {
 }
 ENFOQUE_LABELS = {"cual": "Cualitativo", "cuant": "Cuantitativo"}
 TIPO_FILTRO = {
-    "informe": "Inv. Formativa",
-    "maestria": "Suficiencia",
-    "posgrado": "Suficiencia",
-    "proyecto": "Tesis",
+    # Ahora usamos las 3 categorías normalizadas de _meta.category
+    "informe": "Informe de Tesis",
+    "maestria": "Tesis de Postgrado",
+    "posgrado": "Tesis de Postgrado",
+    "proyecto": "Proyecto de Tesis",
 }
 _REFERENCE_KEYWORDS = {
     "references",
@@ -108,9 +109,17 @@ def _build_format_title(categoria: str, enfoque: str, raw_title: str, fallback_t
 
 def _build_format_entry(item, data: Dict) -> Dict:
     """Construye el dict que alimenta el catalogo UI."""
-    raw_title = data.get("titulo") if isinstance(data, dict) else None
+    # Preferir _meta si existe (fuente de verdad = JSON)
+    meta = data.get("_meta", {}) if isinstance(data, dict) else {}
+    
+    # Título: preferir _meta.title, luego data.titulo, luego generar
+    raw_title = meta.get("title") or (data.get("titulo") if isinstance(data, dict) else None)
     titulo = _build_format_title(item.categoria, item.enfoque, raw_title, item.titulo)
-    cat_label = TIPO_LABELS.get(item.categoria, item.categoria.capitalize())
+    
+    # Categoría: preferir _meta.category, luego usar TIPO_LABELS
+    category_from_meta = meta.get("category")
+    cat_label = category_from_meta or TIPO_LABELS.get(item.categoria, item.categoria.capitalize())
+    
     enfoque_label = ENFOQUE_LABELS.get(item.enfoque)
     resumen = None
     if isinstance(data, dict):
@@ -125,8 +134,9 @@ def _build_format_entry(item, data: Dict) -> Dict:
         facultad = caratula.get("facultad")
         escuela = escuela or caratula.get("escuela")
     # Forzar leyenda uniforme y escalable por universidad.
-    if item.uni:
-        facultad = f"Centro de Formatos {item.uni.upper()}"
+    uni_code = meta.get("university") or item.uni
+    if uni_code:
+        facultad = f"Centro de Formatos {uni_code.upper()}"
     if not facultad:
         facultad = "Centro de Formatos"
     if not escuela:
@@ -138,10 +148,11 @@ def _build_format_entry(item, data: Dict) -> Dict:
             resumen = f"Plantilla oficial de {cat_label}"
 
     return {
-        "id": item.format_id,
-        "uni": item.uni.upper(),
-        "uni_code": item.uni,
-        "tipo": TIPO_FILTRO.get(item.categoria, "Otros"),
+        "id": meta.get("id") or item.format_id,
+        "uni": (meta.get("university") or item.uni).upper(),
+        "uni_code": meta.get("university") or item.uni,
+        "tipo": category_from_meta or TIPO_FILTRO.get(item.categoria, "Otros"),  # Preferir _meta.category
+        "categoria": category_from_meta or item.categoria,  # Nueva: categoria para filtros
         "titulo": titulo,
         "facultad": facultad,
         "escuela": escuela,
@@ -150,7 +161,7 @@ def _build_format_entry(item, data: Dict) -> Dict:
         "fecha": (data.get("fecha") if isinstance(data, dict) and data.get("fecha") else "2026-01-17"),
         "resumen": resumen,
         "tipo_formato": item.categoria,
-        "enfoque": item.enfoque,
+        "enfoque": meta.get("documentType") or item.enfoque,
     }
 
 
