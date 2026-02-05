@@ -1,4 +1,13 @@
 {
+  "_meta": {
+    "entity": "format",
+    "publish": true,
+    "id": "unac-proyecto-cuant",
+    "university": "unac",
+    "category": "Proyecto de Tesis",
+    "documentType": "cuant",
+    "title": "Proyecto de Tesis UNAC - Enfoque Cuantitativo"
+  },
   "configuracion": {
     "fuente_normal": "Times New Roman",
     "tamano_normal": 12,
@@ -18,7 +27,6 @@
     "label_linea": "LÍNEA DE INVESTIGACIÓN:\n[Unidad de Investigación]",
     "fecha": "Callao, [AÑO]",
     "pais": "PERÚ\n"
-
   },
   "pagina_respeto": {
     "titulo": "PÁGINA DE RESPETO",
@@ -257,68 +265,80 @@
           "instruccion_detallada": "Describen y explican principios, leyes, enfoques, teorías relacionadas con sus variables de investigación.\n• Todas las bases teóricas tienen las citas textuales o parafraseados correspondientes.\n• Las bases teóricas tienen relación con las variables de investigación.\nTambién se puede considerar marco legal, ambiental u otro que requiera la investigación.",
           "mostrar_matriz": true,
           "tablas_especiales": [
-  {
-    "titulo": "Figura 2.2 Matriz de consistencia de implementación",
-    "headers": ["PROBLEMA GENERAL", "OBJETIVO GENERAL", "HIPÓTESIS GENERAL", "VARIABLES", "METODOLOGÍA"],
-    "rows": [
-      [
-        "¿De qué manera la implementación de un plan de mantenimiento preventivo mejora la disponibilidad del sistema de bombeo?",
-        "Determinar cómo la implementación de un plan de mantenimiento preventivo mejora la disponibilidad del sistema de bombeo.",
-        "La implementación de un plan de mantenimiento preventivo mejora la disponibilidad del sistema de bombeo.",
-        "VARIABLE INDEPENDIENTE:\nPLAN DE MANTENIMIENTO PREVENTIVO",
-        "TIPO: Aplicada\nENFOQUE: Cuantitativo\nNIVEL: Explicativo"
-      ],
-      [
-        "PROBLEMAS ESPECÍFICOS:\n¿De qué manera mejora la confiabilidad?",
-        "OBJETIVOS ESPECÍFICOS:\nDeterminar cómo mejora la confiabilidad.",
-        "HIPÓTESIS ESPECÍFICAS:\nLa implementación mejora la confiabilidad.",
-        "DIMENSIONES VI:\n- Diagnóstico inicial\n- AMEF\n- Programación de actividades",
-        "DISEÑO: Pre Experimental\nPOBLACIÓN: Sistema de bombeo\nMUESTRA: 2 estaciones"
-      ],
-      [
-        "¿De qué manera mejora la mantenibilidad?",
-        "Determinar cómo mejora la mantenibilidad.",
-        "La implementación mejora la mantenibilidad.",
-        "VARIABLE DEPENDIENTE:\nDISPONIBILIDAD\n\nDIMENSIONES VD:\n- Confiabilidad\n- Mantenibilidad",
-        "TÉCNICAS: Análisis documental, Observación\nINSTRUMENTOS: Ficha de datos\nPROCESAMIENTO: SPSS v25"
-      ]
-    ]
-  },
-  {
-    "titulo": "Figura 2.3 Matriz de operacionalización de diseño",
-    "headers": ["VARIABLES", "DIMENSIONES", "INDICADORES", "ÍNDICE", "MÉTODO Y TÉCNICA"],
-    "rows": [
-      [
-        "VARIABLE I:\nDiseño de un sistema de ventilación mecánica con jetfan",
-        "Parámetros básicos de diseño",
-        "Volumen\nCaudal",
-        "Área x altura\nVolumen de aire/minuto",
-        "MÉTODO:\nCuantitativo"
-      ],
-      [
-        "",
-        "Redes de distribución de aire",
-        "Pérdidas\nRuta crítica",
-        "Pulg. columna agua/100 pies\nMáxima pérdida de presión",
-        "MÉTODO:\nCualitativo"
-      ],
-      [
-        "",
-        "Selección de equipos",
-        "Caída de presión\nCaudal de operación\nEficiencia",
-        "Pérdida real\nVolumen real\nPotencia mecánica/eléctrica",
-        "TÉCNICA:\nDocumental"
-      ],
-      [
-        "",
-        "Validación de diseño",
-        "Preproceso\nResolución\nPostproceso",
-        "Diseño, mallado\nEcuaciones diferenciales\nGráficos",
-        "TÉCNICA:\nEmpírica"
-      ]
-    ]
-  }
-]
+            {
+              "titulo": "Figura 2.2 Matriz de consistencia de implementación",
+              "headers": [
+                "PROBLEMA GENERAL",
+                "OBJETIVO GENERAL",
+                "HIPÓTESIS GENERAL",
+                "VARIABLES",
+                "METODOLOGÍA"
+              ],
+              "rows": [
+                [
+                  "¿De qué manera la implementación de un plan de mantenimiento preventivo mejora la disponibilidad del sistema de bombeo?",
+                  "Determinar cómo la implementación de un plan de mantenimiento preventivo mejora la disponibilidad del sistema de bombeo.",
+                  "La implementación de un plan de mantenimiento preventivo mejora la disponibilidad del sistema de bombeo.",
+                  "VARIABLE INDEPENDIENTE:\nPLAN DE MANTENIMIENTO PREVENTIVO",
+                  "TIPO: Aplicada\nENFOQUE: Cuantitativo\nNIVEL: Explicativo"
+                ],
+                [
+                  "PROBLEMAS ESPECÍFICOS:\n¿De qué manera mejora la confiabilidad?",
+                  "OBJETIVOS ESPECÍFICOS:\nDeterminar cómo mejora la confiabilidad.",
+                  "HIPÓTESIS ESPECÍFICAS:\nLa implementación mejora la confiabilidad.",
+                  "DIMENSIONES VI:\n- Diagnóstico inicial\n- AMEF\n- Programación de actividades",
+                  "DISEÑO: Pre Experimental\nPOBLACIÓN: Sistema de bombeo\nMUESTRA: 2 estaciones"
+                ],
+                [
+                  "¿De qué manera mejora la mantenibilidad?",
+                  "Determinar cómo mejora la mantenibilidad.",
+                  "La implementación mejora la mantenibilidad.",
+                  "VARIABLE DEPENDIENTE:\nDISPONIBILIDAD\n\nDIMENSIONES VD:\n- Confiabilidad\n- Mantenibilidad",
+                  "TÉCNICAS: Análisis documental, Observación\nINSTRUMENTOS: Ficha de datos\nPROCESAMIENTO: SPSS v25"
+                ]
+              ]
+            },
+            {
+              "titulo": "Figura 2.3 Matriz de operacionalización de diseño",
+              "headers": [
+                "VARIABLES",
+                "DIMENSIONES",
+                "INDICADORES",
+                "ÍNDICE",
+                "MÉTODO Y TÉCNICA"
+              ],
+              "rows": [
+                [
+                  "VARIABLE I:\nDiseño de un sistema de ventilación mecánica con jetfan",
+                  "Parámetros básicos de diseño",
+                  "Volumen\nCaudal",
+                  "Área x altura\nVolumen de aire/minuto",
+                  "MÉTODO:\nCuantitativo"
+                ],
+                [
+                  "",
+                  "Redes de distribución de aire",
+                  "Pérdidas\nRuta crítica",
+                  "Pulg. columna agua/100 pies\nMáxima pérdida de presión",
+                  "MÉTODO:\nCualitativo"
+                ],
+                [
+                  "",
+                  "Selección de equipos",
+                  "Caída de presión\nCaudal de operación\nEficiencia",
+                  "Pérdida real\nVolumen real\nPotencia mecánica/eléctrica",
+                  "TÉCNICA:\nDocumental"
+                ],
+                [
+                  "",
+                  "Validación de diseño",
+                  "Preproceso\nResolución\nPostproceso",
+                  "Diseño, mallado\nEcuaciones diferenciales\nGráficos",
+                  "TÉCNICA:\nEmpírica"
+                ]
+              ]
+            }
+          ]
         },
         {
           "texto": "2.3 Marco conceptual",

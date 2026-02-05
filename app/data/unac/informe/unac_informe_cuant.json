@@ -1,4 +1,13 @@
 {
+  "_meta": {
+    "entity": "format",
+    "publish": true,
+    "id": "unac-informe-cuant",
+    "university": "unac",
+    "category": "Informe de Tesis",
+    "documentType": "cuant",
+    "title": "Informe de Tesis UNAC - Enfoque Cuantitativo"
+  },
   "caratula": {
     "universidad": "UNIVERSIDAD NACIONAL DEL CALLAO",
     "facultad": "FACULTAD DE [NOMBRE DE LA FACULTAD]",
@@ -234,11 +243,18 @@
     "variables": {
       "independiente": {
         "nombre": "PLAN DE MANTENIMIENTO",
-        "dimensiones": ["Criticidad", "AMEF", "Programación"]
+        "dimensiones": [
+          "Criticidad",
+          "AMEF",
+          "Programación"
+        ]
       },
       "dependiente": {
         "nombre": "TIEMPO PERDIDO",
-        "dimensiones": ["Disponibilidad", "Confiabilidad"]
+        "dimensiones": [
+          "Disponibilidad",
+          "Confiabilidad"
+        ]
       }
     },
     "metodologia": {
