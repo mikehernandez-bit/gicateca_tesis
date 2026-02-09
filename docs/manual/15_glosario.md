@@ -16,7 +16,7 @@
 | **Generador** | Script Python que lee un JSON y produce un DOCX. Ubicación: `app/universities/{uni}/centro_formatos/`. |
 | **HRESULT** | Código de error de Windows COM. El más común es `-2147220995` ("El objeto no está conectado al servidor"). |
 | **Jinja2** | Motor de templates usado para renderizar HTML. |
-| **Mojibake** | Caracteres corruptos por error de encoding (ej: "Ã©" en lugar de "é"). |
+| **Mojibake** | Caracteres corruptos por error de encoding (ej: "é" en lugar de "é"). |
 | **PDF Prewarm** | Generación anticipada de PDFs al iniciar el servidor para reducir tiempos de respuesta. |
 | **Provider** | Módulo que expone configuración y generadores para una universidad específica. |
 | **SHA256** | Algoritmo de hash usado para identificar cambios en archivos y optimizar cache. |

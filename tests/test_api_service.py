@@ -175,7 +175,11 @@ class TestDTOMapping:
             university="unac",
             category="general",
             document_type="tesis",
-            raw_data={},
+            raw_data={
+                "_meta": {"id": "unac:general:sample", "entity": "format", "publish": True},
+                "preliminares": {"introduccion": {"titulo": "INTRODUCCION"}},
+                "cuerpo": {"capitulos": [{"titulo": "Capitulo I"}]},
+            },
             source_path=Path("/sample.json"),
             fields=[
                 {"name": "titulo", "label": "Título", "type": "text", "required": True},
@@ -208,3 +212,5 @@ class TestDTOMapping:
         assert detail.assets[0].kind == "logo"
         assert detail.templateRef is not None
         assert detail.templateRef.kind == "docx"
+        assert detail.definition["preliminares"]["introduccion"]["titulo"] == "INTRODUCCION"
+        assert "cuerpo" in detail.definition

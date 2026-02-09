@@ -27,9 +27,9 @@ from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # FIELD TYPE ENUM (STRICT)
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 
 class FieldType(str, Enum):
     """Tipos de campo permitidos - strict enum."""
@@ -41,9 +41,9 @@ class FieldType(str, Enum):
     BOOLEAN = "boolean"
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # STRICT DTOs
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 
 class FormatField(BaseModel):
     """Campo de entrada para el wizard de generación."""
@@ -134,6 +134,10 @@ class FormatDetail(BaseModel):
     fields: List[FormatField] = Field(default_factory=list, description="Campos del wizard")
     assets: List[AssetRef] = Field(default_factory=list, description="Assets asociados")
     rules: Optional[RuleSet] = Field(default=None, description="Reglas de formato")
+    definition: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Definicion JSON completa del formato (estructura extendida para n8n)",
+    )
 
 
 class CatalogVersionResponse(BaseModel):
@@ -144,9 +148,9 @@ class CatalogVersionResponse(BaseModel):
     generatedAt: str = Field(..., min_length=1, description="Timestamp ISO de generación")
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # VALIDATION RESPONSE (for /validate endpoint)
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 
 class FormatValidationError(BaseModel):
     """Error de validación de un formato específico."""

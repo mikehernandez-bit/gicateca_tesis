@@ -47,9 +47,9 @@ from app.modules.api.dtos import (
 )
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # INTERNAL FORMAT REPRESENTATION
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 
 @dataclass
 class InternalFormat:
@@ -68,9 +68,9 @@ class InternalFormat:
     rules: Optional[Dict[str, Any]] = None
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # HASH UTILITIES (DETERMINISTIC)
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 
 def canonical_json_bytes(obj: Any) -> bytes:
     """
@@ -133,9 +133,9 @@ def make_stable_format_id(uni: str, category: str, title: str, raw_id: str) -> s
     return base_id
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # FORMAT LOADING AND NORMALIZATION
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 
 def _extract_fields(data: Dict[str, Any]) -> List[Dict[str, Any]]:
     """
@@ -295,33 +295,54 @@ def load_internal_format(item: FormatIndexItem) -> InternalFormat:
     )
 
 
+def _meta_entity(raw_data: Dict[str, Any]) -> str:
+    """Retorna entidad normalizada desde _meta.entity."""
+    meta = raw_data.get("_meta") or {}
+    return str(meta.get("entity", "")).strip().lower()
+
+
+def _meta_publish(raw_data: Dict[str, Any]) -> Optional[bool]:
+    """Retorna publish solo si es bool; de otro modo None."""
+    meta = raw_data.get("_meta") or {}
+    publish = meta.get("publish")
+    if isinstance(publish, bool):
+        return publish
+    return None
+
+
+def _is_config_path(path: Path) -> bool:
+    """Detecta si el archivo vive en una carpeta configs/."""
+    return any(part.lower() == "configs" for part in path.parts)
+
+
+def classify_format_visibility(fmt: InternalFormat) -> str:
+    """
+    Clasifica un JSON descubierto para el catálogo público.
+
+    Estados:
+    - publicable: _meta.entity == "format" AND _meta.publish == true
+    - config: carpeta configs/ OR _meta.entity == "config"
+    - hidden: formato u otro artefacto no publicable
+    """
+    entity = _meta_entity(fmt.raw_data)
+    publish = _meta_publish(fmt.raw_data)
+
+    if _is_config_path(fmt.source_path) or entity == "config":
+        return "config"
+    if entity == "format" and publish is True:
+        return "publicable"
+    return "hidden"
+
+
 def is_publishable_format(fmt: InternalFormat) -> bool:
     """
     Determina si un formato es publicable en el catálogo público.
-    
-    Reglas de inclusión (escalables):
-    1. Si tiene _meta.publish == True -> publicable
-    2. Si tiene _meta.publish == False -> NO publicable
-    3. Si NO tiene _meta.publish:
-       - Heurística: tiene 'caratula' Y 'cuerpo' -> es formato real (publicable)
-       - Si no tiene estas estructuras -> es config (NO publicable)
+
+    Regla estricta (escalable):
+    - publicable solo si _meta.entity == "format" y _meta.publish == true
+    - todo lo demás queda fuera del catálogo público
     """
-    meta = fmt.raw_data.get("_meta") or {}
-    
-    # Si _meta.publish está definido, usar ese valor
-    if "publish" in meta:
-        return bool(meta.get("publish"))
-    
-    # Si _meta.entity != "format", no es publicable
-    entity = meta.get("entity", "").lower()
-    if entity and entity != "format":
-        return False  # es config u otro tipo
-    
-    # Heurística: formatos reales tienen 'caratula' y/o 'cuerpo'
-    has_caratula = "caratula" in fmt.raw_data
-    has_cuerpo = "cuerpo" in fmt.raw_data
-    
-    return has_caratula or has_cuerpo
+    return classify_format_visibility(fmt) == "publicable"
 
 
 def load_all_formats(university: Optional[str] = None, include_unpublished: bool = False) -> List[InternalFormat]:
@@ -340,8 +361,8 @@ def load_all_formats(university: Optional[str] = None, include_unpublished: bool
     for item in items:
         try:
             fmt = load_internal_format(item)
-            
-            # Filtrar solo publicables a menos que se pida incluir todos
+
+            # Catálogo público: solo publicables. Diagnóstico: incluir todos.
             if include_unpublished or is_publishable_format(fmt):
                 formats.append(fmt)
         except Exception:
@@ -350,9 +371,9 @@ def load_all_formats(university: Optional[str] = None, include_unpublished: bool
     return formats
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # CATALOG VERSIONING
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 
 def get_catalog_version(formats: Optional[List[InternalFormat]] = None) -> str:
     """
@@ -375,9 +396,9 @@ def get_catalog_version(formats: Optional[List[InternalFormat]] = None) -> str:
     return hashlib.sha256(global_content.encode("utf-8")).hexdigest()
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # DTO MAPPING
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 
 def map_to_dto_summary(fmt: InternalFormat) -> FormatSummary:
     """Mapea formato interno a DTO de resumen."""
@@ -465,12 +486,14 @@ def map_to_dto_detail(fmt: InternalFormat) -> FormatDetail:
         fields=fields,
         assets=assets,
         rules=rules,
+        # Exponer definicion completa para motores externos (n8n/simulacion).
+        definition=dict(fmt.raw_data),
     )
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # PUBLIC SERVICE API
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 
 def list_formats(
     university: Optional[str] = None,
@@ -529,9 +552,9 @@ def get_catalog_version_info() -> CatalogVersionResponse:
     )
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # CATALOG VALIDATION
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 
 VALID_FIELD_TYPES = {"text", "textarea", "number", "date", "select", "boolean"}
 

@@ -5,11 +5,38 @@
 | Ruta | Contenido |
 |------|-----------|
 | `app/data/{uni}/{categoria}/*.json` | Formatos por universidad/categoría |
+| `app/data/{uni}/configs/*.json` | Configuraciones internas (no publicables) |
 | `app/data/references/*.json` | Normas bibliográficas globales |
 | `app/data/{uni}/references_config.json` | Configuración de normas por universidad |
 | `app/data/{uni}/alerts.json` | Alertas por universidad |
 
 **Fuente:** `app/core/paths.py` L40-48
+
+---
+
+## Regla de Formato Publicable
+
+La API pública (`/api/v1/formats*`) publica únicamente JSON que cumplan:
+
+```json
+{
+  "_meta": {
+    "entity": "format",
+    "publish": true
+  }
+}
+```
+
+Todo lo demás se excluye del catálogo público:
+
+- `_meta.entity == "config"`
+- `_meta.publish == false`
+- archivos en carpeta `configs/`
+
+Consecuencia de versionado:
+
+- `catalogVersion` y `ETag` se calculan solo con formatos publicables.
+- Cambiar `references_config` o cualquier config excluido no cambia la versión pública.
 
 ---
 
@@ -131,6 +158,10 @@ Archivo: `app/data/unac/references_config.json`
 
 ```json
 {
+  "_meta": {
+    "entity": "config",
+    "publish": false
+  },
   "university": "unac",
   "title": "Normas de citación (UNAC)",
   "enabled": ["apa7", "ieee", "iso690", "vancouver"],

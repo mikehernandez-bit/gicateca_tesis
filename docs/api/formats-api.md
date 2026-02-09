@@ -8,6 +8,25 @@ API de solo lectura para consumir el catálogo de formatos de GicaTesis desde si
 /api/v1
 ```
 
+## Regla de Publicación de Formatos
+
+Un JSON entra al catálogo público solo si cumple:
+
+- `_meta.entity == "format"`
+- `_meta.publish == true`
+
+Queda fuera del catálogo público cuando:
+
+- `_meta.entity == "config"`
+- `_meta.publish == false`
+- El archivo vive en carpeta `configs/`
+
+Notas importantes:
+
+- `GET /formats` y `GET /formats/version` se calculan solo con formatos publicables.
+- `GET /formats/{id}` responde `404` para IDs no publicables o de configuración.
+- Cambios en configs excluidos (por ejemplo `references_config`) no invalidan la versión pública.
+
 ## Endpoints
 
 ---
@@ -38,7 +57,7 @@ Lista todos los formatos disponibles.
 ```
 
 **Headers de Respuesta:**
-- `ETag: "<catalogVersion>"` — Hash global del catálogo
+- `ETag: "<catalogVersion>"` — Hash global del catálogo público (solo publicables)
 - `Cache-Control: public, max-age=60`
 
 **Cache 304:**
@@ -80,9 +99,23 @@ Obtiene el detalle completo de un formato.
       "url": "/api/v1/assets/unac/logo/main"
     }
   ],
-  "rules": null
+  "rules": null,
+  "definition": {
+    "_meta": {
+      "entity": "format",
+      "publish": true
+    },
+    "preliminares": {},
+    "cuerpo": {},
+    "anexos": {}
+  }
 }
 ```
+
+Notas de contrato:
+- `fields` se usa para render del wizard.
+- `definition` conserva el JSON completo del formato para integraciones externas (n8n/simulacion).
+- `definition` puede incluir capitulos, subtitulos, tablas, imagenes y reglas internas del formato.
 
 **Response: 404 Not Found**
 ```json
@@ -96,6 +129,8 @@ Obtiene el detalle completo de un formato.
 ### GET /formats/version
 
 Check rápido de la versión actual del catálogo.
+
+La versión se calcula únicamente con formatos publicables.
 
 **Response: 200 OK**
 ```json

@@ -109,9 +109,9 @@ Donde tocar si falla:
 1. **Crear directorio:**
    ```
    app/modules/nuevo_modulo/
-   ├── __init__.py
-   ├── router.py
-   └── service.py  (opcional)
+   +-- __init__.py
+   +-- router.py
+   `-- service.py  (opcional)
    ```
 
 2. **Crear router:**

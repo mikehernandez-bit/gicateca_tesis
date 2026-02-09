@@ -15,12 +15,12 @@
 
 ```
 app/universities/unac/
-├── __init__.py
-├── provider.py           # Configuración del provider
-└── centro_formatos/      # Generadores DOCX
-    ├── generador_informe_tesis.py
-    ├── generador_maestria.py
-    └── generador_proyecto_tesis.py
++-- __init__.py
++-- provider.py           # Configuración del provider
+`-- centro_formatos/      # Generadores DOCX
+    +-- generador_informe_tesis.py
+    +-- generador_maestria.py
+    `-- generador_proyecto_tesis.py
 ```
 
 ### Archivo `provider.py` (UNAC)
@@ -83,10 +83,10 @@ class UniversityProvider(Protocol):
 1. **Crear directorio provider:**
    ```
    app/universities/nueva_uni/
-   ├── __init__.py
-   ├── provider.py
-   └── centro_formatos/
-       └── generador_informe.py  # (u otros)
+   +-- __init__.py
+   +-- provider.py
+   `-- centro_formatos/
+       `-- generador_informe.py  # (u otros)
    ```
 
 2. **Crear `provider.py`:**
@@ -110,15 +110,23 @@ class UniversityProvider(Protocol):
 3. **Crear directorio de datos:**
    ```
    app/data/nueva_uni/
-   ├── alerts.json          # []
-   ├── references_config.json
-   └── informe/
-       └── nueva_uni_informe_cual.json
+   +-- alerts.json          # []
+   +-- references_config.json
+   `-- informe/
+       `-- nueva_uni_informe_cual.json
    ```
+
+   Ejemplo real para UTP:
+   - `app/data/utp/informe/utp_informe_cual.json`
+   - `app/data/utp/references_config.json`
 
 4. **Crear `references_config.json`:**
    ```json
    {
+     "_meta": {
+       "entity": "config",
+       "publish": false
+     },
      "university": "nueva_uni",
      "title": "Normas de citación (Nueva Uni)",
      "enabled": ["apa7", "ieee"],
@@ -127,7 +135,18 @@ class UniversityProvider(Protocol):
    }
    ```
 
-5. **Verificar discovery:**
+5. **Marcar formatos publicables con `_meta`:**
+   ```json
+   {
+     "_meta": {
+       "entity": "format",
+       "publish": true,
+       "id": "utp-informe-cual"
+     }
+   }
+   ```
+
+6. **Verificar discovery:**
    - El sistema descubre automáticamente providers en `app/universities/*/provider.py`.
    - **Fuente:** `app/core/registry.py` L39-49
 

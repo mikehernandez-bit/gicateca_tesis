@@ -130,11 +130,11 @@ El sistema cachea PDFs basándose en el **hash SHA256 del DOCX generado**:
 
 ```
 app/.cache/
-├── docx/
-│   └── unac-informe-cual.docx
-└── pdf/
-    ├── unac-informe-cual-abc123def456.pdf
-    └── unac-informe-cual.manifest.json
++-- docx/
+|   `-- unac-informe-cual.docx
+`-- pdf/
+    +-- unac-informe-cual-abc123def456.pdf
+    `-- unac-informe-cual.manifest.json
 ```
 
 **Invalidación:** Si el JSON fuente o el generador cambian (mtime), se regenera.

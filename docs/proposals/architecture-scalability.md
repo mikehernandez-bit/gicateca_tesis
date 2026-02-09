@@ -77,14 +77,14 @@ La fuente canónica es `_meta.uni` en cada JSON de formato:
 
 ```
 1. Leer _meta.uni del formato
-   ├─ Si existe y es válido → usar ese valor
-   └─ Si falta o vacío:
-      ├─ Emitir WARNING: "Formato sin _meta.uni, usando DEFAULT_UNI"
-      └─ Usar get_default_uni_code()
-          ├─ Leer GICA_DEFAULT_UNI del entorno
-          ├─ Si no existe → usar "unac"
-          └─ Validar que exista en registry
-              └─ Si no existe → WARNING adicional + usar "unac"
+   +--- Si existe y es válido → usar ese valor
+   `--- Si falta o vacío:
+      +--- Emitir WARNING: "Formato sin _meta.uni, usando DEFAULT_UNI"
+      `--- Usar get_default_uni_code()
+          +--- Leer GICA_DEFAULT_UNI del entorno
+          +--- Si no existe → usar "unac"
+          `--- Validar que exista en registry
+              `--- Si no existe → WARNING adicional + usar "unac"
 ```
 
 ⚠️ **ANTIPATRÓN:** NO inferir `uni_code` desde prefijo de `format_id`.

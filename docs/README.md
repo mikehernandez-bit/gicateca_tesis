@@ -54,3 +54,12 @@ py -m uvicorn app.main:app --reload
 | Archivo | Contenido |
 |---------|-----------|
 | [architecture-scalability.md](proposals/architecture-scalability.md) | Propuesta: Universidad como Plugin (escalabilidad) |
+
+## Reglas de encoding
+
+- Guardar archivos en UTF-8.
+- No usar caracteres de box drawing en docs o codigo.
+- No usar emojis en documentacion.
+- Ejecutar `python scripts/check_encoding.py` antes de commit.
+- Ejecutar `python scripts/check_mojibake.py` antes de commit.
+
