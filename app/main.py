@@ -36,6 +36,8 @@ from app.modules.alerts.router import router as alerts_router
 from app.modules.references.router import router as references_router
 from app.modules.admin.router import router as admin_router
 from app.modules.api.router import router as api_router
+from app.modules.api.generation_router import router as generation_router
+from app.modules.api.render_router import router as render_router
 
 app = FastAPI(title="Formatoteca", version="0.1.0")
 
@@ -76,3 +78,5 @@ app.include_router(alerts_router)
 app.include_router(admin_router)
 app.include_router(references_router)
 app.include_router(api_router)
+app.include_router(generation_router)
+app.include_router(render_router)

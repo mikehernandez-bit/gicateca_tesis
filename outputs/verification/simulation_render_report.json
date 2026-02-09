@@ -1,0 +1,11 @@
+{
+  "formatId": "unac-informe-cual",
+  "docxPath": "C:\\Users\\jhoan\\Documents\\gicateca_tesis\\outputs\\verification\\simulation_render_test.docx",
+  "placeholderFound": false,
+  "bannedFound": {
+    "nota": false,
+    "guia": false,
+    "ejemplo": false,
+    "instruccion": false
+  }
+}
