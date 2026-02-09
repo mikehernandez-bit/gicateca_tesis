@@ -6,17 +6,17 @@
 
 ```
 app/templates/
-├── base.html              # Layout principal
-├── components/            # Componentes reutilizables
-│   └── ...
-└── pages/                 # Páginas
-    ├── admin.html         # Panel admin
-    ├── alerts.html        # Alertas
-    ├── catalog.html       # Catálogo (~12KB)
-    ├── detail.html        # Detalle de formato (~15KB)
-    ├── home.html          # Inicio (~5KB)
-    ├── references.html    # Referencias (~4KB)
-    └── versions.html      # Versiones (~2KB)
++-- base.html              # Layout principal
++-- components/            # Componentes reutilizables
+|   `-- ...
+`-- pages/                 # Páginas
+    +-- admin.html         # Panel admin
+    +-- alerts.html        # Alertas
+    +-- catalog.html       # Catálogo (~12KB)
+    +-- detail.html        # Detalle de formato (~15KB)
+    +-- home.html          # Inicio (~5KB)
+    +-- references.html    # Referencias (~4KB)
+    `-- versions.html      # Versiones (~2KB)
 ```
 
 **Fuente:** `app/templates/pages/` (7 archivos)
@@ -39,11 +39,11 @@ app/templates/
 
 ```
 app/static/js/
-├── catalog.js          # UI del catálogo (~16KB)
-├── cover-preview.js    # Modal unificado de carátula (~8.5KB)
-├── format-viewer.js    # Vista detalle (~33KB)
-├── navigation.js       # Navegación (~1KB)
-└── references.js       # UI de referencias (~22KB)
++-- catalog.js          # UI del catálogo (~16KB)
++-- cover-preview.js    # Modal unificado de carátula (~8.5KB)
++-- format-viewer.js    # Vista detalle (~33KB)
++-- navigation.js       # Navegación (~1KB)
+`-- references.js       # UI de referencias (~22KB)
 ```
 
 **Fuente:** `app/static/js/` (5 archivos)

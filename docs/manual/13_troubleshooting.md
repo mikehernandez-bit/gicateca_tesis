@@ -129,7 +129,7 @@
 ## Problema 4: Mojibake (caracteres corruptos)
 
 ### Síntomas
-- Texto como "Ã©" en lugar de "é".
+- Texto como "é" en lugar de "é".
 - El sistema muestra advertencias "[WARN] Posible mojibake...".
 
 ### Causas Posibles

@@ -4,52 +4,52 @@
 
 ```
 gicateca_tesis/
-├── app/                          # Código principal de la aplicación
-│   ├── core/                     # Núcleo compartido
-│   │   ├── loaders.py            # Discovery y carga de JSON
-│   │   ├── paths.py              # Resolución de rutas (cache, data)
-│   │   ├── pdf_converter.py      # Conversión DOCX→PDF con Word COM
-│   │   ├── registry.py           # Discovery de providers de universidades
-│   │   ├── templates.py          # Configuración de Jinja2
-│   │   └── university_registry.py
-│   ├── data/                     # Datos JSON por universidad
-│   │   ├── references/           # Normas globales (APA, IEEE, etc.)
-│   │   ├── unac/                 # Datos UNAC
-│   │   │   ├── informe/          # JSON de formatos de informe
-│   │   │   ├── maestria/         # JSON de formatos de maestría
-│   │   │   ├── proyecto/         # JSON de formatos de proyecto
-│   │   │   └── references_config.json
-│   │   └── uni/                  # Datos UNI
-│   ├── modules/                  # Módulos funcionales
-│   │   ├── admin/                # Panel de administración
-│   │   ├── alerts/               # Sistema de alertas
-│   │   ├── catalog/              # Catálogo y generación DOCX
-│   │   ├── formats/              # Detalle, PDF y data de formatos
-│   │   ├── home/                 # Página de inicio
-│   │   └── references/           # Referencias bibliográficas
-│   ├── static/                   # Archivos estáticos
-│   │   ├── assets/               # Logos (LogoUNAC.png, LogoUNI.png)
-│   │   ├── css/                  # Estilos
-│   │   └── js/                   # JavaScript (catalog.js, format-viewer.js)
-│   ├── templates/                # Plantillas Jinja2
-│   │   ├── base.html             # Layout base
-│   │   ├── components/           # Componentes reutilizables
-│   │   └── pages/                # Páginas (catalog.html, detail.html, etc.)
-│   ├── universities/             # Providers de universidades
-│   │   ├── contracts.py          # Contrato UniversityProvider
-│   │   ├── unac/                 # Provider UNAC
-│   │   │   ├── provider.py       # Configuración UNAC
-│   │   │   └── centro_formatos/  # Generadores DOCX
-│   │   └── uni/                  # Provider UNI
-│   └── main.py                   # Punto de entrada FastAPI
-├── docs/                         # Documentación (tú estás aquí)
-├── scripts/                      # Scripts de utilidad
-│   ├── check_mojibake.py         # Detecta encoding corrupto
-│   ├── fix_mojibake_json.py      # Corrige mojibake
-│   ├── fix_to_utf8.py            # Convierte a UTF-8
-│   └── test_pdf_concurrency.py   # Test de concurrencia PDF
-├── tests/                        # Tests
-└── requirements.txt              # Dependencias Python
++-- app/                          # Código principal de la aplicación
+|   +-- core/                     # Núcleo compartido
+|   |   +-- loaders.py            # Discovery y carga de JSON
+|   |   +-- paths.py              # Resolución de rutas (cache, data)
+|   |   +-- pdf_converter.py      # Conversión DOCX→PDF con Word COM
+|   |   +-- registry.py           # Discovery de providers de universidades
+|   |   +-- templates.py          # Configuración de Jinja2
+|   |   `-- university_registry.py
+|   +-- data/                     # Datos JSON por universidad
+|   |   +-- references/           # Normas globales (APA, IEEE, etc.)
+|   |   +-- unac/                 # Datos UNAC
+|   |   |   +-- informe/          # JSON de formatos de informe
+|   |   |   +-- maestria/         # JSON de formatos de maestría
+|   |   |   +-- proyecto/         # JSON de formatos de proyecto
+|   |   |   `-- references_config.json
+|   |   `-- uni/                  # Datos UNI
+|   +-- modules/                  # Módulos funcionales
+|   |   +-- admin/                # Panel de administración
+|   |   +-- alerts/               # Sistema de alertas
+|   |   +-- catalog/              # Catálogo y generación DOCX
+|   |   +-- formats/              # Detalle, PDF y data de formatos
+|   |   +-- home/                 # Página de inicio
+|   |   `-- references/           # Referencias bibliográficas
+|   +-- static/                   # Archivos estáticos
+|   |   +-- assets/               # Logos (LogoUNAC.png, LogoUNI.png)
+|   |   +-- css/                  # Estilos
+|   |   `-- js/                   # JavaScript (catalog.js, format-viewer.js)
+|   +-- templates/                # Plantillas Jinja2
+|   |   +-- base.html             # Layout base
+|   |   +-- components/           # Componentes reutilizables
+|   |   `-- pages/                # Páginas (catalog.html, detail.html, etc.)
+|   +-- universities/             # Providers de universidades
+|   |   +-- contracts.py          # Contrato UniversityProvider
+|   |   +-- unac/                 # Provider UNAC
+|   |   |   +-- provider.py       # Configuración UNAC
+|   |   |   `-- centro_formatos/  # Generadores DOCX
+|   |   `-- uni/                  # Provider UNI
+|   `-- main.py                   # Punto de entrada FastAPI
++-- docs/                         # Documentación (tú estás aquí)
++-- scripts/                      # Scripts de utilidad
+|   +-- check_mojibake.py         # Detecta encoding corrupto
+|   +-- fix_mojibake_json.py      # Corrige mojibake
+|   +-- fix_to_utf8.py            # Convierte a UTF-8
+|   `-- test_pdf_concurrency.py   # Test de concurrencia PDF
++-- tests/                        # Tests
+`-- requirements.txt              # Dependencias Python
 ```
 
 ---

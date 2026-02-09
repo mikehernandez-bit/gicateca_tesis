@@ -38,6 +38,7 @@ Usado para detalle (`GET /formats/{id}`). Extiende FormatSummary.
 | `fields` | FormatField[] | ✅ | Campos del wizard |
 | `assets` | AssetRef[] | ✅ | Assets asociados |
 | `rules` | RuleSet | ❌ | Reglas de formato |
+| `definition` | object | ✅ | JSON completo del formato (estructura extendida) |
 
 ---
 
@@ -128,3 +129,4 @@ Reglas de formato si existen en la fuente.
 - **IDs son estables**: Renombrar carpetas internas NO cambia el ID público.
 - **Version es por contenido**: Solo cambia si cambia el JSON o la plantilla.
 - **Campos opcionales**: Si un campo es `null`, significa que no existe en la fuente.
+- **`fields` vs `definition`**: `fields` es el subset para UI; `definition` es el documento integral para integraciones.

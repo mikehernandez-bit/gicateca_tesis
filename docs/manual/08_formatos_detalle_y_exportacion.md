@@ -70,11 +70,11 @@ El sistema cachea los archivos generados en:
 
 ```
 app/.cache/
-├── docx/
-│   └── {format_id}.docx
-└── pdf/
-    ├── {format_id}-{hash}.pdf
-    └── {format_id}.manifest.json
++-- docx/
+|   `-- {format_id}.docx
+`-- pdf/
+    +-- {format_id}-{hash}.pdf
+    `-- {format_id}.manifest.json
 ```
 
 ### Criterios de Frescura

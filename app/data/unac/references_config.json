@@ -1,7 +1,13 @@
 {
+  "_meta": {
+    "entity": "config",
+    "publish": false
+  },
   "university": "unac",
   "title": "Normas de citación (UNAC)",
   "enabled": ["apa7","ieee","iso690","vancouver"],
   "order": ["apa7","ieee","iso690","vancouver"],
   "notes": {}
 }
+
+

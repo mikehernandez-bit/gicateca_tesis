@@ -95,6 +95,8 @@ class TestGetFormatDetail:
         assert detail["id"] == valid_id
         assert "title" in detail
         assert "fields" in detail
+        assert "definition" in detail
+        assert isinstance(detail["definition"], dict)
 
     def test_304_with_matching_etag(self, client):
         """Debe retornar 304 si If-None-Match coincide."""

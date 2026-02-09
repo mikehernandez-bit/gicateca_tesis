@@ -1,4 +1,8 @@
 {
+  "_meta": {
+    "entity": "config",
+    "publish": false
+  },
   "university": "uni",
   "title": "Normas de citación (UNI)",
   "enabled": ["ieee","apa7","iso690"],

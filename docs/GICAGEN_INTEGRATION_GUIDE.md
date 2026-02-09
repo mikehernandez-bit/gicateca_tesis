@@ -24,6 +24,10 @@
 
 La **Formats API v1** permite a GicaGen obtener la lista de formatos disponibles en GicaTesis y sus detalles (campos del wizard, assets, reglas). Es **read-only** y está optimizada con cache **ETag/304**.
 
+Regla de catálogo público:
+- Solo se publican JSON con `_meta.entity == "format"` y `_meta.publish == true`.
+- Configs (`_meta.entity == "config"` o `_meta.publish == false`) no aparecen en `/formats` y no afectan `/formats/version`.
+
 ### URL Base
 
 ```
@@ -50,23 +54,23 @@ http://localhost:8000/api/v1
 ## Arquitectura
 
 ```
-┌──────────────┐         ┌─────────────────────────────────────────────────────┐
-│   GicaGen    │ ──GET── │  GicaTesis                                          │
-│  (Cliente)   │         │  ┌─────────────┐    ┌─────────────┐    ┌──────────┐│
-│              │ ◀─JSON─ │  │ API Router  │───▶│   Service   │───▶│ Loaders  ││
-│              │         │  │/api/v1/*    │    │(Hash,DTOs)  │    │(JSON,etc)││
-└──────────────┘         │  └─────────────┘    └─────────────┘    └──────────┘│
-                         └─────────────────────────────────────────────────────┘
+┌--------------┐         ┌-----------------------------------------------------┐
+|   GicaGen    | --GET-- |  GicaTesis                                          |
+|  (Cliente)   |         |  ┌-------------┐    ┌-------------┐    ┌----------┐|
+|              | ◀-JSON- |  | API Router  |---▶|   Service   |---▶| Loaders  ||
+|              |         |  |/api/v1/*    |    |(Hash,DTOs)  |    |(JSON,etc)||
+`--------------┘         |  `-------------┘    `-------------┘    `----------┘|
+                         `-----------------------------------------------------┘
 ```
 
 ### Archivos del Módulo API
 
 ```
 app/modules/api/
-├── __init__.py          # Inicialización del módulo
-├── dtos.py              # Pydantic DTOs (contratos)
-├── service.py           # Lógica de negocio (load, hash, map)
-└── router.py            # Endpoints HTTP
++-- __init__.py          # Inicialización del módulo
++-- dtos.py              # Pydantic DTOs (contratos)
++-- service.py           # Lógica de negocio (load, hash, map)
+`-- router.py            # Endpoints HTTP
 ```
 
 ---
@@ -187,7 +191,16 @@ Host: localhost:8000
     }
   ],
   "assets": [],
-  "rules": null
+  "rules": null,
+  "definition": {
+    "_meta": {
+      "entity": "format",
+      "publish": true
+    },
+    "preliminares": {},
+    "cuerpo": {},
+    "anexos": {}
+  }
 }
 ```
 
@@ -250,8 +263,13 @@ interface FormatDetail extends FormatSummary {
   fields: FormatField[];       // Campos del wizard
   assets: AssetRef[];          // Logos, imágenes asociadas
   rules?: RuleSet;             // Reglas de formato (márgenes, fuente, etc.)
+  definition: Record<string, unknown>; // JSON completo del formato (estructura extendida)
 }
 ```
+
+`fields` y `definition` no son equivalentes:
+- `fields` es el subset para formularios del wizard.
+- `definition` es la estructura integral del formato para flujos externos (n8n, validadores, simulación).
 
 ### FormatField
 
@@ -327,27 +345,27 @@ interface CatalogVersionResponse {
 ### Flujo recomendado para GicaGen
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│ 1. Al iniciar GicaGen                                           │
-├─────────────────────────────────────────────────────────────────┤
-│    GET /api/v1/formats/version                                  │
-│    └─ Comparar version con cache local                          │
-│       └─ Si son iguales → Usar cache local                      │
-│       └─ Si son diferentes → Descargar catálogo completo        │
-├─────────────────────────────────────────────────────────────────┤
-│ 2. Sincronización periódica (cada 60s o al cambiar de formato)  │
-├─────────────────────────────────────────────────────────────────┤
-│    GET /api/v1/formats                                          │
-│    Headers: If-None-Match: "<etag guardado>"                    │
-│    └─ Si 304 → Cache sigue válido                               │
-│    └─ Si 200 → Actualizar cache y guardar nuevo ETag            │
-├─────────────────────────────────────────────────────────────────┤
-│ 3. Al seleccionar un formato                                    │
-├─────────────────────────────────────────────────────────────────┤
-│    GET /api/v1/formats/{id}                                     │
-│    Headers: If-None-Match: "<format version>"                   │
-│    └─ Usar campos para renderizar wizard                        │
-└─────────────────────────────────────────────────────────────────┘
+┌-----------------------------------------------------------------┐
+| 1. Al iniciar GicaGen                                           |
++-----------------------------------------------------------------┤
+|    GET /api/v1/formats/version                                  |
+|    `--- Comparar version con cache local                          |
+|       `--- Si son iguales → Usar cache local                      |
+|       `--- Si son diferentes → Descargar catálogo completo        |
++-----------------------------------------------------------------┤
+| 2. Sincronización periódica (cada 60s o al cambiar de formato)  |
++-----------------------------------------------------------------┤
+|    GET /api/v1/formats                                          |
+|    Headers: If-None-Match: "<etag guardado>"                    |
+|    `--- Si 304 → Cache sigue válido                               |
+|    `--- Si 200 → Actualizar cache y guardar nuevo ETag            |
++-----------------------------------------------------------------┤
+| 3. Al seleccionar un formato                                    |
++-----------------------------------------------------------------┤
+|    GET /api/v1/formats/{id}                                     |
+|    Headers: If-None-Match: "<format version>"                   |
+|    `--- Usar campos para renderizar wizard                        |
+`-----------------------------------------------------------------┘
 ```
 
 ### Cuándo cambia la versión

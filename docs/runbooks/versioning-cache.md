@@ -121,6 +121,7 @@ return sha256("\n".join(pairs))
 | Modificar template DOCX | ✅ Sí |
 | Mover carpeta sin cambiar contenido | ❌ No |
 | Agregar nuevo formato | ✅ Sí |
+| Cambiar config excluido (`_meta.entity=config`) | ❌ No |
 | Cambiar timestamp sin cambiar contenido | ❌ No |
 
 ---
