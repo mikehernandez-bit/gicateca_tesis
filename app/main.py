@@ -25,9 +25,12 @@ Donde tocar si falla:
 - Verificar middleware y rutas registradas en este archivo.
 """
 
+import os
 from fastapi import FastAPI, Request
-from fastapi.responses import RedirectResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
+
+API_KEY = os.getenv("GICATESIS_API_KEY")
 
 from app.modules.home.router import router as home_router
 from app.modules.catalog.router import router as catalog_router
@@ -46,6 +49,24 @@ app = FastAPI(title="Formatoteca", version="0.1.0")
 def _prewarm_pdf_cache() -> None:
     # Precalienta PDFs solo si el flag de entorno esta activo.
     _prewarm_pdfs()
+
+@app.middleware("http")
+async def verify_api_key(request: Request, call_next):
+    """
+    Middleware de seguridad opcional.
+    Si GICATESIS_API_KEY esta definida en variables de entorno,
+    verifica que el header X-GICATESIS-KEY coincida.
+    """
+    if API_KEY and request.url.path.startswith("/api/v1/"):
+        # Permitir docs y openapi sin clave
+        if "docs" in request.url.path or "openapi" in request.url.path:
+            return await call_next(request)
+            
+        client_key = request.headers.get("X-GICATESIS-KEY")
+        if client_key != API_KEY:
+            return JSONResponse(status_code=403, content={"detail": "Forbidden: Invalid API Key"})
+            
+    return await call_next(request)
 
 @app.middleware("http")
 async def ensure_utf8_charset(request: Request, call_next):

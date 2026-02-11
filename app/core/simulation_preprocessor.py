@@ -61,7 +61,7 @@ SECTION_CONTAINER_KEYS = frozenset(
 )
 
 # Required fallback text when a section has no aiResult content.
-DEFAULT_AI_PLACEHOLDER = "[Contenido generado por IA – simulación]"
+DEFAULT_AI_PLACEHOLDER = "Contenido IA simulado"
 
 # Fixed template guide tokens to purge only in simulation outputs.
 GUIDE_TOKENS = (
