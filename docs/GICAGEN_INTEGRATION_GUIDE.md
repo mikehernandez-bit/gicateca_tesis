@@ -1,7 +1,7 @@
 # GicaGen Integration Guide - Formats API v1
 
 > **Documento completo** para integrar GicaGen con la API de Formatos de GicaTesis.  
-> Última actualización: 2026-02-05
+> Ultima actualizacion: 2026-02-17
 
 ---
 
@@ -22,7 +22,7 @@
 
 ### ¿Qué es esta API?
 
-La **Formats API v1** permite a GicaGen obtener la lista de formatos disponibles en GicaTesis y sus detalles (campos del wizard, assets, reglas). Es **read-only** y está optimizada con cache **ETag/304**.
+La **Formats API v1** permite a GicaGen obtener la lista de formatos disponibles en GicaTesis, sus detalles (campos del wizard, assets, reglas), y **generar documentos DOCX/PDF** directamente. Es optimizada con cache **ETag/304**.
 
 Regla de catálogo público:
 - Solo se publican JSON con `_meta.entity == "format"` y `_meta.publish == true`.
@@ -41,36 +41,65 @@ http://localhost:8000/api/v1
 
 ### Características Clave
 
-| Característica | Detalles |
+| Caracteristica | Detalles |
 |----------------|----------|
 | **Protocolo** | HTTP/HTTPS |
 | **Formato** | JSON |
-| **Autenticación** | Ninguna (público) |
+| **Autenticacion** | API Key opcional via `X-GICATESIS-KEY` |
 | **Cache** | ETag + If-None-Match (304) |
 | **Versionado** | Hash SHA256 del contenido |
+
+---
+
+## Autenticacion
+
+Si la variable de entorno `GICATESIS_API_KEY` esta definida en el servidor, todos los endpoints `/api/v1/*` requieren el header:
+
+```
+X-GICATESIS-KEY: <valor-de-GICATESIS_API_KEY>
+```
+
+Si `GICATESIS_API_KEY` **no esta definida**, la API es publica (sin autenticacion).
+
+**Ejemplo con API key:**
+```http
+GET /api/v1/formats HTTP/1.1
+Host: localhost:8000
+X-GICATESIS-KEY: mi-clave-secreta
+```
+
+**Response sin API key (cuando es requerida):**
+```json
+{"detail": "Missing or invalid API key"}
+```
+HTTP Status: `403 Forbidden`
+
+**Fuente:** `app/main.py` L69-84
 
 ---
 
 ## Arquitectura
 
 ```
-┌--------------┐         ┌-----------------------------------------------------┐
++--------------+         +-----------------------------------------------------+
 |   GicaGen    | --GET-- |  GicaTesis                                          |
-|  (Cliente)   |         |  ┌-------------┐    ┌-------------┐    ┌----------┐|
-|              | ◀-JSON- |  | API Router  |---▶|   Service   |---▶| Loaders  ||
-|              |         |  |/api/v1/*    |    |(Hash,DTOs)  |    |(JSON,etc)||
-`--------------┘         |  `-------------┘    `-------------┘    `----------┘|
-                         `-----------------------------------------------------┘
+|  (Cliente)   |         |  +--------------+    +-------------+    +----------+|
+|              | <-JSON- |  | API Routers  |--->|   Service   |--->| Loaders  ||
+|              |         |  |/api/v1/*     |    |(Hash,DTOs)  |    |(JSON,etc)||
++--------------+         |  +--------------+    +-------------+    +----------+|
+                         +-----------------------------------------------------+
 ```
 
-### Archivos del Módulo API
+### Archivos del Modulo API
 
 ```
 app/modules/api/
-+-- __init__.py          # Inicialización del módulo
-+-- dtos.py              # Pydantic DTOs (contratos)
-+-- service.py           # Lógica de negocio (load, hash, map)
-`-- router.py            # Endpoints HTTP
++-- __init__.py              # Inicializacion del modulo
++-- dtos.py                  # Pydantic DTOs (contratos)
++-- service.py               # Logica de negocio (load, hash, map)
++-- router.py                # Endpoints: formats, version, validate, assets
++-- generation_router.py     # Endpoints: generate, artifacts
++-- render_router.py         # Endpoints: render DOCX/PDF
 ```
 
 ---
@@ -233,6 +262,102 @@ Cache-Control: public, max-age=86400
 - ❌ No permite `../` (path traversal)
 - ❌ No permite paths absolutos
 - ✅ Solo sirve desde `/app/static/`
+
+---
+
+### 5. GET /api/v1/formats/validate
+
+**Propósito:** Validar la integridad del catálogo de formatos.
+
+**Request:**
+```http
+GET /api/v1/formats/validate HTTP/1.1
+Host: localhost:8000
+```
+
+**Response 200:**
+```json
+{
+  "valid": true,
+  "issues": [],
+  "total_formats": 9
+}
+```
+
+---
+
+### 6. POST /api/v1/generate
+
+**Propósito:** Generar un documento DOCX a partir de datos JSON personalizados.
+
+**Request:**
+```http
+POST /api/v1/generate HTTP/1.1
+Host: localhost:8000
+Content-Type: application/json
+
+{
+  "format_id": "unac-informe-cuant",
+  "data": { ... }
+}
+```
+
+**Response 200:**
+```json
+{
+  "run_id": "gen-20260216120000",
+  "status": "completed",
+  "docx_url": "/api/v1/artifacts/gen-20260216120000/docx"
+}
+```
+
+---
+
+### 7. GET /api/v1/artifacts/{run_id}/docx
+
+**Propósito:** Descargar el DOCX generado.
+
+**Response:** Archivo binario DOCX.
+
+---
+
+### 8. GET /api/v1/artifacts/{run_id}/pdf
+
+**Propósito:** Descargar el PDF generado.
+
+**Response:** Archivo binario PDF.
+
+---
+
+### 9. POST /api/v1/render/docx
+
+**Propósito:** Renderizar DOCX directamente desde JSON (sin almacenar artifacts).
+
+**Request:**
+```http
+POST /api/v1/render/docx HTTP/1.1
+Host: localhost:8000
+Content-Type: application/json
+
+{
+  "format_id": "unac-proyecto-cual",
+  "data": { ... }
+}
+```
+
+**Response:** Archivo binario DOCX (descarga directa).
+
+---
+
+### 10. POST /api/v1/render/pdf
+
+**Propósito:** Renderizar PDF directamente desde JSON.
+
+**Request:** Igual que `/render/docx`.
+
+**Response:** Archivo binario PDF (descarga directa).
+
+**Nota:** Requiere Microsoft Word instalado en el servidor (conversión COM).
 
 ---
 

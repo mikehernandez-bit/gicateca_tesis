@@ -39,6 +39,7 @@ from app.core.loaders import find_format_index, load_format_by_id
 from app.core.paths import get_docx_cache_dir, get_pdf_cache_dir
 from app.core.pdf_converter import convert_docx_to_pdf
 from app.core.registry import get_provider
+from app.core.document_generator import cleanup_temp_file
 from app.core.templates import templates
 from app.modules.formats import service
 
@@ -303,6 +304,11 @@ def _get_source_info(format_id: str):
         Path(__file__).resolve().parent / "service.py",
         Path(__file__).resolve().parents[2] / "core" / "loaders.py",
     ]
+    # Track engine modules so cache invalidates when normalizer/renderers change
+    engine_dir = Path(__file__).resolve().parents[2] / "engine"
+    if engine_dir.is_dir():
+        for py in engine_dir.rglob("*.py"):
+            extra_paths.append(py)
     for path in extra_paths:
         if path.exists():
             extra_mtime = max(extra_mtime, path.stat().st_mtime)
@@ -343,10 +349,12 @@ async def get_format_versions(format_id: str, request: Request):
         formato = service.get_formato(format_id)
     except ValueError:
         raise HTTPException(status_code=404, detail="Formato no encontrado")
-    
+
+    # Extraer versión real desde _meta
+    meta = formato.get("_meta", {}) if isinstance(formato, dict) else {}
+    current_version = meta.get("version", "1.0")
     versions = [
-        {"version": "2.0", "date": "2026-01-17", "changes": "Actualización de plantilla"},
-        {"version": "1.0", "date": "2025-12-01", "changes": "Versión inicial"},
+        {"version": current_version, "date": "2026-02-16", "changes": "Versión actual"},
     ]
     
     return templates.TemplateResponse(
@@ -369,7 +377,7 @@ async def generate_format_document(format_id: str, background_tasks: BackgroundT
     except RuntimeError as exc:
         raise HTTPException(status_code=500, detail=str(exc))
     
-    background_tasks.add_task(service.cleanup_temp_file, output_path)
+    background_tasks.add_task(cleanup_temp_file, output_path)
     return FileResponse(
         path=str(output_path),
         filename=filename,
@@ -454,9 +462,11 @@ async def get_format_cover_model(format_id: str):
         logger.error("Error cargando formato %s: %s", format_id, e)
         raise HTTPException(status_code=500, detail=str(e))
     
-    # Determinar uni_code desde _meta.uni
+    # Determinar uni_code desde _meta.university (con fallback a _meta.uni)
     meta = data.get("_meta") or {}
-    uni_code = (meta.get("uni") or "").strip().lower()
+    uni_code = (
+        meta.get("university") or meta.get("uni") or ""
+    ).strip().lower()
     
     if not uni_code:
         uni_code = get_default_uni_code()

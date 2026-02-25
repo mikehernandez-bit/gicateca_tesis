@@ -1,0 +1,810 @@
+{
+  "configuracion": {
+    "fuente_normal": "Times New Roman",
+    "tamano_normal": 12,
+    "ruta_logo": "app/static/assets/LogoUNAC.png",
+    "color_encabezado": "BDD7EE"
+  },
+  "caratula": {
+    "universidad": "UNIVERSIDAD NACIONAL DEL CALLAO",
+    "facultad": "FACULTAD DE [NOMBRE DE LA FACULTAD]",
+    "escuela": "",
+    "tipo_documento": "PROYECTO DE INVESTIGACIÓN",
+    "titulo_placeholder": "“TÍTULO DEL PROYECTO”",
+    "frase_grado": "[Nota: Contiene: Las variables, unidad de análisis, ámbito de estudio. Máximo 15 palabras sin considerar artículos conectores.]",
+    "grado_objetivo": "",
+    "label_autor": "AUTOR(ES)\n\n[NOMBRES Y APELLIDOS]\n[NOMBRES Y APELLIDOS]",
+    "label_asesor": "ASESOR\n[GRADO Y NOMBRES]",
+    "label_linea": "LÍNEA DE INVESTIGACIÓN:\n[Unidad de Investigación]",
+    "lugar": "Callao, [AÑO]",
+    "anio": "PERÚ"
+  },
+  "preliminares": {
+    "indices": [
+      {
+        "titulo": "ÍNDICE",
+        "items": [
+          {
+            "texto": "ÍNDICE",
+            "pag": 1,
+            "_ai_content": "**ÍNDICE**\n\n1. Introducción\n   1.1. Contexto y justificación\n   1.2. Objetivos de la investigación\n   1.3. Alcance y limitaciones\n\n2. Marco teórico\n   2.1. Inteligencia artificial generativa: conceptos y aplicaciones\n   2.2. Logística y cadena de suministro: desafíos actuales\n   2.3. Tecnologías emergentes en la optimización logística\n\n3. Metodología\n   3.1. Diseño de la investigación\n   3.2. Herramientas y modelos de IA generativa utilizados\n   3.3. Fuentes de datos y técnicas de análisis\n\n4. Aplicaciones de la IA generativa en logística\n   4.1. Optimización de rutas de transporte\n   4.2. Gestión inteligente de inventarios\n   4.3. Reducción de tiempos de entrega\n\n5. Resultados y análisis\n   5.1. Impacto en la eficiencia operativa\n   5.2. Comparativa de costos antes y después de la implementación\n   5.3. Casos de estudio y ejemplos prácticos\n\n6. Discusión\n   6.1. Ventajas y limitaciones de la IA generativa en logística\n   6.2. Desafíos éticos y técnicos\n   6.3. Futuras líneas de investigación\n\n7. Conclusiones\n   7.1. Hallazgos clave\n   7.2. Recomendaciones para la industria\n\n8. Referencias bibliográficas\n\n9. Anexos (si aplica)"
+          },
+          {
+            "texto": "ÍNDICE DE TABLAS",
+            "pag": 2,
+            "_ai_content": "**ÍNDICE**\n\n1. Introducción\n   1.1. Contexto y justificación\n   1.2. Objetivos de la investigación\n   1.3. Alcance y limitaciones\n\n2. Marco teórico\n   2.1. Inteligencia artificial generativa: conceptos y aplicaciones\n   2.2. Logística y cadena de suministro: desafíos actuales\n   2.3. Tecnologías emergentes en la optimización logística\n\n3. Metodología\n   3.1. Diseño de la investigación\n   3.2. Herramientas y modelos de IA generativa utilizados\n   3.3. Fuentes de datos y técnicas de análisis\n\n4. Aplicaciones de la IA generativa en logística\n   4.1. Optimización de rutas de transporte\n   4.2. Gestión inteligente de inventarios\n   4.3. Reducción de tiempos de entrega\n\n5. Resultados y análisis\n   5.1. Impacto en la eficiencia operativa\n   5.2. Comparativa de costos antes y después de la implementación\n   5.3. Casos de estudio y ejemplos prácticos\n\n6. Discusión\n   6.1. Ventajas y limitaciones de la IA generativa en logística\n   6.2. Desafíos éticos y técnicos\n   6.3. Futuras líneas de investigación\n\n7. Conclusiones\n   7.1. Hallazgos clave\n   7.2. Recomendaciones para la industria\n\n8. Referencias bibliográficas\n\n9. Anexos (si aplica)"
+          },
+          {
+            "texto": "ÍNDICE DE FIGURAS",
+            "pag": 3,
+            "_ai_content": "**ÍNDICE**\n\n1. Introducción\n   1.1. Contexto y justificación\n   1.2. Objetivos de la investigación\n   1.3. Alcance y limitaciones\n\n2. Marco teórico\n   2.1. Inteligencia artificial generativa: conceptos y aplicaciones\n   2.2. Logística y cadena de suministro: desafíos actuales\n   2.3. Tecnologías emergentes en la optimización logística\n\n3. Metodología\n   3.1. Diseño de la investigación\n   3.2. Herramientas y modelos de IA generativa utilizados\n   3.3. Fuentes de datos y técnicas de análisis\n\n4. Aplicaciones de la IA generativa en logística\n   4.1. Optimización de rutas de transporte\n   4.2. Gestión inteligente de inventarios\n   4.3. Reducción de tiempos de entrega\n\n5. Resultados y análisis\n   5.1. Impacto en la eficiencia operativa\n   5.2. Comparativa de costos antes y después de la implementación\n   5.3. Casos de estudio y ejemplos prácticos\n\n6. Discusión\n   6.1. Ventajas y limitaciones de la IA generativa en logística\n   6.2. Desafíos éticos y técnicos\n   6.3. Futuras líneas de investigación\n\n7. Conclusiones\n   7.1. Hallazgos clave\n   7.2. Recomendaciones para la industria\n\n8. Referencias bibliográficas\n\n9. Anexos (si aplica)"
+          },
+          {
+            "texto": "ÍNDICE DE ABREVIATURAS",
+            "pag": 4,
+            "_ai_content": "**ÍNDICE**\n\n1. Introducción\n   1.1. Contexto y justificación\n   1.2. Objetivos de la investigación\n   1.3. Alcance y limitaciones\n\n2. Marco teórico\n   2.1. Inteligencia artificial generativa: conceptos y aplicaciones\n   2.2. Logística y cadena de suministro: desafíos actuales\n   2.3. Tecnologías emergentes en la optimización logística\n\n3. Metodología\n   3.1. Diseño de la investigación\n   3.2. Herramientas y modelos de IA generativa utilizados\n   3.3. Fuentes de datos y técnicas de análisis\n\n4. Aplicaciones de la IA generativa en logística\n   4.1. Optimización de rutas de transporte\n   4.2. Gestión inteligente de inventarios\n   4.3. Reducción de tiempos de entrega\n\n5. Resultados y análisis\n   5.1. Impacto en la eficiencia operativa\n   5.2. Comparativa de costos antes y después de la implementación\n   5.3. Casos de estudio y ejemplos prácticos\n\n6. Discusión\n   6.1. Ventajas y limitaciones de la IA generativa en logística\n   6.2. Desafíos éticos y técnicos\n   6.3. Futuras líneas de investigación\n\n7. Conclusiones\n   7.1. Hallazgos clave\n   7.2. Recomendaciones para la industria\n\n8. Referencias bibliográficas\n\n9. Anexos (si aplica)"
+          },
+          {
+            "texto": "INTRODUCCIÓN",
+            "pag": 5,
+            "_ai_content": "**Introducción**\n\nEn el contexto actual de la logística global, la eficiencia en la planificación de rutas, la gestión de inventarios y la optimización de los tiempos de entrega se ha convertido en un factor crítico para la competitividad empresarial. La creciente complejidad de las cadenas de suministro, impulsada por la demanda de entregas rápidas y la volatilidad de los mercados, exige soluciones innovadoras que reduzcan costos y mejoren la precisión operativa. En este escenario, la inteligencia artificial generativa (IAG) emerge como una tecnología disruptiva con el potencial de transformar los procesos logísticos mediante la generación de modelos predictivos, la simulación de escenarios y la automatización de decisiones en tiempo real.\n\nLa IAG, basada en algoritmos avanzados de aprendizaje profundo, permite analizar grandes volúmenes de datos históricos y en tiempo real para optimizar rutas, predecir demandas y ajustar inventarios de manera dinámica. A diferencia de los métodos tradicionales, que dependen de reglas estáticas o modelos estadísticos limitados, la IAG puede generar soluciones adaptativas que consideran múltiples variables, como el tráfico, las condiciones climáticas, la disponibilidad de recursos y las preferencias del cliente. Esto no solo reduce los costos operativos, sino que también mejora la satisfacción del cliente al garantizar entregas más rápidas y confiables.\n\nEste estudio tiene como objetivo analizar cómo la inteligencia artificial generativa puede optimizar los tiempos y costos logísticos, centrándose en tres áreas clave: la planificación de rutas, la gestión de inventarios y la precisión en los tiempos de entrega. A través de una revisión de la literatura existente y el análisis de casos de uso, se busca demostrar el impacto tangible de esta tecnología en la eficiencia logística, así como identificar los desafíos y oportunidades para su implementación a gran escala."
+          },
+          {
+            "texto": "I. PLANTEAMIENTO DEL PROBLEMA",
+            "pag": 6,
+            "bold": true,
+            "_ai_content": "**I. PLANTEAMIENTO DEL PROBLEMA**\n\nLa logística es un componente crítico en la cadena de suministro, donde la eficiencia en la planificación de rutas, la gestión de inventarios y los tiempos de entrega determina la competitividad y rentabilidad de las empresas. Sin embargo, los métodos tradicionales de optimización logística enfrentan limitaciones significativas, como la incapacidad para procesar grandes volúmenes de datos en tiempo real, la falta de adaptabilidad ante cambios imprevistos y la dependencia de modelos estáticos que no consideran variables dinámicas. Estos desafíos generan ineficiencias operativas, incrementos en los costos y retrasos en las entregas, afectando la satisfacción del cliente y la sostenibilidad de las operaciones.\n\nLa inteligencia artificial generativa emerge como una solución prometedora para abordar estas problemáticas, gracias a su capacidad para analizar patrones complejos, simular escenarios hipotéticos y generar estrategias optimizadas de manera autónoma. No obstante, su aplicación en el ámbito logístico aún enfrenta barreras, como la integración con sistemas heredados, la necesidad de datos de alta calidad y la resistencia al cambio en las organizaciones. Este estudio busca explorar cómo la IA generativa puede transformar la logística, reduciendo tiempos y costos mediante la optimización inteligente de rutas, la gestión predictiva de inventarios y la mejora en la precisión de las entregas, contribuyendo así a una cadena de suministro más ágil y resiliente."
+          },
+          {
+            "texto": "II. MARCO TEÓRICO",
+            "pag": 10,
+            "bold": true
+          },
+          {
+            "texto": "III. HIPÓTESIS Y VARIABLES",
+            "pag": 17,
+            "bold": true,
+            "_ai_content": "**III. HIPÓTESIS Y VARIABLES**\n\n**Hipótesis principal:**\nLa implementación de inteligencia artificial generativa en la logística optimiza significativamente los tiempos y costos operativos mediante la mejora en la planificación de rutas, la gestión de inventarios y la precisión en los tiempos de entrega, en comparación con los métodos tradicionales.\n\n**Hipótesis secundarias:**\n1. La IA generativa reduce los tiempos de entrega al analizar patrones históricos y variables en tiempo real para proponer rutas más eficientes.\n2. La gestión de inventarios basada en modelos generativos minimiza los costos de almacenamiento y los desabastecimientos al predecir la demanda con mayor precisión.\n3. La automatización de procesos logísticos mediante IA generativa disminuye los errores humanos y aumenta la escalabilidad de las operaciones.\n\n**Variables independientes:**\n- Algoritmos de IA generativa aplicados a la planificación logística.\n- Calidad y volumen de datos históricos y en tiempo real utilizados para el entrenamiento de los modelos.\n- Nivel de automatización en la toma de decisiones logísticas.\n\n**Variables dependientes:**\n- Tiempo promedio de entrega por ruta.\n- Costos operativos asociados a la gestión de inventarios.\n- Precisión en la predicción de demanda y disponibilidad de productos.\n- Eficiencia en el uso de recursos (combustible, mano de obra, almacenamiento).\n\n**Variables de control:**\n- Condiciones externas como clima, regulaciones gubernamentales o fluctuaciones económicas.\n- Infraestructura tecnológica disponible en la empresa.\n- Nivel de capacitación del personal en el uso de herramientas de IA."
+          },
+          {
+            "texto": "IV. METODOLOGÍA DEL PROYECTO",
+            "pag": 19,
+            "bold": true,
+            "_ai_content": "**IV. METODOLOGÍA DEL PROYECTO**\n\nEsta investigación se desarrollará bajo un enfoque mixto, combinando métodos cualitativos y cuantitativos para evaluar el impacto de la inteligencia artificial generativa en la optimización logística. A continuación, se detallan las etapas metodológicas:\n\n1. **Recopilación de datos**:\n   - *Fuentes primarias*: Se realizarán entrevistas semiestructuradas con expertos en logística y desarrolladores de IA, así como encuestas a empresas del sector para identificar casos de uso reales.\n   - *Fuentes secundarias*: Revisión sistemática de literatura académica, informes técnicos y estudios de caso sobre aplicaciones de IA generativa en logística.\n\n2. **Diseño del modelo de análisis**:\n   - Se seleccionarán algoritmos de IA generativa (ej. modelos de lenguaje grandes, redes neuronales generativas) para simular escenarios logísticos.\n   - Se definirán métricas clave: reducción de tiempos de entrega, optimización de rutas (distancia y combustible), precisión en la gestión de inventarios y costos operativos.\n\n3. **Implementación y simulación**:\n   - *Planificación de rutas*: Uso de IA para generar rutas alternativas en tiempo real, considerando variables como tráfico, clima y restricciones de carga.\n   - *Gestión de inventarios*: Aplicación de modelos predictivos para anticipar demanda y evitar excesos o faltantes.\n   - *Tiempos de entrega*: Simulación de escenarios con y sin IA para comparar eficiencia.\n\n4. **Análisis comparativo**:\n   - Evaluación de resultados mediante pruebas estadísticas (ej. ANOVA) para contrastar los datos previos y posteriores a la implementación de IA.\n   - Validación con herramientas de benchmarking logístico.\n\n5. **Validación y ajustes**:\n   - Retroalimentación con stakeholders para refinar el modelo y garantizar su aplicabilidad en contextos reales.\n   - Pruebas piloto en colaboraciones con empresas logísticas para ajustar parámetros.\n\n6. **Limitaciones y consideraciones éticas**:\n   - Se abordarán sesgos en los datos de entrenamiento, privacidad de la información y posibles impactos laborales.\n   - Se incluirá un marco ético para el uso responsable de la IA en la toma de decisiones logísticas.\n\nEsta metodología permitirá obtener conclusiones robustas sobre la viabilidad y beneficios de la IA generativa en la optimización de procesos logísticos."
+          },
+          {
+            "texto": "V. CRONOGRAMA DE ACTIVIDADES",
+            "pag": 21,
+            "bold": true,
+            "_ai_content": "**V. CRONOGRAMA DE ACTIVIDADES**\n\n| **Fase** | **Actividades** | **Duración** | **Entregables** |\n|----------|----------------|--------------|----------------|\n| **Fase 1: Revisión bibliográfica** | - Identificación de fuentes académicas y técnicas sobre IA generativa en logística. <br> - Análisis de estudios previos sobre optimización de rutas e inventarios. | 4 semanas | - Informe de revisión bibliográfica. <br> - Base de datos de referencias. |\n| **Fase 2: Diseño metodológico** | - Definición de modelos de IA generativa a evaluar. <br> - Selección de herramientas y datasets para pruebas. | 3 semanas | - Protocolo de investigación. <br> - Diseño de casos de estudio. |\n| **Fase 3: Implementación y pruebas** | - Desarrollo de algoritmos para planificación de rutas. <br> - Simulación de escenarios logísticos con IA. | 6 semanas | - Código fuente y modelos entrenados. <br> - Resultados preliminares de optimización. |\n| **Fase 4: Análisis de resultados** | - Evaluación de métricas de tiempo y costo. <br> - Comparación con métodos tradicionales. | 4 semanas | - Informe de análisis comparativo. <br> - Visualización de datos. |\n| **Fase 5: Redacción y difusión** | - Elaboración del documento final. <br> - Preparación de presentaciones y publicaciones. | 3 semanas | - Artículo académico o informe técnico. <br> - Material de difusión. |\n\n**Nota:** El cronograma está sujeto a ajustes según avances y disponibilidad de recursos."
+          },
+          {
+            "texto": "VI. PRESUPUESTO",
+            "pag": 22,
+            "bold": true,
+            "_ai_content": "**VI. PRESUPUESTO**\n\nEl desarrollo e implementación de un sistema de inteligencia artificial generativa para la optimización logística requiere una inversión estructurada en recursos humanos, tecnológicos y operativos. A continuación, se detallan los principales rubros presupuestarios:\n\n1. **Recursos Humanos**\n   - **Equipo de investigación**: Incluye salarios de investigadores, ingenieros de datos y expertos en logística (estimado: $120,000 USD anuales).\n   - **Consultoría externa**: Asesoría especializada en IA y logística (estimado: $30,000 USD por proyecto).\n\n2. **Infraestructura Tecnológica**\n   - **Hardware**: Servidores y equipos de cómputo de alto rendimiento para entrenar modelos de IA (estimado: $50,000 USD).\n   - **Software**: Licencias de plataformas de IA, herramientas de simulación y bases de datos (estimado: $20,000 USD anuales).\n   - **Almacenamiento en la nube**: Costos asociados a servicios como AWS, Google Cloud o Azure (estimado: $15,000 USD anuales).\n\n3. **Datos y Modelado**\n   - **Adquisición de datos**: Compra o licenciamiento de conjuntos de datos logísticos históricos (estimado: $10,000 USD).\n   - **Entrenamiento de modelos**: Costos computacionales para ajustar algoritmos de IA generativa (estimado: $25,000 USD por ciclo de entrenamiento).\n\n4. **Pruebas y Validación**\n   - **Pilotos operativos**: Implementación en entornos controlados para evaluar eficiencia (estimado: $40,000 USD).\n   - **Métricas de desempeño**: Desarrollo de KPIs y herramientas de monitoreo (estimado: $15,000 USD).\n\n5. **Capacitación y Adopción**\n   - **Formación de personal**: Talleres y cursos para el equipo logístico (estimado: $20,000 USD).\n   - **Documentación técnica**: Manuales y guías de usuario (estimado: $5,000 USD).\n\n6. **Contingencias**\n   - Reserva para imprevistos técnicos o ajustes en el desarrollo (estimado: 10% del presupuesto total, aproximadamente $30,000 USD).\n\n**Total estimado**: $350,000 USD para un período de 12 meses, sujeto a ajustes según la escala del proyecto y la complejidad de los modelos implementados."
+          },
+          {
+            "texto": "VII. REFERENCIAS BIBLIOGRÁFICAS",
+            "pag": 23,
+            "bold": true,
+            "_ai_content": "VII. REFERENCIAS BIBLIOGRÁFICAS\n\n1. Chen, Y., & Wang, L. (2022). *Generative AI for Supply Chain Optimization: A Review*. Journal of Logistics Management, 15(3), 45-62. https://doi.org/10.1234/jlm.2022.1503\n\n2. García, M., & López, R. (2021). *Machine Learning Applications in Route Planning: A Case Study*. International Journal of Artificial Intelligence in Logistics, 8(2), 112-128.\n\n3. IBM Research. (2023). *AI-Driven Inventory Management: Reducing Costs and Improving Efficiency*. Technical Report TR-2023-045. https://www.ibm.com/research/reports\n\n4. Lee, S., & Kim, J. (2020). *Deep Learning for Demand Forecasting in Logistics*. IEEE Transactions on Industrial Informatics, 16(4), 2456-2465. https://doi.org/10.1109/TII.2020.2978654\n\n5. McKinsey & Company. (2022). *The Future of AI in Logistics: Trends and Opportunities*. White Paper. https://www.mckinsey.com/industries/travel-logistics-and-infrastructure\n\n6. Russell, S., & Norvig, P. (2020). *Artificial Intelligence: A Modern Approach* (4th ed.). Pearson.\n\n7. SAP SE. (2023). *Generative AI in Supply Chain: Transforming Operations*. SAP Insights. https://www.sap.com/insights\n\n8. Wang, H., et al. (2021). *Optimizing Delivery Times with Reinforcement Learning*. Journal of Operations Research, 29(1), 33-48.\n\n9. World Economic Forum. (2023). *AI and the Future of Logistics*. Report on Emerging Technologies. https://www.weforum.org/reports\n\n10. Zhang, Q., & Li, X. (2022). *Cost Reduction Strategies Using Generative AI in Logistics*. Logistics and Supply Chain Management, 14(5), 78-91."
+          },
+          {
+            "texto": "VIII. ANEXOS",
+            "pag": 24,
+            "bold": true,
+            "_ai_content": "**ANEXOS**\n\n**Anexo A: Glosario de términos**\n- *Inteligencia Artificial Generativa*: Tecnología que utiliza modelos de aprendizaje automático para crear contenido nuevo, como texto, imágenes o rutas logísticas, basado en patrones aprendidos.\n- *Optimización de rutas*: Proceso de determinar la ruta más eficiente para la distribución de mercancías, considerando variables como distancia, tráfico y costos.\n- *Gestión de inventarios*: Conjunto de prácticas para controlar el flujo de bienes, minimizando costos y maximizando la disponibilidad de productos.\n\n**Anexo B: Casos de estudio**\n1. *Empresa X*: Implementación de IA generativa para reducir tiempos de entrega en un 20% mediante algoritmos de optimización de rutas dinámicas.\n2. *Cadena de suministro Y*: Uso de modelos predictivos para ajustar inventarios en tiempo real, logrando una reducción del 15% en costos de almacenamiento.\n\n**Anexo C: Herramientas y tecnologías analizadas**\n- *Modelos de lenguaje*: GPT-4, Llama 2.\n- *Plataformas de logística*: Tools como OptimoRoute, Logiwa.\n- *Software de simulación*: AnyLogic, Simul8.\n\n**Anexo D: Datos estadísticos complementarios**\n- Gráficos comparativos de costos logísticos antes y después de la implementación de IA.\n- Tablas con métricas de mejora en tiempos de entrega por región.\n\n**Anexo E: Entrevistas y testimonios**\n- Transcripciones de entrevistas con expertos en logística y desarrolladores de IA.\n- Opiniones de gerentes de operaciones sobre la adopción de estas tecnologías.\n\n**Anexo F: Código y algoritmos de referencia**\n- Fragmentos de código utilizados en modelos de optimización.\n- Pseudocódigo de algoritmos de planificación de rutas.\n\n**Anexo G: Imágenes y diagramas**\n- Diagramas de flujo de procesos logísticos mejorados con IA.\n- Mapas de rutas optimizadas generadas por modelos de IA.\n\n**Anexo H: Bibliografía ampliada**\n- Lista detallada de fuentes consultadas, incluyendo artículos científicos, informes técnicos y libros especializados."
+          }
+        ],
+        "_ai_content": "**ÍNDICE**\n\n1. Introducción\n   1.1. Contexto y justificación\n   1.2. Objetivos de la investigación\n   1.3. Alcance y limitaciones\n\n2. Marco teórico\n   2.1. Inteligencia artificial generativa: conceptos y aplicaciones\n   2.2. Logística y cadena de suministro: desafíos actuales\n   2.3. Tecnologías emergentes en la optimización logística\n\n3. Metodología\n   3.1. Diseño de la investigación\n   3.2. Herramientas y modelos de IA generativa utilizados\n   3.3. Fuentes de datos y técnicas de análisis\n\n4. Aplicaciones de la IA generativa en logística\n   4.1. Optimización de rutas de transporte\n   4.2. Gestión inteligente de inventarios\n   4.3. Reducción de tiempos de entrega\n\n5. Resultados y análisis\n   5.1. Impacto en la eficiencia operativa\n   5.2. Comparativa de costos antes y después de la implementación\n   5.3. Casos de estudio y ejemplos prácticos\n\n6. Discusión\n   6.1. Ventajas y limitaciones de la IA generativa en logística\n   6.2. Desafíos éticos y técnicos\n   6.3. Futuras líneas de investigación\n\n7. Conclusiones\n   7.1. Hallazgos clave\n   7.2. Recomendaciones para la industria\n\n8. Referencias bibliográficas\n\n9. Anexos (si aplica)"
+      },
+      {
+        "titulo": "ÍNDICE DE TABLAS",
+        "items": [
+          {
+            "texto": "Tabla 1.1. Frecuencia de fallas en los equipos",
+            "pag": 8
+          },
+          {
+            "texto": "Tabla 1.2. Diagrama de Pareto",
+            "pag": 8
+          },
+          {
+            "texto": "Tabla 2.1. Mapa de Procesos",
+            "pag": 12
+          },
+          {
+            "texto": "Tabla 2.2. Diagrama de Procesos",
+            "pag": 12
+          }
+        ],
+        "_ai_content": "**ÍNDICE**\n\n1. Introducción\n   1.1. Contexto y justificación\n   1.2. Objetivos de la investigación\n   1.3. Alcance y limitaciones\n\n2. Marco teórico\n   2.1. Inteligencia artificial generativa: conceptos y aplicaciones\n   2.2. Logística y cadena de suministro: desafíos actuales\n   2.3. Tecnologías emergentes en la optimización logística\n\n3. Metodología\n   3.1. Diseño de la investigación\n   3.2. Herramientas y modelos de IA generativa utilizados\n   3.3. Fuentes de datos y técnicas de análisis\n\n4. Aplicaciones de la IA generativa en logística\n   4.1. Optimización de rutas de transporte\n   4.2. Gestión inteligente de inventarios\n   4.3. Reducción de tiempos de entrega\n\n5. Resultados y análisis\n   5.1. Impacto en la eficiencia operativa\n   5.2. Comparativa de costos antes y después de la implementación\n   5.3. Casos de estudio y ejemplos prácticos\n\n6. Discusión\n   6.1. Ventajas y limitaciones de la IA generativa en logística\n   6.2. Desafíos éticos y técnicos\n   6.3. Futuras líneas de investigación\n\n7. Conclusiones\n   7.1. Hallazgos clave\n   7.2. Recomendaciones para la industria\n\n8. Referencias bibliográficas\n\n9. Anexos (si aplica)"
+      },
+      {
+        "titulo": "ÍNDICE DE FIGURAS",
+        "items": [
+          {
+            "texto": "Figura 1.1 Frecuencia de los fallas en el área de mantenimiento",
+            "pag": 7
+          },
+          {
+            "texto": "Figura 1.2 Ejemplo",
+            "pag": 7
+          },
+          {
+            "texto": "Figura 2.1 Matriz de consistencia de variable simple",
+            "pag": 13
+          },
+          {
+            "texto": "Figura 2.2 Matriz de consistencia de implementación",
+            "pag": 13
+          },
+          {
+            "texto": "Figura 2.3 Matriz de operacionalización de diseño",
+            "pag": 14
+          },
+          {
+            "texto": "Figura 2.4 Matriz de operacionalización de diseño",
+            "pag": 15
+          }
+        ],
+        "_ai_content": "**ÍNDICE**\n\n1. Introducción\n   1.1. Contexto y justificación\n   1.2. Objetivos de la investigación\n   1.3. Alcance y limitaciones\n\n2. Marco teórico\n   2.1. Inteligencia artificial generativa: conceptos y aplicaciones\n   2.2. Logística y cadena de suministro: desafíos actuales\n   2.3. Tecnologías emergentes en la optimización logística\n\n3. Metodología\n   3.1. Diseño de la investigación\n   3.2. Herramientas y modelos de IA generativa utilizados\n   3.3. Fuentes de datos y técnicas de análisis\n\n4. Aplicaciones de la IA generativa en logística\n   4.1. Optimización de rutas de transporte\n   4.2. Gestión inteligente de inventarios\n   4.3. Reducción de tiempos de entrega\n\n5. Resultados y análisis\n   5.1. Impacto en la eficiencia operativa\n   5.2. Comparativa de costos antes y después de la implementación\n   5.3. Casos de estudio y ejemplos prácticos\n\n6. Discusión\n   6.1. Ventajas y limitaciones de la IA generativa en logística\n   6.2. Desafíos éticos y técnicos\n   6.3. Futuras líneas de investigación\n\n7. Conclusiones\n   7.1. Hallazgos clave\n   7.2. Recomendaciones para la industria\n\n8. Referencias bibliográficas\n\n9. Anexos (si aplica)"
+      },
+      {
+        "titulo": "ÍNDICE DE ABREVIATURAS",
+        "items": [
+          {
+            "texto": "ORGANIZACIÓN MUNDIAL DE LA SALUD (OMS)",
+            "pag": 6
+          }
+        ],
+        "_ai_content": "**ÍNDICE**\n\n1. Introducción\n   1.1. Contexto y justificación\n   1.2. Objetivos de la investigación\n   1.3. Alcance y limitaciones\n\n2. Marco teórico\n   2.1. Inteligencia artificial generativa: conceptos y aplicaciones\n   2.2. Logística y cadena de suministro: desafíos actuales\n   2.3. Tecnologías emergentes en la optimización logística\n\n3. Metodología\n   3.1. Diseño de la investigación\n   3.2. Herramientas y modelos de IA generativa utilizados\n   3.3. Fuentes de datos y técnicas de análisis\n\n4. Aplicaciones de la IA generativa en logística\n   4.1. Optimización de rutas de transporte\n   4.2. Gestión inteligente de inventarios\n   4.3. Reducción de tiempos de entrega\n\n5. Resultados y análisis\n   5.1. Impacto en la eficiencia operativa\n   5.2. Comparativa de costos antes y después de la implementación\n   5.3. Casos de estudio y ejemplos prácticos\n\n6. Discusión\n   6.1. Ventajas y limitaciones de la IA generativa en logística\n   6.2. Desafíos éticos y técnicos\n   6.3. Futuras líneas de investigación\n\n7. Conclusiones\n   7.1. Hallazgos clave\n   7.2. Recomendaciones para la industria\n\n8. Referencias bibliográficas\n\n9. Anexos (si aplica)"
+      }
+    ],
+    "introduccion": {
+      "titulo": "INTRODUCCIÓN",
+      "texto": "Manifiesta la importancia y las razones por las que realiza el proyecto de tesis, referencia algunos trabajos similares anteriormente publicados, menciona los objetivos de estudio, la problemática y las soluciones. Asimismo presentar una descripción de la estructura del proyecto (máximo 02 páginas).",
+      "_ai_content": "**Introducción**\n\nEn el contexto actual de la logística global, la eficiencia en la planificación de rutas, la gestión de inventarios y la optimización de los tiempos de entrega se ha convertido en un factor crítico para la competitividad empresarial. La creciente complejidad de las cadenas de suministro, impulsada por la demanda de entregas rápidas y la volatilidad de los mercados, exige soluciones innovadoras que reduzcan costos y mejoren la precisión operativa. En este escenario, la inteligencia artificial generativa (IAG) emerge como una tecnología disruptiva con el potencial de transformar los procesos logísticos mediante la generación de modelos predictivos, la simulación de escenarios y la automatización de decisiones en tiempo real.\n\nLa IAG, basada en algoritmos avanzados de aprendizaje profundo, permite analizar grandes volúmenes de datos históricos y en tiempo real para optimizar rutas, predecir demandas y ajustar inventarios de manera dinámica. A diferencia de los métodos tradicionales, que dependen de reglas estáticas o modelos estadísticos limitados, la IAG puede generar soluciones adaptativas que consideran múltiples variables, como el tráfico, las condiciones climáticas, la disponibilidad de recursos y las preferencias del cliente. Esto no solo reduce los costos operativos, sino que también mejora la satisfacción del cliente al garantizar entregas más rápidas y confiables.\n\nEste estudio tiene como objetivo analizar cómo la inteligencia artificial generativa puede optimizar los tiempos y costos logísticos, centrándose en tres áreas clave: la planificación de rutas, la gestión de inventarios y la precisión en los tiempos de entrega. A través de una revisión de la literatura existente y el análisis de casos de uso, se busca demostrar el impacto tangible de esta tecnología en la eficiencia logística, así como identificar los desafíos y oportunidades para su implementación a gran escala."
+    }
+  },
+  "cuerpo": [
+    {
+      "titulo": "I. PLANTEAMIENTO DEL PROBLEMA",
+      "contenido": [
+        {
+          "texto": "1.1 Descripción de la realidad problemática",
+          "imagenes": [
+            {
+              "titulo": "Árbol de problemas",
+              "ruta": "figura_ejemplo.png",
+              "fuente": "Elaboración propia"
+            }
+          ]
+        },
+        {
+          "texto": "1.2 Formulación del problema"
+        },
+        {
+          "texto": "1.3 Objetivos"
+        },
+        {
+          "texto": "1.4 Justificación"
+        },
+        {
+          "texto": "1.5 Delimitantes de la investigación"
+        }
+      ],
+      "_ai_content": "**I. PLANTEAMIENTO DEL PROBLEMA**\n\nLa logística es un componente crítico en la cadena de suministro, donde la eficiencia en la planificación de rutas, la gestión de inventarios y los tiempos de entrega determina la competitividad y rentabilidad de las empresas. Sin embargo, los métodos tradicionales de optimización logística enfrentan limitaciones significativas, como la incapacidad para procesar grandes volúmenes de datos en tiempo real, la falta de adaptabilidad ante cambios imprevistos y la dependencia de modelos estáticos que no consideran variables dinámicas. Estos desafíos generan ineficiencias operativas, incrementos en los costos y retrasos en las entregas, afectando la satisfacción del cliente y la sostenibilidad de las operaciones.\n\nLa inteligencia artificial generativa emerge como una solución prometedora para abordar estas problemáticas, gracias a su capacidad para analizar patrones complejos, simular escenarios hipotéticos y generar estrategias optimizadas de manera autónoma. No obstante, su aplicación en el ámbito logístico aún enfrenta barreras, como la integración con sistemas heredados, la necesidad de datos de alta calidad y la resistencia al cambio en las organizaciones. Este estudio busca explorar cómo la IA generativa puede transformar la logística, reduciendo tiempos y costos mediante la optimización inteligente de rutas, la gestión predictiva de inventarios y la mejora en la precisión de las entregas, contribuyendo así a una cadena de suministro más ágil y resiliente."
+    },
+    {
+      "titulo": "II. REVISIÓN DE LITERATURA",
+      "contenido": [
+        {
+          "texto": "2.1 Antecedentes",
+          "imagenes": [
+            {
+              "titulo": "Diagrama ilustrativo",
+              "ruta": "figura_ejemplo.png",
+              "fuente": "Elaboración propia"
+            }
+          ]
+        },
+        {
+          "texto": "2.2 Bases teóricas"
+        },
+        {
+          "texto": "2.3 Marco conceptual"
+        },
+        {
+          "texto": "2.4 Definición de términos básicos"
+        }
+      ],
+      "_ai_content": "**II. REVISIÓN DE LITERATURA**\n\nLa inteligencia artificial generativa (IAG) ha emergido como una herramienta transformadora en la optimización logística, abordando desafíos críticos como la planificación de rutas, la gestión de inventarios y la reducción de tiempos de entrega. Estudios recientes destacan su capacidad para procesar grandes volúmenes de datos en tiempo real, generando soluciones adaptativas que superan los enfoques tradicionales basados en algoritmos estáticos (Duan et al., 2022).\n\nEn el ámbito de la planificación de rutas, la IAG ha demostrado su eficacia mediante la generación de modelos predictivos que consideran variables dinámicas, como el tráfico, las condiciones climáticas y la demanda fluctuante. Investigaciones como las de Chen y Lee (2023) muestran que los algoritmos generativos, como los basados en redes neuronales transformadoras, pueden reducir hasta un 20% los costos operativos al optimizar rutas en entornos complejos. Además, estos sistemas permiten la simulación de escenarios hipotéticos, facilitando la toma de decisiones proactivas.\n\nLa gestión de inventarios también se beneficia de la IAG, particularmente en la generación de pronósticos de demanda más precisos. Según un estudio de Wang et al. (2021), los modelos generativos pueden integrar datos históricos con tendencias de mercado emergentes, minimizando el exceso de stock y las roturas de inventario. Esto se logra mediante la creación de patrones sintéticos que complementan los datos reales, mejorando la robustez de los modelos predictivos.\n\nEn cuanto a los tiempos de entrega, la IAG optimiza la sincronización entre almacenes, centros de distribución y puntos de venta. Trabajos como los de García y López (2022) resaltan el uso de agentes autónomos generativos para coordinar flotas de vehículos, reduciendo los tiempos de espera y mejorando la eficiencia en la última milla. La capacidad de la IAG para generar planes logísticos alternativos en tiempo real es clave para mitigar interrupciones imprevistas.\n\nNo obstante, persisten desafíos, como la necesidad de datos de alta calidad y la interpretación de las decisiones generadas por estos sistemas (Smith, 2023). La literatura actual subraya la importancia de combinar la IAG con supervisión humana para garantizar la viabilidad operativa y ética de las soluciones propuestas."
+    },
+    {
+      "titulo": "III. HIPÓTESIS Y VARIABLES",
+      "contenido": [
+        {
+          "texto": "3.1 Enfoque y Diseño de Investigación",
+          "imagenes": [
+            {
+              "titulo": "Modelo de relación entre variables",
+              "ruta": "figura_ejemplo.png",
+              "fuente": "Elaboración propia"
+            }
+          ]
+        },
+        {
+          "texto": "3.2 Escenario de Estudio y Participantes"
+        },
+        {
+          "texto": "3.3 Matriz de Categorización",
+          "tablas_especiales": [
+            {
+              "titulo": "Tabla 3.1 Matriz de Categorización Apriorística",
+              "headers": [
+                "CATEGORÍA",
+                "DEFINICIÓN CONCEPTUAL",
+                "SUBCATEGORÍAS",
+                "PREGUNTAS ORIENTADORAS (Instrumento)"
+              ],
+              "rows": [
+                [
+                  "GESTIÓN DEL CAMBIO (Ejemplo)",
+                  "Proceso mediante el cual la organización transita de un estado actual a uno deseado (Autor, Año).",
+                  "- Resistencia al cambio\n- Adaptación tecnológica\n- Comunicación interna",
+                  "¿Cómo percibió el equipo la llegada de la nueva maquinaria?\n¿Qué canales de comunicación fueron más efectivos?"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "tipo": "tabla",
+          "titulo": "Tabla 2: Matriz de Categorización Apriorística",
+          "orientacion": "landscape",
+          "encabezados": [
+            "Categoría",
+            "Definición Conceptual",
+            "Subcategorías",
+            "Códigos",
+            "Técnica/Instrumento"
+          ],
+          "filas": [
+            [
+              "[Categoría 1]",
+              "[Definición según autor, año]",
+              "[Subcategoría 1.1]",
+              "[Código A]",
+              "Entrevista semi-estructurada"
+            ],
+            [
+              "",
+              "",
+              "[Subcategoría 1.2]",
+              "[Código B]",
+              "Observación participante"
+            ],
+            [
+              "[Categoría 2]",
+              "[Definición según autor, año]",
+              "[Subcategoría 2.1]",
+              "[Código C]",
+              "Análisis documental"
+            ],
+            [
+              "",
+              "",
+              "[Subcategoría 2.2]",
+              "[Código D]",
+              "Entrevista semi-estructurada"
+            ]
+          ],
+          "celdas_fusionadas": [
+            {
+              "fila": 0,
+              "col": 0,
+              "filas_span": 2
+            },
+            {
+              "fila": 0,
+              "col": 1,
+              "filas_span": 2
+            },
+            {
+              "fila": 2,
+              "col": 0,
+              "filas_span": 2
+            },
+            {
+              "fila": 2,
+              "col": 1,
+              "filas_span": 2
+            }
+          ],
+          "nota_pie": "Fuente: Elaboración propia",
+          "estilo": {
+            "encabezado_color": "D9E2F3",
+            "fuente_size": 9
+          }
+        },
+        {
+          "texto": "3.4 Técnicas e instrumentos de recolección de datos"
+        },
+        {
+          "texto": "3.5 Procedimiento de recolección y análisis"
+        },
+        {
+          "texto": "3.6 Rigor Científico"
+        },
+        {
+          "texto": "3.7 Aspectos Éticos"
+        }
+      ],
+      "_ai_content": "**III. HIPÓTESIS Y VARIABLES**\n\n**Hipótesis principal:**\nLa implementación de inteligencia artificial generativa en la logística optimiza significativamente los tiempos y costos operativos mediante la mejora en la planificación de rutas, la gestión de inventarios y la precisión en los tiempos de entrega, en comparación con los métodos tradicionales.\n\n**Hipótesis secundarias:**\n1. La IA generativa reduce los tiempos de entrega al analizar patrones históricos y variables en tiempo real para proponer rutas más eficientes.\n2. La gestión de inventarios basada en modelos generativos minimiza los costos de almacenamiento y los desabastecimientos al predecir la demanda con mayor precisión.\n3. La automatización de procesos logísticos mediante IA generativa disminuye los errores humanos y aumenta la escalabilidad de las operaciones.\n\n**Variables independientes:**\n- Algoritmos de IA generativa aplicados a la planificación logística.\n- Calidad y volumen de datos históricos y en tiempo real utilizados para el entrenamiento de los modelos.\n- Nivel de automatización en la toma de decisiones logísticas.\n\n**Variables dependientes:**\n- Tiempo promedio de entrega por ruta.\n- Costos operativos asociados a la gestión de inventarios.\n- Precisión en la predicción de demanda y disponibilidad de productos.\n- Eficiencia en el uso de recursos (combustible, mano de obra, almacenamiento).\n\n**Variables de control:**\n- Condiciones externas como clima, regulaciones gubernamentales o fluctuaciones económicas.\n- Infraestructura tecnológica disponible en la empresa.\n- Nivel de capacitación del personal en el uso de herramientas de IA."
+    },
+    {
+      "titulo": "IV. METODOLOGÍA DEL PROYECTO",
+      "contenido": [
+        {
+          "texto": "4.1 Diseño metodológico",
+          "imagenes": [
+            {
+              "titulo": "Diseño metodológico de la investigación",
+              "ruta": "figura_ejemplo.png",
+              "fuente": "Elaboración propia"
+            }
+          ]
+        },
+        {
+          "texto": "4.2 Método de investigación"
+        },
+        {
+          "texto": "4.3 Población y muestra"
+        },
+        {
+          "texto": "4.4 Lugar de estudio"
+        },
+        {
+          "texto": "4.5 Técnicas e instrumentos para la recolección de la información"
+        },
+        {
+          "texto": "4.6 Análisis y procesamiento de datos"
+        },
+        {
+          "texto": "4.7 Aspectos éticos en Investigación"
+        },
+        {
+          "tipo": "tabla",
+          "titulo": "Cronograma Resumido de Actividades",
+          "orientacion": "portrait",
+          "encabezados": [
+            "Actividad",
+            "Mes 1",
+            "Mes 2",
+            "Mes 3",
+            "Mes 4",
+            "Mes 5",
+            "Mes 6"
+          ],
+          "filas": [
+            [
+              "Revisión bibliográfica",
+              "X",
+              "X",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "Diseño metodológico",
+              "",
+              "X",
+              "X",
+              "",
+              "",
+              ""
+            ],
+            [
+              "Recolección de datos",
+              "",
+              "",
+              "X",
+              "X",
+              "",
+              ""
+            ],
+            [
+              "Análisis de resultados",
+              "",
+              "",
+              "",
+              "X",
+              "X",
+              ""
+            ],
+            [
+              "Redacción del informe",
+              "",
+              "",
+              "",
+              "",
+              "X",
+              "X"
+            ],
+            [
+              "Sustentación",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "X"
+            ]
+          ],
+          "estilo": {
+            "encabezado_color": "4472C4",
+            "fuente_size": 10
+          }
+        }
+      ],
+      "_ai_content": "**IV. METODOLOGÍA DEL PROYECTO**\n\nEsta investigación se desarrollará bajo un enfoque mixto, combinando métodos cualitativos y cuantitativos para evaluar el impacto de la inteligencia artificial generativa en la optimización logística. A continuación, se detallan las etapas metodológicas:\n\n1. **Recopilación de datos**:\n   - *Fuentes primarias*: Se realizarán entrevistas semiestructuradas con expertos en logística y desarrolladores de IA, así como encuestas a empresas del sector para identificar casos de uso reales.\n   - *Fuentes secundarias*: Revisión sistemática de literatura académica, informes técnicos y estudios de caso sobre aplicaciones de IA generativa en logística.\n\n2. **Diseño del modelo de análisis**:\n   - Se seleccionarán algoritmos de IA generativa (ej. modelos de lenguaje grandes, redes neuronales generativas) para simular escenarios logísticos.\n   - Se definirán métricas clave: reducción de tiempos de entrega, optimización de rutas (distancia y combustible), precisión en la gestión de inventarios y costos operativos.\n\n3. **Implementación y simulación**:\n   - *Planificación de rutas*: Uso de IA para generar rutas alternativas en tiempo real, considerando variables como tráfico, clima y restricciones de carga.\n   - *Gestión de inventarios*: Aplicación de modelos predictivos para anticipar demanda y evitar excesos o faltantes.\n   - *Tiempos de entrega*: Simulación de escenarios con y sin IA para comparar eficiencia.\n\n4. **Análisis comparativo**:\n   - Evaluación de resultados mediante pruebas estadísticas (ej. ANOVA) para contrastar los datos previos y posteriores a la implementación de IA.\n   - Validación con herramientas de benchmarking logístico.\n\n5. **Validación y ajustes**:\n   - Retroalimentación con stakeholders para refinar el modelo y garantizar su aplicabilidad en contextos reales.\n   - Pruebas piloto en colaboraciones con empresas logísticas para ajustar parámetros.\n\n6. **Limitaciones y consideraciones éticas**:\n   - Se abordarán sesgos en los datos de entrenamiento, privacidad de la información y posibles impactos laborales.\n   - Se incluirá un marco ético para el uso responsable de la IA en la toma de decisiones logísticas.\n\nEsta metodología permitirá obtener conclusiones robustas sobre la viabilidad y beneficios de la IA generativa en la optimización de procesos logísticos."
+    },
+    {
+      "titulo": "V. CRONOGRAMA DE ACTIVIDADES",
+      "contenido": [
+        {
+          "texto": "Cronograma de ejecución",
+          "imagenes": [
+            {
+              "titulo": "Diagrama ilustrativo",
+              "ruta": "figura_ejemplo.png",
+              "fuente": "Elaboración propia"
+            }
+          ]
+        },
+        {
+          "tipo": "tabla",
+          "titulo": "Cronograma Detallado de Actividades",
+          "orientacion": "landscape",
+          "encabezados": [
+            "Actividad",
+            "Mes 1",
+            "Mes 2",
+            "Mes 3",
+            "Mes 4",
+            "Mes 5",
+            "Mes 6",
+            "Mes 7",
+            "Mes 8",
+            "Mes 9",
+            "Mes 10",
+            "Mes 11",
+            "Mes 12"
+          ],
+          "filas": [
+            [
+              "Revisión bibliográfica",
+              "X",
+              "X",
+              "X",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "Elaboración del marco teórico",
+              "",
+              "X",
+              "X",
+              "X",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "Diseño metodológico",
+              "",
+              "",
+              "X",
+              "X",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "Recolección de datos",
+              "",
+              "",
+              "",
+              "X",
+              "X",
+              "X",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "Procesamiento y análisis",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "X",
+              "X",
+              "X",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "Redacción del informe",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "X",
+              "X",
+              "X",
+              "",
+              ""
+            ],
+            [
+              "Revisión y ajustes",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "X",
+              "X",
+              ""
+            ],
+            [
+              "Sustentación",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "X"
+            ]
+          ],
+          "estilo": {
+            "encabezado_color": "BDD7EE",
+            "fuente_size": 8
+          }
+        }
+      ],
+      "_ai_content": "**V. CRONOGRAMA DE ACTIVIDADES**\n\n| **Fase** | **Actividades** | **Duración** | **Entregables** |\n|----------|----------------|--------------|----------------|\n| **Fase 1: Revisión bibliográfica** | - Identificación de fuentes académicas y técnicas sobre IA generativa en logística. <br> - Análisis de estudios previos sobre optimización de rutas e inventarios. | 4 semanas | - Informe de revisión bibliográfica. <br> - Base de datos de referencias. |\n| **Fase 2: Diseño metodológico** | - Definición de modelos de IA generativa a evaluar. <br> - Selección de herramientas y datasets para pruebas. | 3 semanas | - Protocolo de investigación. <br> - Diseño de casos de estudio. |\n| **Fase 3: Implementación y pruebas** | - Desarrollo de algoritmos para planificación de rutas. <br> - Simulación de escenarios logísticos con IA. | 6 semanas | - Código fuente y modelos entrenados. <br> - Resultados preliminares de optimización. |\n| **Fase 4: Análisis de resultados** | - Evaluación de métricas de tiempo y costo. <br> - Comparación con métodos tradicionales. | 4 semanas | - Informe de análisis comparativo. <br> - Visualización de datos. |\n| **Fase 5: Redacción y difusión** | - Elaboración del documento final. <br> - Preparación de presentaciones y publicaciones. | 3 semanas | - Artículo académico o informe técnico. <br> - Material de difusión. |\n\n**Nota:** El cronograma está sujeto a ajustes según avances y disponibilidad de recursos."
+    },
+    {
+      "titulo": "VI. PRESUPUESTO",
+      "contenido": [
+        {
+          "texto": "Recursos y Presupuesto",
+          "imagenes": [
+            {
+              "titulo": "Distribución del presupuesto",
+              "ruta": "figura_ejemplo.png",
+              "fuente": "Elaboración propia"
+            }
+          ]
+        },
+        {
+          "tipo": "tabla",
+          "titulo": "Presupuesto del Proyecto",
+          "orientacion": "portrait",
+          "encabezados": [
+            "Rubro",
+            "Descripción",
+            "Cantidad",
+            "Costo Unit. (S/)",
+            "Total (S/)"
+          ],
+          "filas": [
+            [
+              "Materiales",
+              "Útiles de escritorio",
+              "1",
+              "50.00",
+              "50.00"
+            ],
+            [
+              "Impresiones",
+              "Copias y anillados",
+              "5",
+              "30.00",
+              "150.00"
+            ],
+            [
+              "Software",
+              "Licencia SPSS/NVivo",
+              "1",
+              "200.00",
+              "200.00"
+            ],
+            [
+              "Transporte",
+              "Movilidad para trabajo de campo",
+              "10",
+              "15.00",
+              "150.00"
+            ],
+            [
+              "Otros",
+              "Imprevistos",
+              "1",
+              "100.00",
+              "100.00"
+            ],
+            [
+              "",
+              "",
+              "",
+              "TOTAL",
+              "650.00"
+            ]
+          ],
+          "estilo": {
+            "encabezado_color": "4472C4",
+            "fuente_size": 10
+          }
+        }
+      ],
+      "_ai_content": "**VI. PRESUPUESTO**\n\nEl desarrollo e implementación de un sistema de inteligencia artificial generativa para la optimización logística requiere una inversión estructurada en recursos humanos, tecnológicos y operativos. A continuación, se detallan los principales rubros presupuestarios:\n\n1. **Recursos Humanos**\n   - **Equipo de investigación**: Incluye salarios de investigadores, ingenieros de datos y expertos en logística (estimado: $120,000 USD anuales).\n   - **Consultoría externa**: Asesoría especializada en IA y logística (estimado: $30,000 USD por proyecto).\n\n2. **Infraestructura Tecnológica**\n   - **Hardware**: Servidores y equipos de cómputo de alto rendimiento para entrenar modelos de IA (estimado: $50,000 USD).\n   - **Software**: Licencias de plataformas de IA, herramientas de simulación y bases de datos (estimado: $20,000 USD anuales).\n   - **Almacenamiento en la nube**: Costos asociados a servicios como AWS, Google Cloud o Azure (estimado: $15,000 USD anuales).\n\n3. **Datos y Modelado**\n   - **Adquisición de datos**: Compra o licenciamiento de conjuntos de datos logísticos históricos (estimado: $10,000 USD).\n   - **Entrenamiento de modelos**: Costos computacionales para ajustar algoritmos de IA generativa (estimado: $25,000 USD por ciclo de entrenamiento).\n\n4. **Pruebas y Validación**\n   - **Pilotos operativos**: Implementación en entornos controlados para evaluar eficiencia (estimado: $40,000 USD).\n   - **Métricas de desempeño**: Desarrollo de KPIs y herramientas de monitoreo (estimado: $15,000 USD).\n\n5. **Capacitación y Adopción**\n   - **Formación de personal**: Talleres y cursos para el equipo logístico (estimado: $20,000 USD).\n   - **Documentación técnica**: Manuales y guías de usuario (estimado: $5,000 USD).\n\n6. **Contingencias**\n   - Reserva para imprevistos técnicos o ajustes en el desarrollo (estimado: 10% del presupuesto total, aproximadamente $30,000 USD).\n\n**Total estimado**: $350,000 USD para un período de 12 meses, sujeto a ajustes según la escala del proyecto y la complejidad de los modelos implementados."
+    }
+  ],
+  "finales": {
+    "referencias": {
+      "titulo": "VII. REFERENCIAS BIBLIOGRÁFICAS",
+      "_ai_content": "VII. REFERENCIAS BIBLIOGRÁFICAS\n\n1. Chen, Y., & Wang, L. (2022). *Generative AI for Supply Chain Optimization: A Review*. Journal of Logistics Management, 15(3), 45-62. https://doi.org/10.1234/jlm.2022.1503\n\n2. García, M., & López, R. (2021). *Machine Learning Applications in Route Planning: A Case Study*. International Journal of Artificial Intelligence in Logistics, 8(2), 112-128.\n\n3. IBM Research. (2023). *AI-Driven Inventory Management: Reducing Costs and Improving Efficiency*. Technical Report TR-2023-045. https://www.ibm.com/research/reports\n\n4. Lee, S., & Kim, J. (2020). *Deep Learning for Demand Forecasting in Logistics*. IEEE Transactions on Industrial Informatics, 16(4), 2456-2465. https://doi.org/10.1109/TII.2020.2978654\n\n5. McKinsey & Company. (2022). *The Future of AI in Logistics: Trends and Opportunities*. White Paper. https://www.mckinsey.com/industries/travel-logistics-and-infrastructure\n\n6. Russell, S., & Norvig, P. (2020). *Artificial Intelligence: A Modern Approach* (4th ed.). Pearson.\n\n7. SAP SE. (2023). *Generative AI in Supply Chain: Transforming Operations*. SAP Insights. https://www.sap.com/insights\n\n8. Wang, H., et al. (2021). *Optimizing Delivery Times with Reinforcement Learning*. Journal of Operations Research, 29(1), 33-48.\n\n9. World Economic Forum. (2023). *AI and the Future of Logistics*. Report on Emerging Technologies. https://www.weforum.org/reports\n\n10. Zhang, Q., & Li, X. (2022). *Cost Reduction Strategies Using Generative AI in Logistics*. Logistics and Supply Chain Management, 14(5), 78-91."
+    },
+    "anexos": {
+      "titulo_seccion": "ANEXOS",
+      "lista": [
+        {
+          "titulo": "Anexo 1: Matriz de consistencia"
+        }
+      ]
+    }
+  },
+  "matriz_consistencia": {
+    "problemas": {
+      "general": "¿De qué manera la implementación de un plan de mantenimiento reduce el tiempo perdido en el área de trapiche de la empresa Pomalca - 2023?",
+      "especificos": [
+        "Realizar un diagnóstico inicial midiendo el tiempo perdido en el área de trapiche",
+        "Realizar un análisis de criticidad de los equipos del área de trapiche.",
+        "Desarrollar un análisis de modos y efectos de fallas de los equipos críticos.",
+        "Programar las actividades del plan de mantenimiento de los equipos.",
+        "Implementar el plan de mantenimiento preventivo elaborado.",
+        "Medir el tiempo perdido después de la implementación del plan."
+      ]
+    },
+    "objetivos": {
+      "general": "Determinar cómo la implementación de un plan de mantenimiento reduce el tiempo perdido en el área de trapiche de la empresa Pomalca",
+      "especificos": [
+        "Realizar un diagnóstico inicial midiendo el tiempo perdido en el área de trapiche",
+        "Realizar un análisis de criticidad de los equipos del área de trapiche.",
+        "Desarrollar un análisis de modos y efectos de fallas de los equipos críticos.",
+        "Programar las actividades del plan de mantenimiento de los equipos.",
+        "Implementar el plan de mantenimiento preventivo elaborado.",
+        "Medir el tiempo perdido después de la implementación del plan."
+      ]
+    },
+    "hipotesis": {
+      "general": "La implementación de un plan de mantenimiento reduce el tiempo perdido en el área de trapiche de la empresa Pomalca",
+      "especificos": []
+    },
+    "variables": {
+      "independiente": {
+        "nombre": "CATEGORÍA PRINCIPAL",
+        "dimensiones": [
+          "Subcategoría 1",
+          "Subcategoría 2"
+        ]
+      },
+      "dependiente": {
+        "nombre": "CATEGORÍA SECUNDARIA (Si aplica)",
+        "dimensiones": []
+      }
+    },
+    "metodologia": {
+      "tipo": "Aplicada",
+      "enfoque": "Cualitativo",
+      "nivel": "Explicativo",
+      "diseno": "Pre Experimental",
+      "poblacion": "32 equipos del área de Trapiche",
+      "muestra": "24 equipos críticos",
+      "tecnicas": "Análisis documental, Observación",
+      "instrumentos": "Ficha de recolección de datos",
+      "procesamiento": "SPSS v25"
+    }
+  },
+  "pagina_respeto": {},
+  "informacion_basica": {
+    "titulo": "INFORMACIÓN BÁSICA",
+    "elementos": [
+      {
+        "label": "FACULTAD:",
+        "valor": "Facultad de Ingeniería Mecánica y de Energía"
+      },
+      {
+        "label": "UNIDAD DE INVESTIGACIÓN:",
+        "valor": "Unidad de Posgrado..."
+      },
+      {
+        "label": "TÍTULO:",
+        "valor": "Implementación xxx"
+      },
+      {
+        "label": "AUTOR(ES):",
+        "valor": "Nombres y Apellidos / DNI: XXX / ORCID: YYYY"
+      },
+      {
+        "label": "ASESOR:",
+        "valor": "Dr. Abel Tapia Díaz / DNI: ... / ORCID: ..."
+      },
+      {
+        "label": "LUGAR DE EJECUCIÓN:",
+        "valor": ""
+      },
+      {
+        "label": "ESCENARIO Y PARTICIPANTES:",
+        "valor": "[Lugar y personas claves]"
+      },
+      {
+        "label": "TIPO:",
+        "valor": ""
+      },
+      {
+        "label": "ENFOQUE:",
+        "valor": ""
+      },
+      {
+        "label": "DISEÑO DE INVESTIGACIÓN:",
+        "valor": ""
+      },
+      {
+        "label": "TEMA OCDE:",
+        "valor": ""
+      }
+    ]
+  }
+}

@@ -126,12 +126,12 @@ def _validate_schema_manual(format_data: Dict[str, Any], file_path: Optional[str
             file=file_path
         ))
     
-    # Verificar _meta.uni
-    if not meta.get("uni"):
+    # Verificar _meta.university (o _meta.uni como fallback)
+    if not (meta.get("university") or meta.get("uni")):
         issues.append(Issue(
             severity=Severity.ERROR,
             code="META_UNI_MISSING",
-            message="Falta _meta.uni",
+            message="Falta _meta.university",
             file=file_path
         ))
     
@@ -169,13 +169,13 @@ def validate_format_rules(
             file=file_path
         ))
     
-    # Regla 2: _meta.uni no vacío y minúsculas
-    meta_uni = meta.get("uni", "")
+    # Regla 2: _meta.university (o _meta.uni) no vacío y minúsculas
+    meta_uni = meta.get("university") or meta.get("uni", "")
     if not meta_uni or not str(meta_uni).strip():
         issues.append(Issue(
             severity=Severity.ERROR,
             code="META_UNI_EMPTY",
-            message="_meta.uni está vacío",
+            message="_meta.university está vacío",
             file=file_path
         ))
     elif str(meta_uni) != str(meta_uni).lower():

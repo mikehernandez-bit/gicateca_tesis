@@ -6,7 +6,12 @@
     "university": "unac",
     "category": "Informe de Tesis",
     "documentType": "cual",
-    "title": "Informe de Tesis UNAC - Enfoque Cualitativo"
+    "title": "Informe de Tesis UNAC - Enfoque Cualitativo",
+    "descripcion": "Plantilla Oficial Informe de Tesis UNAC - Enfoque Cualitativo (Directiva 004-2022-R)",
+    "version": "2.1.0"
+  },
+  "configuracion": {
+    "ruta_logo": "app/static/assets/LogoUNAC.png"
   },
   "caratula": {
     "universidad": "UNIVERSIDAD NACIONAL DEL CALLAO",
@@ -19,8 +24,8 @@
     "label_autor": "AUTOR: [NOMBRES Y APELLIDOS]",
     "label_asesor": "ASESOR: [NOMBRES Y APELLIDOS]",
     "label_linea": "LÍNEA DE INVESTIGACIÓN: [NOMBRE DE LA LÍNEA]",
-    "fecha": "Callao, 2026",
-    "pais": "PERÚ"
+    "lugar": "Callao, 2026",
+    "anio": "PERÚ"
   },
   "preliminares": {
     "dedicatoria": {
@@ -53,7 +58,14 @@
         {
           "texto": "1.1 Descripción de la realidad problemática",
           "nota": "Describa el contexto, la situación social o el fenómeno tal como se presenta en la realidad (Escenario).",
-          "instruccion_detallada": "Contextualiza el fenómeno basándote en la observación y hechos sociales mediante un enfoque deductivo.\n\nContexto internacional/nacional: Describe el fenómeno a nivel global y país basándote en literatura cualitativa previa.\nContexto institucional/local: Detalla los síntomas observables, las vivencias de los involucrados y las deficiencias del proceso.\nSustento ingenieril: Aplica herramientas como el Árbol de problemas o Diagrama de Ishikawa para identificar las causas del fenómeno estudiado.\nCierre: Menciona la necesidad de comprender el fenómeno para proponer una mejora técnica."
+          "instruccion_detallada": "Contextualiza el fenómeno basándote en la observación y hechos sociales mediante un enfoque deductivo.\n\nContexto internacional/nacional: Describe el fenómeno a nivel global y país basándote en literatura cualitativa previa.\nContexto institucional/local: Detalla los síntomas observables, las vivencias de los involucrados y las deficiencias del proceso.\nSustento ingenieril: Aplica herramientas como el Árbol de problemas o Diagrama de Ishikawa para identificar las causas del fenómeno estudiado.\nCierre: Menciona la necesidad de comprender el fenómeno para proponer una mejora técnica.",
+          "imagenes": [
+            {
+              "titulo": "Árbol de problemas",
+              "ruta": "figura_ejemplo.png",
+              "fuente": "Elaboración propia"
+            }
+          ]
         },
         {
           "texto": "1.2 Formulación del problema",
@@ -85,7 +97,14 @@
         {
           "texto": "2.1 Antecedentes (Internacional y nacional)",
           "nota": "Investigaciones previas que sirven de referencia.",
-          "instruccion_detallada": "Busca tesis cualitativas o artículos de los últimos 5-10 años.\n\nRedacta en párrafo fluido: Autor, año, propósito, diseño cualitativo, participantes clave y hallazgos principales (categorías emergentes)."
+          "instruccion_detallada": "Busca tesis cualitativas o artículos de los últimos 5-10 años.\n\nRedacta en párrafo fluido: Autor, año, propósito, diseño cualitativo, participantes clave y hallazgos principales (categorías emergentes).",
+          "imagenes": [
+            {
+              "titulo": "Marco conceptual de la investigación",
+              "ruta": "figura_ejemplo.png",
+              "fuente": "Elaboración propia basada en la revisión de literatura"
+            }
+          ]
         },
         {
           "texto": "2.2 Bases teóricas",
@@ -112,7 +131,14 @@
         {
           "texto": "3.1 Enfoque y Diseño de investigación",
           "nota": "Fenomenológico, Etnográfico, Estudio de Caso, etc.",
-          "instruccion_detallada": "Justifica por qué elegiste el diseño (ej. Fenomenológico para entender experiencias) y el enfoque cualitativo."
+          "instruccion_detallada": "Justifica por qué elegiste el diseño (ej. Fenomenológico para entender experiencias) y el enfoque cualitativo.",
+          "imagenes": [
+            {
+              "titulo": "Diseño metodológico de la investigación",
+              "ruta": "figura_ejemplo.png",
+              "fuente": "Elaboración propia"
+            }
+          ]
         },
         {
           "texto": "3.2 Escenario de estudio y Participantes",
@@ -138,6 +164,85 @@
           "texto": "3.6 Aspectos Éticos",
           "nota": "Cumplimiento de la Conducta Responsable en Investigación (CRI).",
           "instruccion_detallada": "Declara explícitamente el cumplimiento de principios éticos: Respeto por las personas (anonimato), Beneficencia y Justicia. Menciona el uso de consentimiento informado y la ausencia de conflictos de interés."
+        },
+        {
+          "tipo": "tabla",
+          "titulo": "Matriz de Categorización Apriorística",
+          "orientacion": "landscape",
+          "encabezados": [
+            "Categoría",
+            "Definición Conceptual",
+            "Subcategorías",
+            "Códigos",
+            "Técnica/Instrumento"
+          ],
+          "filas": [
+            [
+              "[Categoría 1]",
+              "[Definición según autor, año]",
+              "[Subcategoría 1.1]",
+              "[Código A]",
+              "Entrevista semi-estructurada"
+            ],
+            [
+              "",
+              "",
+              "[Subcategoría 1.2]",
+              "[Código B]",
+              "Observación participante"
+            ],
+            [
+              "[Categoría 2]",
+              "[Definición según autor, año]",
+              "[Subcategoría 2.1]",
+              "[Código C]",
+              "Análisis documental"
+            ],
+            [
+              "",
+              "",
+              "[Subcategoría 2.2]",
+              "[Código D]",
+              "Entrevista semi-estructurada"
+            ]
+          ],
+          "celdas_fusionadas": [
+            { "fila": 0, "col": 0, "filas_span": 2 },
+            { "fila": 0, "col": 1, "filas_span": 2 },
+            { "fila": 2, "col": 0, "filas_span": 2 },
+            { "fila": 2, "col": 1, "filas_span": 2 }
+          ],
+          "nota_pie": "Fuente: Elaboración propia",
+          "estilo": {
+            "encabezado_color": "D9E2F3",
+            "fuente_size": 9
+          }
+        },
+        {
+          "tipo": "tabla",
+          "titulo": "Cronograma de Actividades",
+          "orientacion": "portrait",
+          "encabezados": [
+            "Actividad",
+            "Mes 1",
+            "Mes 2",
+            "Mes 3",
+            "Mes 4",
+            "Mes 5",
+            "Mes 6"
+          ],
+          "filas": [
+            ["Revisión bibliográfica", "X", "X", "", "", "", ""],
+            ["Diseño metodológico", "", "X", "X", "", "", ""],
+            ["Recolección de datos", "", "", "X", "X", "", ""],
+            ["Análisis de resultados", "", "", "", "X", "X", ""],
+            ["Redacción del informe", "", "", "", "", "X", "X"],
+            ["Sustentación", "", "", "", "", "", "X"]
+          ],
+          "estilo": {
+            "encabezado_color": "4472C4",
+            "fuente_size": 10
+          }
         }
       ]
     },
@@ -149,7 +254,14 @@
         {
           "texto": "4.1 Presentación de resultados (Categorización)",
           "nota": "Hallazgos por categorías con citas textuales (verbatim).",
-          "instruccion_detallada": "Presenta las categorías halladas. Es vital incluir fragmentos de las entrevistas entre comillas para respaldar cada hallazgo."
+          "instruccion_detallada": "Presenta las categorías halladas. Es vital incluir fragmentos de las entrevistas entre comillas para respaldar cada hallazgo.",
+          "imagenes": [
+            {
+              "titulo": "Red de categorías y subcategorías emergentes",
+              "ruta": "figura_ejemplo.png",
+              "fuente": "Elaboración propia con Atlas.ti"
+            }
+          ]
         },
         {
           "texto": "4.2 Análisis e Interpretación (Triangulación)",
@@ -160,6 +272,48 @@
           "texto": "4.3 Discusión de resultados",
           "nota": "Contrastación con antecedentes.",
           "instruccion_detallada": "Compara tus hallazgos con los antecedentes nacionales e internacionales. ¿Tus informantes piensan igual que los de otros estudios?"
+        },
+        {
+          "tipo": "tabla",
+          "titulo": "Resultados de la Categorización Cualitativa",
+          "orientacion": "portrait",
+          "encabezados": [
+            "Categoría",
+            "Subcategoría",
+            "Código",
+            "Fragmento representativo",
+            "f (participantes)"
+          ],
+          "filas": [
+            [
+              "[Categoría 1]",
+              "[Subcategoría 1.1]",
+              "[Código A]",
+              "[Cita textual del informante]",
+              "[n]"
+            ],
+            [
+              "",
+              "[Subcategoría 1.2]",
+              "[Código B]",
+              "[Cita textual del informante]",
+              "[n]"
+            ],
+            [
+              "[Categoría 2]",
+              "[Subcategoría 2.1]",
+              "[Código C]",
+              "[Cita textual del informante]",
+              "[n]"
+            ]
+          ],
+          "celdas_fusionadas": [
+            { "fila": 0, "col": 0, "filas_span": 2 }
+          ],
+          "nota_pie": "Fuente: Elaboración propia",
+          "estilo": {
+            "encabezado_color": "D9D9D9"
+          }
         }
       ]
     },
@@ -180,9 +334,18 @@
     "anexos": {
       "titulo_seccion": "VIII. ANEXOS",
       "lista": [
-        { "titulo": "Anexo 1: Matriz de Categorización", "nota": "Resumen de categorías y subcategorías." },
-        { "titulo": "Anexo 2: Guía de Instrumentos", "nota": "Preguntas de entrevista o guía de observación." },
-        { "titulo": "Anexo 3: Consentimiento Informado", "nota": "Aceptación de los participantes." }
+        {
+          "titulo": "Anexo 1: Matriz de Categorización",
+          "nota": "Resumen de categorías y subcategorías."
+        },
+        {
+          "titulo": "Anexo 2: Guía de Instrumentos",
+          "nota": "Preguntas de entrevista o guía de observación."
+        },
+        {
+          "titulo": "Anexo 3: Consentimiento Informado",
+          "nota": "Aceptación de los participantes."
+        }
       ]
     }
   },
@@ -213,11 +376,19 @@
     "variables": {
       "independiente": {
         "nombre": "CATEGORÍA 1: GESTIÓN DEL TALENTO",
-        "dimensiones": ["Subcat: Motivación", "Subcat: Capacitación", "Subcat: Evaluación"]
+        "dimensiones": [
+          "Subcat: Motivación",
+          "Subcat: Capacitación",
+          "Subcat: Evaluación"
+        ]
       },
       "dependiente": {
         "nombre": "CATEGORÍA 2: DINÁMICA ORGANIZACIONAL",
-        "dimensiones": ["Subcat: Clima Laboral", "Subcat: Liderazgo", "Subcat: Comunicación"]
+        "dimensiones": [
+          "Subcat: Clima Laboral",
+          "Subcat: Liderazgo",
+          "Subcat: Comunicación"
+        ]
       }
     },
     "metodologia": {
@@ -232,6 +403,5 @@
       "procesamiento": "Atlas.ti v9 / Triangulación"
     }
   },
-  "version": "1.1.0",
-  "descripcion": "Plantilla Informe de Tesis UNAC - Enfoque Cualitativo (Con Matriz de Categorización)"
+  "pagina_respeto": {}
 }

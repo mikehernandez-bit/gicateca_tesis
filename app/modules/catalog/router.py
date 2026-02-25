@@ -28,6 +28,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
 from pydantic import ValidationError
 
 from app.core.templates import templates
+from app.core.document_generator import cleanup_temp_file
 from app.modules.catalog.schemas import FormatoGenerateIn
 from app.modules.catalog import service
 
@@ -74,7 +75,7 @@ async def generate_document(request: Request, background_tasks: BackgroundTasks)
         return JSONResponse({"error": str(exc)}, status_code=500)
 
     # Limpia el archivo temporal luego de enviar la respuesta.
-    background_tasks.add_task(service.cleanup_temp_file, output_path)
+    background_tasks.add_task(cleanup_temp_file, output_path)
     return FileResponse(
         path=str(output_path),
         filename=filename,

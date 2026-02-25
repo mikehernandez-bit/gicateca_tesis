@@ -6,7 +6,12 @@
     "university": "unac",
     "category": "Informe de Tesis",
     "documentType": "cuant",
-    "title": "Informe de Tesis UNAC - Enfoque Cuantitativo"
+    "title": "Informe de Tesis UNAC - Enfoque Cuantitativo",
+    "descripcion": "Plantilla Oficial Informe de Tesis UNAC - Enfoque Cuantitativo (Directiva 004-2022-R)",
+    "version": "2.0.0"
+  },
+  "configuracion": {
+    "ruta_logo": "app/static/assets/LogoUNAC.png"
   },
   "caratula": {
     "universidad": "UNIVERSIDAD NACIONAL DEL CALLAO",
@@ -19,8 +24,8 @@
     "label_autor": "AUTOR: [NOMBRES Y APELLIDOS]",
     "label_asesor": "ASESOR: [NOMBRES Y APELLIDOS]",
     "label_linea": "LÍNEA DE INVESTIGACIÓN: [NOMBRE DE LA LÍNEA]",
-    "fecha": "Callao, [AÑO]",
-    "pais": "PERÚ"
+    "lugar": "Callao, [AÑO]",
+    "anio": "PERÚ"
   },
   "preliminares": {
     "dedicatoria": {
@@ -52,7 +57,14 @@
       "contenido": [
         {
           "texto": "1.1 Descripción de la realidad problemática",
-          "instruccion_detallada": "En este apartado debes presentar y contextualizar claramente el problema basándote en evidencia objetiva, datos y hechos, utilizando un enfoque deductivo (de lo general a lo específico).\n\nDebes desarrollar el contenido considerando tres niveles de análisis:\n\n- Contexto internacional: Describe cómo se comporta la variable o el problema a nivel mundial o regional. Usa estadísticas, informes de organismos internacionales (ONU, Banco Mundial, etc.) o tendencias globales que demuestren la relevancia del tema.\n- Contexto nacional: Explica la situación del problema en el Perú. Cita normativas, informes ministeriales, planes nacionales o datos estadísticos del INEI que evidencien la deficiencia o necesidad a nivel país.\n- Contexto institucional o local: Describe la realidad específica en la empresa, área o lugar de estudio. Detalla los síntomas observables (fallas, demoras, pérdidas, quejas) con datos preliminares si es posible.\n- Sustento ingenieril (Obligatorio): Debes aplicar al menos una herramienta de ingeniería para diagnosticar técnicamente el problema, tal como:\n  * Diagrama de Ishikawa (Causa-Efecto).\n  * Diagrama de Pareto (80/20).\n  * Árbol de problemas.\n  * Matriz de Vester o Matriz de Priorización.\n- Cierre: Finaliza mencionando explícitamente la propuesta de solución técnica (ej. 'Por lo expuesto, se propone la implementación de...')."
+          "instruccion_detallada": "En este apartado debes presentar y contextualizar claramente el problema basándote en evidencia objetiva, datos y hechos, utilizando un enfoque deductivo (de lo general a lo específico).\n\nDebes desarrollar el contenido considerando tres niveles de análisis:\n\n- Contexto internacional: Describe cómo se comporta la variable o el problema a nivel mundial o regional. Usa estadísticas, informes de organismos internacionales (ONU, Banco Mundial, etc.) o tendencias globales que demuestren la relevancia del tema.\n- Contexto nacional: Explica la situación del problema en el Perú. Cita normativas, informes ministeriales, planes nacionales o datos estadísticos del INEI que evidencien la deficiencia o necesidad a nivel país.\n- Contexto institucional o local: Describe la realidad específica en la empresa, área o lugar de estudio. Detalla los síntomas observables (fallas, demoras, pérdidas, quejas) con datos preliminares si es posible.\n- Sustento ingenieril (Obligatorio): Debes aplicar al menos una herramienta de ingeniería para diagnosticar técnicamente el problema, tal como:\n  * Diagrama de Ishikawa (Causa-Efecto).\n  * Diagrama de Pareto (80/20).\n  * Árbol de problemas.\n  * Matriz de Vester o Matriz de Priorización.\n- Cierre: Finaliza mencionando explícitamente la propuesta de solución técnica (ej. 'Por lo expuesto, se propone la implementación de...').",
+          "imagenes": [
+            {
+              "titulo": "Árbol de problemas",
+              "ruta": "figura_ejemplo.png",
+              "fuente": "Elaboración propia"
+            }
+          ]
         },
         {
           "texto": "1.2 Formulación del problema",
@@ -79,7 +91,14 @@
       "contenido": [
         {
           "texto": "2.1 Antecedentes (Internacional y nacional)",
-          "instruccion_detallada": "Presenta el 'estado del arte' revisando investigaciones previas. Debes buscar tesis o artículos científicos (papers) indexados, preferiblemente de los últimos 5 a 10 años.\n\nEstructura de cada antecedente: Debes redactar en forma de párrafo fluido (no viñetas aisladas) incluyendo obligatoriamente:\n- Apellido del autor y Año.\n- Título de la investigación.\n- Objetivo principal del estudio.\n- Metodología empleada (Diseño, muestra, instrumentos).\n- Resultados numéricos más relevantes (datos estadísticos, mejoras porcentuales, correlaciones).\n- Conclusiones principales.\n\nCantidad: Se recomienda un promedio de 5 antecedentes internacionales y 5 nacionales para pregrado (o 20-30 referencias totales para posgrado)."
+          "instruccion_detallada": "Presenta el 'estado del arte' revisando investigaciones previas. Debes buscar tesis o artículos científicos (papers) indexados, preferiblemente de los últimos 5 a 10 años.\n\nEstructura de cada antecedente: Debes redactar en forma de párrafo fluido (no viñetas aisladas) incluyendo obligatoriamente:\n- Apellido del autor y Año.\n- Título de la investigación.\n- Objetivo principal del estudio.\n- Metodología empleada (Diseño, muestra, instrumentos).\n- Resultados numéricos más relevantes (datos estadísticos, mejoras porcentuales, correlaciones).\n- Conclusiones principales.\n\nCantidad: Se recomienda un promedio de 5 antecedentes internacionales y 5 nacionales para pregrado (o 20-30 referencias totales para posgrado).",
+          "imagenes": [
+            {
+              "titulo": "Marco conceptual de la investigación",
+              "ruta": "figura_ejemplo.png",
+              "fuente": "Elaboración propia basada en la revisión de literatura"
+            }
+          ]
         },
         {
           "texto": "2.2 Bases teóricas",
@@ -102,11 +121,102 @@
       "contenido": [
         {
           "texto": "3.1 Hipótesis (General y específicas)",
-          "instruccion_detallada": "Son las respuestas tentativas y probables a los problemas formulados.\n\n- Requisito: Deben ser proposiciones afirmativas que establezcan una relación clara (causa-efecto, correlación, diferencia de grupos) entre las variables.\n- Comprobación: Deben estar formuladas de tal manera que puedan ser aceptadas o rechazadas mediante pruebas estadísticas (Hipótesis Nula vs. Alterna).\n- Alineación: Debe existir una Hipótesis General para el Problema General y Hipótesis Específicas para cada Problema Específico."
+          "instruccion_detallada": "Son las respuestas tentativas y probables a los problemas formulados.\n\n- Requisito: Deben ser proposiciones afirmativas que establezcan una relación clara (causa-efecto, correlación, diferencia de grupos) entre las variables.\n- Comprobación: Deben estar formuladas de tal manera que puedan ser aceptadas o rechazadas mediante pruebas estadísticas (Hipótesis Nula vs. Alterna).\n- Alineación: Debe existir una Hipótesis General para el Problema General y Hipótesis Específicas para cada Problema Específico.",
+          "imagenes": [
+            {
+              "titulo": "Modelo de relación entre variables",
+              "ruta": "figura_ejemplo.png",
+              "fuente": "Elaboración propia"
+            }
+          ]
         },
         {
           "texto": "3.1.1 Operacionalización de variables",
           "instruccion_detallada": "Es el proceso técnico fundamental de convertir conceptos abstractos en datos medibles. Se suele presentar en una matriz (tabla) que contiene:\n\n- Definición Conceptual: Qué es la variable teóricamente según un autor.\n- Definición Operacional: Cómo se medirá, calculará o manipulará en este estudio específico.\n- Dimensiones: Factores, componentes o grandes aspectos de la variable.\n- Indicadores: La unidad de medida exacta y observable (ej. %, kg, horas, grados, puntaje).\n- Escala de medición: Nominal, Ordinal, de Intervalo o de Razón."
+        },
+        {
+          "tipo": "tabla",
+          "titulo": "Tabla 1: Operacionalización de Variables",
+          "orientacion": "landscape",
+          "encabezados": [
+            "Variable",
+            "Def. Conceptual",
+            "Def. Operacional",
+            "Dimensiones",
+            "Indicadores",
+            "Escala"
+          ],
+          "filas": [
+            [
+              "V.I: [nombre]",
+              "[Definición según autor, año]",
+              "[Cómo se mide en este estudio]",
+              "[Dimensión 1]",
+              "[Indicador 1]",
+              "[Razón/Ordinal]"
+            ],
+            [
+              "",
+              "",
+              "",
+              "[Dimensión 2]",
+              "[Indicador 2]",
+              "[Razón/Ordinal]"
+            ],
+            [
+              "V.D: [nombre]",
+              "[Definición según autor, año]",
+              "[Cómo se mide en este estudio]",
+              "[Dimensión 1]",
+              "[Indicador 1]",
+              "[Razón/Ordinal]"
+            ],
+            [
+              "",
+              "",
+              "",
+              "[Dimensión 2]",
+              "[Indicador 2]",
+              "[Razón/Ordinal]"
+            ]
+          ],
+          "celdas_fusionadas": [
+            {
+              "fila": 0,
+              "col": 0,
+              "filas_span": 2
+            },
+            {
+              "fila": 0,
+              "col": 1,
+              "filas_span": 2
+            },
+            {
+              "fila": 0,
+              "col": 2,
+              "filas_span": 2
+            },
+            {
+              "fila": 2,
+              "col": 0,
+              "filas_span": 2
+            },
+            {
+              "fila": 2,
+              "col": 1,
+              "filas_span": 2
+            },
+            {
+              "fila": 2,
+              "col": 2,
+              "filas_span": 2
+            }
+          ],
+          "nota_pie": "Fuente: Elaboración propia",
+          "estilo": {
+            "encabezado_color": "D9E2F3",
+            "fuente_size": 9
+          }
         }
       ]
     },
@@ -117,7 +227,14 @@
       "contenido": [
         {
           "texto": "4.1 Diseño metodológico",
-          "instruccion_detallada": "Define la estrategia operativa para probar la hipótesis. Debes especificar y justificar técnicamente:\n\n- Tipo de investigación: Básica (teórica/pura) o Aplicada (solución práctica/tecnológica).\n- Nivel: Exploratorio, Descriptivo, Correlacional o Explicativo (Causal).\n- Diseño:\n  * Experimental: Pre-experimental, Cuasi-experimental o Experimental puro (si manipulas deliberadamente la variable independiente).\n  * No Experimental: Transversal (una sola medición en el tiempo) o Longitudinal (varias mediciones a lo largo del tiempo)."
+          "instruccion_detallada": "Define la estrategia operativa para probar la hipótesis. Debes especificar y justificar técnicamente:\n\n- Tipo de investigación: Básica (teórica/pura) o Aplicada (solución práctica/tecnológica).\n- Nivel: Exploratorio, Descriptivo, Correlacional o Explicativo (Causal).\n- Diseño:\n  * Experimental: Pre-experimental, Cuasi-experimental o Experimental puro (si manipulas deliberadamente la variable independiente).\n  * No Experimental: Transversal (una sola medición en el tiempo) o Longitudinal (varias mediciones a lo largo del tiempo).",
+          "imagenes": [
+            {
+              "titulo": "Diseño metodológico de la investigación",
+              "ruta": "figura_ejemplo.png",
+              "fuente": "Elaboración propia"
+            }
+          ]
         },
         {
           "texto": "4.2 Método de investigación",
@@ -152,11 +269,142 @@
       "contenido": [
         {
           "texto": "5.1 Resultados descriptivos",
-          "instruccion_detallada": "Presenta el análisis exploratorio de los datos recolectados.\n\nInstrucción: Utiliza tablas de distribución de frecuencias y gráficos estadísticos (barras, líneas, histogramas, sectores) debidamente numerados y titulados según norma (APA/ISO). Debajo de cada tabla/figura, redacta una interpretación objetiva de los datos (qué porcentaje es mayor, cuál es la tendencia, qué dato resalta). No emitas juicios de valor aquí, solo describe los datos."
+          "instruccion_detallada": "Presenta el análisis exploratorio de los datos recolectados.\n\nInstrucción: Utiliza tablas de distribución de frecuencias y gráficos estadísticos (barras, líneas, histogramas, sectores) debidamente numerados y titulados según norma (APA/ISO). Debajo de cada tabla/figura, redacta una interpretación objetiva de los datos (qué porcentaje es mayor, cuál es la tendencia, qué dato resalta). No emitas juicios de valor aquí, solo describe los datos.",
+          "imagenes": [
+            {
+              "titulo": "Distribución de frecuencias de la variable principal",
+              "ruta": "figura_ejemplo.png",
+              "fuente": "Elaboración propia con datos de la encuesta"
+            }
+          ]
+        },
+        {
+          "tipo": "tabla",
+          "titulo": "Tabla 2: Distribución de frecuencias de la variable dependiente",
+          "orientacion": "portrait",
+          "encabezados": [
+            "Nivel",
+            "Frecuencia (fi)",
+            "Porcentaje (%)",
+            "% Acumulado"
+          ],
+          "filas": [
+            [
+              "Bajo",
+              "[dato]",
+              "[dato]",
+              "[dato]"
+            ],
+            [
+              "Medio",
+              "[dato]",
+              "[dato]",
+              "[dato]"
+            ],
+            [
+              "Alto",
+              "[dato]",
+              "[dato]",
+              "[dato]"
+            ],
+            [
+              "Total",
+              "[N]",
+              "100%",
+              ""
+            ]
+          ],
+          "nota_pie": "Fuente: Elaboración propia con SPSS v25",
+          "estilo": {
+            "encabezado_color": "D9D9D9"
+          }
         },
         {
           "texto": "5.2 Resultados inferenciales",
           "instruccion_detallada": "Es la parte crítica de la tesis cuantitativa donde se prueban las hipótesis.\n\nInstrucción:\n1. Presenta primero la Prueba de Normalidad para justificar si usas pruebas paramétricas o no paramétricas.\n2. Desarrolla la Prueba de Hipótesis para la General y las Específicas:\n  * Plantea estadísticamente H0 (Nula) y H1 (Alterna).\n  * Muestra el estadístico de prueba calculado y el Valor-p (Sig.).\n  * Toma la decisión estadística: 'Como p < 0.05, se rechaza la hipótesis nula y se acepta la alterna'."
+        },
+        {
+          "tipo": "tabla",
+          "titulo": "Tabla 3: Prueba de normalidad (Shapiro-Wilk)",
+          "orientacion": "portrait",
+          "encabezados": [
+            "Variable",
+            "Estadístico",
+            "gl",
+            "Sig.",
+            "Distribución"
+          ],
+          "filas": [
+            [
+              "[Variable dependiente] - Pre",
+              "[valor]",
+              "[N]",
+              "[p-valor]",
+              "[Normal/No normal]"
+            ],
+            [
+              "[Variable dependiente] - Post",
+              "[valor]",
+              "[N]",
+              "[p-valor]",
+              "[Normal/No normal]"
+            ]
+          ],
+          "nota_pie": "Fuente: Elaboración propia. Nivel de significancia α = 0.05",
+          "estilo": {
+            "encabezado_color": "D9D9D9"
+          }
+        },
+        {
+          "tipo": "tabla",
+          "titulo": "Tabla 4: Contrastación de hipótesis general",
+          "orientacion": "portrait",
+          "encabezados": [
+            "Hipótesis",
+            "Prueba",
+            "Estadístico",
+            "Sig. (bilateral)",
+            "Decisión"
+          ],
+          "filas": [
+            [
+              "H₀: [no hay diferencia significativa]",
+              "[T-Student / Wilcoxon]",
+              "[valor]",
+              "[p-valor]",
+              "[Se rechaza / No se rechaza H₀]"
+            ],
+            [
+              "H₁: [sí hay diferencia significativa]",
+              "",
+              "",
+              "",
+              ""
+            ]
+          ],
+          "celdas_fusionadas": [
+            {
+              "fila": 0,
+              "col": 1,
+              "filas_span": 2
+            },
+            {
+              "fila": 0,
+              "col": 2,
+              "filas_span": 2
+            },
+            {
+              "fila": 0,
+              "col": 3,
+              "filas_span": 2
+            },
+            {
+              "fila": 0,
+              "col": 4,
+              "filas_span": 2
+            }
+          ],
+          "nota_pie": "Fuente: Elaboración propia. Nivel de significancia α = 0.05"
         }
       ]
     },
@@ -167,7 +415,14 @@
       "contenido": [
         {
           "texto": "6.1 Contrastación y demostración de la hipótesis",
-          "instruccion_detallada": "Realiza la discusión técnica de los hallazgos inferenciales.\n\nInstrucción: Analiza si la evidencia estadística obtenida (en el cap. 5.2) respalda o no lo que afirmaste teóricamente en tu Hipótesis (cap. 3.1). Explica qué significa este resultado en el contexto de tu problema de ingeniería (ej. 'Se demostró estadísticamente que el nuevo sistema redujo las fallas en un 20%, validando la hipótesis de mejora...')."
+          "instruccion_detallada": "Realiza la discusión técnica de los hallazgos inferenciales.\n\nInstrucción: Analiza si la evidencia estadística obtenida (en el cap. 5.2) respalda o no lo que afirmaste teóricamente en tu Hipótesis (cap. 3.1). Explica qué significa este resultado en el contexto de tu problema de ingeniería (ej. 'Se demostró estadísticamente que el nuevo sistema redujo las fallas en un 20%, validando la hipótesis de mejora...').",
+          "imagenes": [
+            {
+              "titulo": "Distribución de frecuencias de la variable principal",
+              "ruta": "figura_ejemplo.png",
+              "fuente": "Elaboración propia con datos de la encuesta"
+            }
+          ]
         },
         {
           "texto": "6.2 Contrastación con otros estudios",
@@ -185,9 +440,25 @@
     },
     {
       "titulo": "VIII. RECOMENDACIONES",
-      "nota_capitulo": "Sugerencias de acción prácticas y viables basadas en las conclusiones.\n\nInstrucción:\n- Metodológicas: Para futuros investigadores (ej. ampliar muestra, incluir nuevas variables, usar otro diseño).\n- Académicas: Para la universidad o línea de investigación.\n- Prácticas: Dirigidas a la empresa o institución estudiada (ej. implementar el plan diseñado, realizar mantenimientos periódicos, capacitar al personal en X). Deben ser acciones concretas y realizables."
-    },
-    {
+      "nota_capitulo": "Sugerencias de acción prácticas y viables basadas en las conclusiones.",
+      "contenido": [
+        {
+          "texto": "8.1 Recomendaciones metodológicas",
+          "nota": "Para futuros investigadores: ampliar muestra, incluir nuevas variables, usar otro diseño."
+        },
+        {
+          "texto": "8.2 Recomendaciones académicas",
+          "nota": "Para la universidad o línea de investigación."
+        },
+        {
+          "texto": "8.3 Recomendaciones prácticas",
+          "nota": "Dirigidas a la empresa o institución estudiada: implementar el plan diseñado, realizar mantenimientos periódicos, capacitar al personal. Deben ser acciones concretas y realizables."
+        }
+      ]
+    }
+  ],
+  "finales": {
+    "referencias": {
       "titulo": "IX. REFERENCIAS BIBLIOGRÁFICAS",
       "nota_capitulo": "Listado riguroso según norma (ISO 690/IEEE para Ingeniería, APA otras). Usar gestores bibliográficos.",
       "ejemplos_apa": [
@@ -195,23 +466,12 @@
         "Rodriguez, M. A. (2020). Implementación de un plan de mantenimiento preventivo. Tesis de Ingeniería, Universidad Nacional del Callao.",
         "Pérez, J., & Gómez, L. (2019). Reliability analysis in industrial systems. IEEE Transactions on Reliability, 68(2), 450-460."
       ]
-    }
-  ],
-  "finales": {
+    },
     "anexos": {
       "titulo_seccion": "ANEXOS",
       "lista": [
         {
-          "titulo": "Anexo 1: Matriz de Consistencia",
-          "nota": "Resumen lógico de Problemas, Objetivos, Hipótesis, Variables y Método (Generado automáticamente)."
-        },
-        {
-          "titulo": "Anexo 2: Instrumento de recolección de datos",
-          "nota": "Adjuntar el Cuestionario, Ficha de Registro o Ficha Técnica de los equipos."
-        },
-        {
-          "titulo": "Anexo 3: Validación de instrumento",
-          "nota": "Constancia de juicio de expertos y fiabilidad."
+          "titulo": "Anexo 1: Matriz de consistencia"
         }
       ]
     }
@@ -269,6 +529,5 @@
       "procesamiento": "SPSS v25"
     }
   },
-  "version": "2.0.0",
-  "descripcion": "Plantilla Oficial Informe de Tesis UNAC - Enfoque Cuantitativo (Directiva 004-2022-R)"
+  "pagina_respeto": {}
 }

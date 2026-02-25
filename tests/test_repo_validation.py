@@ -48,9 +48,19 @@ def test_format_schema_valid():
     valid_format = {
         "_meta": {
             "id": "test-format",
-            "uni": "unac"
+            "university": "unac"
         },
-        "caratula": {}
+        "configuracion": {
+            "ruta_logo": "app/static/assets/LogoUNAC.png"
+        },
+        "caratula": {
+            "universidad": "UNIVERSIDAD NACIONAL DEL CALLAO",
+            "facultad": "FACULTAD DE TEST",
+            "titulo_placeholder": "TEST"
+        },
+        "cuerpo": [
+            {"titulo": "CAP I"}
+        ]
     }
     
     issues = validate_format_schema(valid_format)
@@ -73,7 +83,7 @@ def test_format_schema_missing_meta():
     errors = [i for i in issues if i.is_error()]
     
     assert len(errors) > 0, "Debería detectar error de _meta faltante"
-    assert any("META" in i.code for i in errors), "Error debería mencionar META"
+    assert any("_meta" in i.message for i in errors), f"Error debería mencionar _meta: {errors}"
     
     print("✅ test_format_schema_missing_meta PASSED")
 
@@ -85,7 +95,7 @@ def test_format_rules_uni_mismatch():
     format_data = {
         "_meta": {
             "id": "test",
-            "uni": "uni"  # Dice UNI
+            "university": "uni"  # Dice UNI
         }
     }
     

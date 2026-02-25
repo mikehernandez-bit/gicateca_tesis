@@ -28,52 +28,24 @@ from app.modules.catalog.service import get_all_formatos
 from app.modules.formats.service import get_formato
 
 def test_catalog():
-    """Test catalog service."""
-    print("=" * 60)
-    print("Testing Catalog Service")
-    print("=" * 60)
-    
-    try:
-        # Carga el catalogo completo y lista formatos basicos.
-        formatos = get_all_formatos()
-        print(f"✓ Loaded {len(formatos)} formatos")
-        
-        for i, f in enumerate(formatos, 1):
-            print(f"\n{i}. {f['titulo']}")
-            print(f"   ID: {f['id']}")
-            print(f"   Tipo: {f['tipo']}")
-            print(f"   Estado: {f['estado']}")
-            print(f"   Versión: {f['version']}")
-        
-        return True
-    except Exception as e:
-        print(f"✗ Error: {e}")
-        return False
+    """Test catalog service returns formatos."""
+    formatos = get_all_formatos()
+    assert len(formatos) > 0, "Catalog should have at least one formato"
+    for f in formatos:
+        assert "id" in f, "Each formato must have an id"
+        assert "titulo" in f, "Each formato must have a titulo"
 
 def test_formats():
-    """Test formats service."""
-    print("\n" + "=" * 60)
-    print("Testing Formats Service")
-    print("=" * 60)
-    
-    # IDs representativos para validar carga de formatos.
+    """Test formats service loads known format IDs."""
     test_ids = [
         "unac-informe-cual",
         "unac-proyecto-cuant",
-        "unac-maestria-cual"
+        "unac-maestria-cual",
     ]
-    
     for format_id in test_ids:
-        try:
-            formato = get_formato(format_id)
-            print(f"✓ {format_id}")
-            print(f"  Título: {formato['titulo']}")
-            print(f"  Versión: {formato['version']}")
-        except Exception as e:
-            print(f"✗ {format_id}: {e}")
-            return False
-    
-    return True
+        formato = get_formato(format_id)
+        assert formato is not None, f"{format_id} should load"
+        assert "titulo" in formato, f"{format_id} must have titulo"
 
 if __name__ == "__main__":
     success = test_catalog() and test_formats()

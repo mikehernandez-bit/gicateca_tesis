@@ -6,7 +6,9 @@
     "university": "unac",
     "category": "Proyecto de Tesis",
     "documentType": "cuant",
-    "title": "Proyecto de Tesis UNAC - Enfoque Cuantitativo"
+    "title": "Proyecto de Tesis UNAC - Enfoque Cuantitativo",
+    "descripcion": "Formato de proyecto de tesis con enfoque cuantitativo para la Universidad Nacional del Callao.",
+    "version": "2.0.0"
   },
   "configuracion": {
     "fuente_normal": "Times New Roman",
@@ -25,66 +27,8 @@
     "label_autor": "AUTOR(ES)\n\n[NOMBRES Y APELLIDOS]\n[NOMBRES Y APELLIDOS]",
     "label_asesor": "ASESOR\n[GRADO Y NOMBRES]",
     "label_linea": "LÍNEA DE INVESTIGACIÓN:\n[Unidad de Investigación]",
-    "fecha": "Callao, [AÑO]",
-    "pais": "PERÚ\n"
-  },
-  "pagina_respeto": {
-    "titulo": "PÁGINA DE RESPETO",
-    "notas": [
-      {
-        "texto": "Los datos no deben tener más de 4 años de antigüedad una vez terminada la experiencia.\n\nEn caso de tener la autorización de la empresa, se deberá presentar en una hoja membretada (o un formato oficial).\n\nAnexo 3",
-        "formato": "recuadro"
-      }
-    ]
-  },
-  "informacion_basica": {
-    "titulo": "INFORMACIÓN BÁSICA",
-    "elementos": [
-      {
-        "label": "FACULTAD:",
-        "valor": "Facultad de Ingeniería Mecánica y de Energía"
-      },
-      {
-        "label": "UNIDAD DE INVESTIGACIÓN:",
-        "valor": "Unidad de Posgrado..."
-      },
-      {
-        "label": "TÍTULO:",
-        "valor": "Implementación xxx"
-      },
-      {
-        "label": "AUTOR(ES):",
-        "valor": "Nombres y Apellidos / DNI: XXX / ORCID: YYYY"
-      },
-      {
-        "label": "ASESOR:",
-        "valor": "Dr. Abel Tapia Díaz / DNI: ... / ORCID: ..."
-      },
-      {
-        "label": "LUGAR DE EJECUCIÓN:",
-        "valor": ""
-      },
-      {
-        "label": "UNIDAD DE ANÁLISIS:",
-        "valor": ""
-      },
-      {
-        "label": "TIPO:",
-        "valor": ""
-      },
-      {
-        "label": "ENFOQUE:",
-        "valor": ""
-      },
-      {
-        "label": "DISEÑO DE INVESTIGACIÓN:",
-        "valor": ""
-      },
-      {
-        "label": "TEMA OCDE:",
-        "valor": ""
-      }
-    ]
+    "lugar": "Callao, [AÑO]",
+    "anio": "PERÚ"
   },
   "preliminares": {
     "indices": [
@@ -227,7 +171,14 @@
         {
           "texto": "1.1 Descripción de la realidad problemática",
           "nota": "Describe, explica y evidencia la realidad problemática en el contexto internacional y/o nacional y de la empresa.",
-          "instruccion_detallada": "Describe, explica y evidencia la realidad problemática en el contexto internacional y/o nacional y de la empresa, de las líneas de investigación prioritarias o transversales utilizando fuentes científicas y/o oficiales. Sustenta la identificación del problema relevante y evidencia el análisis de la problemática utilizando al menos una herramienta de ingeniería (Pareto, Ishikawa, árbol de problemas, matriz de relevancia, matriz de priorización, entre otras). Se debe mencionar la propuesta de solución del problema de investigación."
+          "instruccion_detallada": "Describe, explica y evidencia la realidad problemática en el contexto internacional y/o nacional y de la empresa, de las líneas de investigación prioritarias o transversales utilizando fuentes científicas y/o oficiales. Sustenta la identificación del problema relevante y evidencia el análisis de la problemática utilizando al menos una herramienta de ingeniería (Pareto, Ishikawa, árbol de problemas, matriz de relevancia, matriz de priorización, entre otras). Se debe mencionar la propuesta de solución del problema de investigación.",
+          "imagenes": [
+            {
+              "titulo": "Árbol de problemas",
+              "ruta": "figura_ejemplo.png",
+              "fuente": "Elaboración propia"
+            }
+          ]
         },
         {
           "texto": "1.2 Formulación del problema",
@@ -257,7 +208,14 @@
         {
           "texto": "2.1 Antecedentes",
           "nota": "Búsqueda exhaustiva en bases de datos (mínimo 5 antecedentes).",
-          "instruccion_detallada": "Los antecedentes de la presente investigación son el reflejo de una búsqueda exhaustiva en diferentes bases de datos de las universidades y de artículos científicos relacionados al tema de estudio.\n2.1.1 Antecedentes Internacionales.\n2.1.2 Antecedentes Nacionales.\n(Se debe considerar mínimo 5 antecedentes, puede incluir artículos científicos nacionales)."
+          "instruccion_detallada": "Los antecedentes de la presente investigación son el reflejo de una búsqueda exhaustiva en diferentes bases de datos de las universidades y de artículos científicos relacionados al tema de estudio.\n2.1.1 Antecedentes Internacionales.\n2.1.2 Antecedentes Nacionales.\n(Se debe considerar mínimo 5 antecedentes, puede incluir artículos científicos nacionales).",
+          "imagenes": [
+            {
+              "titulo": "Marco conceptual de la investigación",
+              "ruta": "figura_ejemplo.png",
+              "fuente": "Elaboración propia basada en la revisión de literatura"
+            }
+          ]
         },
         {
           "texto": "2.2 Bases teóricas",
@@ -266,7 +224,7 @@
           "mostrar_matriz": true,
           "tablas_especiales": [
             {
-              "titulo": "Figura 2.2 Matriz de consistencia de implementación",
+              "titulo": "Matriz de Consistencia de Implementación",
               "headers": [
                 "PROBLEMA GENERAL",
                 "OBJETIVO GENERAL",
@@ -299,7 +257,7 @@
               ]
             },
             {
-              "titulo": "Figura 2.3 Matriz de operacionalización de diseño",
+              "titulo": "Matriz de Operacionalización de Diseño",
               "headers": [
                 "VARIABLES",
                 "DIMENSIONES",
@@ -356,7 +314,14 @@
         {
           "texto": "3.1 Hipótesis",
           "nota": "Afirmación que debe ser probada (General y Específicas).",
-          "instruccion_detallada": "En caso de no aplicar a la investigación sustentar el motivo. Las investigaciones descriptivas simples no requieren hipótesis.\nHipótesis General: Plantearse como afirmación, las cuales deben ser probada por medio de técnicas de investigación usando datos empíricos y ser acordes a los objetivos planteados.\nHipótesis Específicas: Expresa respuestas coherentes de cómo dar solución a cada uno de los problemas específicos y está formulado en forma afirmativa de proposición."
+          "instruccion_detallada": "En caso de no aplicar a la investigación sustentar el motivo. Las investigaciones descriptivas simples no requieren hipótesis.\nHipótesis General: Plantearse como afirmación, las cuales deben ser probada por medio de técnicas de investigación usando datos empíricos y ser acordes a los objetivos planteados.\nHipótesis Específicas: Expresa respuestas coherentes de cómo dar solución a cada uno de los problemas específicos y está formulado en forma afirmativa de proposición.",
+          "imagenes": [
+            {
+              "titulo": "Modelo de relación entre variables",
+              "ruta": "figura_ejemplo.png",
+              "fuente": "Elaboración propia"
+            }
+          ]
         },
         {
           "texto": "3.2 Operacionalización de variable",
@@ -384,6 +349,89 @@
               ]
             ]
           }
+        },
+        {
+          "tipo": "tabla",
+          "titulo": "Operacionalización de Variables",
+          "orientacion": "landscape",
+          "encabezados": [
+            "Variable",
+            "Definición Conceptual",
+            "Definición Operacional",
+            "Dimensiones",
+            "Indicadores",
+            "Escala"
+          ],
+          "filas": [
+            [
+              "Variable Independiente: [nombre]",
+              "[Definición teórica]",
+              "[Cómo se mide]",
+              "Dimensión 1",
+              "Indicador 1.1\nIndicador 1.2",
+              "Ordinal"
+            ],
+            [
+              "",
+              "",
+              "",
+              "Dimensión 2",
+              "Indicador 2.1\nIndicador 2.2",
+              "Ordinal"
+            ],
+            [
+              "Variable Dependiente: [nombre]",
+              "[Definición teórica]",
+              "[Cómo se mide]",
+              "Dimensión A",
+              "Indicador A.1\nIndicador A.2",
+              "Nominal"
+            ],
+            [
+              "",
+              "",
+              "",
+              "Dimensión B",
+              "Indicador B.1\nIndicador B.2",
+              "Nominal"
+            ]
+          ],
+          "celdas_fusionadas": [
+            {
+              "fila": 0,
+              "col": 0,
+              "filas_span": 2
+            },
+            {
+              "fila": 0,
+              "col": 1,
+              "filas_span": 2
+            },
+            {
+              "fila": 0,
+              "col": 2,
+              "filas_span": 2
+            },
+            {
+              "fila": 2,
+              "col": 0,
+              "filas_span": 2
+            },
+            {
+              "fila": 2,
+              "col": 1,
+              "filas_span": 2
+            },
+            {
+              "fila": 2,
+              "col": 2,
+              "filas_span": 2
+            }
+          ],
+          "estilo": {
+            "encabezado_color": "D9D9D9",
+            "fuente_size": 9
+          }
         }
       ]
     },
@@ -393,7 +441,14 @@
         {
           "texto": "4.1 Diseño metodológico",
           "nota": "Tipo, Enfoque, Nivel y Diseño de investigación.",
-          "instruccion_detallada": "En esta sección se debe indicar: Tipo de investigación (Básica o Aplicada), Enfoque de Investigación (Cuantitativa o Cualitativa), Nivel de Investigación (Descriptiva, Correlacional, explicativo u otros), Diseño de Investigación (No experimental, Experimental, y su esquema correspondiente) especificando el tipo. Debe definir cada clasificación de su investigación citando y argumentar su elección."
+          "instruccion_detallada": "En esta sección se debe indicar: Tipo de investigación (Básica o Aplicada), Enfoque de Investigación (Cuantitativa o Cualitativa), Nivel de Investigación (Descriptiva, Correlacional, explicativo u otros), Diseño de Investigación (No experimental, Experimental, y su esquema correspondiente) especificando el tipo. Debe definir cada clasificación de su investigación citando y argumentar su elección.",
+          "imagenes": [
+            {
+              "titulo": "Diseño metodológico de la investigación",
+              "ruta": "figura_ejemplo.png",
+              "fuente": "Elaboración propia"
+            }
+          ]
         },
         {
           "texto": "4.2 Método de investigación",
@@ -421,6 +476,80 @@
         {
           "texto": "4.7 Aspectos éticos en Investigación",
           "instruccion_detallada": "Considerar los principios del código de ética de la UNAC y especificar ¿Cómo se aplican los principios mencionados?"
+        },
+        {
+          "tipo": "tabla",
+          "titulo": "Cronograma Resumido de Actividades",
+          "orientacion": "portrait",
+          "encabezados": [
+            "Actividad",
+            "Mes 1",
+            "Mes 2",
+            "Mes 3",
+            "Mes 4",
+            "Mes 5",
+            "Mes 6"
+          ],
+          "filas": [
+            [
+              "Revisión bibliográfica",
+              "X",
+              "X",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "Diseño metodológico",
+              "",
+              "X",
+              "X",
+              "",
+              "",
+              ""
+            ],
+            [
+              "Recolección de datos",
+              "",
+              "",
+              "X",
+              "X",
+              "",
+              ""
+            ],
+            [
+              "Análisis de resultados",
+              "",
+              "",
+              "",
+              "X",
+              "X",
+              ""
+            ],
+            [
+              "Redacción del informe",
+              "",
+              "",
+              "",
+              "",
+              "X",
+              "X"
+            ],
+            [
+              "Sustentación",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "X"
+            ]
+          ],
+          "estilo": {
+            "encabezado_color": "4472C4",
+            "fuente_size": 10
+          }
         }
       ]
     },
@@ -430,7 +559,160 @@
         {
           "texto": "Cronograma de ejecución",
           "nota": "Secuencia del desarrollo de la investigación.",
-          "instruccion_detallada": "Evidencia la secuencia del desarrollo de la investigación hasta la elaboración del informe final. La frecuencia (meses / semanas / días) va a depender de la investigación. No requiere enumerar como tabla. No requiere indicar elaboración propia."
+          "instruccion_detallada": "Evidencia la secuencia del desarrollo de la investigación hasta la elaboración del informe final. La frecuencia (meses / semanas / días) va a depender de la investigación. No requiere enumerar como tabla. No requiere indicar elaboración propia.",
+          "imagenes": [
+            {
+              "titulo": "Diagrama ilustrativo",
+              "ruta": "figura_ejemplo.png",
+              "fuente": "Elaboración propia"
+            }
+          ]
+        },
+        {
+          "tipo": "tabla",
+          "titulo": "Cronograma Detallado de Actividades",
+          "orientacion": "landscape",
+          "encabezados": [
+            "Actividad",
+            "Mes 1",
+            "Mes 2",
+            "Mes 3",
+            "Mes 4",
+            "Mes 5",
+            "Mes 6",
+            "Mes 7",
+            "Mes 8",
+            "Mes 9",
+            "Mes 10",
+            "Mes 11",
+            "Mes 12"
+          ],
+          "filas": [
+            [
+              "Revisión bibliográfica",
+              "X",
+              "X",
+              "X",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "Elaboración del marco teórico",
+              "",
+              "X",
+              "X",
+              "X",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "Diseño metodológico",
+              "",
+              "",
+              "X",
+              "X",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "Recolección de datos",
+              "",
+              "",
+              "",
+              "X",
+              "X",
+              "X",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "Procesamiento y análisis",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "X",
+              "X",
+              "X",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "Redacción del informe",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "X",
+              "X",
+              "X",
+              "",
+              ""
+            ],
+            [
+              "Revisión y ajustes",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "X",
+              "X",
+              ""
+            ],
+            [
+              "Sustentación",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "X"
+            ]
+          ],
+          "estilo": {
+            "encabezado_color": "BDD7EE",
+            "fuente_size": 8
+          }
         }
       ]
     },
@@ -440,7 +722,74 @@
         {
           "texto": "Recursos y Presupuesto",
           "nota": "Inversión, recursos humanos, materiales y financieros.",
-          "instruccion_detallada": "Se debe presentar lo que el investigador ha invertido bajo su responsabilidad, en la investigación. Se considera los recursos humanos, materiales y financieros necesarios para el desarrollo de la investigación (en soles) e indicar la fuente de financiamiento."
+          "instruccion_detallada": "Se debe presentar lo que el investigador ha invertido bajo su responsabilidad, en la investigación. Se considera los recursos humanos, materiales y financieros necesarios para el desarrollo de la investigación (en soles) e indicar la fuente de financiamiento.",
+          "imagenes": [
+            {
+              "titulo": "Distribución del presupuesto",
+              "ruta": "figura_ejemplo.png",
+              "fuente": "Elaboración propia"
+            }
+          ]
+        },
+        {
+          "tipo": "tabla",
+          "titulo": "Presupuesto del Proyecto",
+          "orientacion": "portrait",
+          "encabezados": [
+            "Rubro",
+            "Descripción",
+            "Cantidad",
+            "Costo Unit. (S/)",
+            "Total (S/)"
+          ],
+          "filas": [
+            [
+              "Materiales",
+              "Útiles de escritorio",
+              "1",
+              "50.00",
+              "50.00"
+            ],
+            [
+              "Impresiones",
+              "Copias y anillados",
+              "5",
+              "30.00",
+              "150.00"
+            ],
+            [
+              "Software",
+              "Licencia SPSS/NVivo",
+              "1",
+              "200.00",
+              "200.00"
+            ],
+            [
+              "Transporte",
+              "Movilidad para trabajo de campo",
+              "10",
+              "15.00",
+              "150.00"
+            ],
+            [
+              "Otros",
+              "Imprevistos",
+              "1",
+              "100.00",
+              "100.00"
+            ],
+            [
+              "",
+              "",
+              "",
+              "TOTAL",
+              "650.00"
+            ]
+          ],
+          "estilo": {
+            "encabezado_color": "4472C4",
+            "fuente_size": 10
+          }
         }
       ]
     }
@@ -457,23 +806,10 @@
       ]
     },
     "anexos": {
-      "titulo_seccion": "VIII. ANEXOS",
+      "titulo_seccion": "ANEXOS",
       "lista": [
         {
-          "titulo": "Anexo 1: Matriz de consistencia",
-          "nota": "Está conformada por una matriz (cuadro) formado por columnas y filas que permite evaluar la coherencia y conexión lógica que existe entre el título de la investigación, la formulación del problema, el (los) objetivo(s), la (s) hipótesis, las variables, y la metodología. (Resolución 017-18-CU)."
-        },
-        {
-          "titulo": "Anexo 2: Herramienta de ingeniería para el análisis de la problemática",
-          "nota": "Se debe incluir la aplicación de al menos una herramienta de ingeniería utilizada para evidenciar el problema central (Ejemplo: Diagrama de Pareto, Diagrama de Ishikawa, Árbol de problemas, Matriz de relevancia, entre otras)."
-        },
-        {
-          "titulo": "Anexo 3: Autorización del uso de datos",
-          "nota": "Utilice este formato para imprimirlo en papel membretado con las firmas correspondientes:\n\nYo .................................................................................., identificado con DNI .................................., en mi calidad de ........................................................... del área ......................................... de la empresa/institución ................................................................................................. con R.U.C N° ................................................., ubicada en la ciudad de ............................................\n\nOTORGO LA AUTORIZACIÓN..."
-        },
-        {
-          "titulo": "Anexo 4: Ficha de recolección de datos",
-          "nota": "Adjuntar los formatos de las fichas, cuestionarios o guías de observación utilizados para la captura de datos en campo. Nota: Las fichas de recolección de datos no requieren validación por juicio de expertos según normativa vigente."
+          "titulo": "Anexo 1: Matriz de consistencia"
         }
       ]
     }
@@ -530,5 +866,55 @@
       "instrumentos": "Ficha de recolección de datos",
       "procesamiento": "SPSS v25"
     }
+  },
+  "pagina_respeto": {},
+  "informacion_basica": {
+    "titulo": "INFORMACIÓN BÁSICA",
+    "elementos": [
+      {
+        "label": "FACULTAD:",
+        "valor": "Facultad de Ingeniería Mecánica y de Energía"
+      },
+      {
+        "label": "UNIDAD DE INVESTIGACIÓN:",
+        "valor": "Unidad de Posgrado..."
+      },
+      {
+        "label": "TÍTULO:",
+        "valor": "Implementación xxx"
+      },
+      {
+        "label": "AUTOR(ES):",
+        "valor": "Nombres y Apellidos / DNI: XXX / ORCID: YYYY"
+      },
+      {
+        "label": "ASESOR:",
+        "valor": "Dr. Abel Tapia Díaz / DNI: ... / ORCID: ..."
+      },
+      {
+        "label": "LUGAR DE EJECUCIÓN:",
+        "valor": ""
+      },
+      {
+        "label": "UNIDAD DE ANÁLISIS:",
+        "valor": ""
+      },
+      {
+        "label": "TIPO:",
+        "valor": ""
+      },
+      {
+        "label": "ENFOQUE:",
+        "valor": ""
+      },
+      {
+        "label": "DISEÑO DE INVESTIGACIÓN:",
+        "valor": ""
+      },
+      {
+        "label": "TEMA OCDE:",
+        "valor": ""
+      }
+    ]
   }
 }

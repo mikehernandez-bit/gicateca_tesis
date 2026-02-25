@@ -6,107 +6,285 @@
     "university": "uni",
     "category": "Proyecto de Tesis",
     "documentType": "standard",
-    "title": "Plan de Trabajo de Tesis UNI - Formato Estándar"
+    "title": "Plan de Trabajo de Tesis UNI - Formato Estándar",
+    "descripcion": "Formato para Proyecto de Tesis (Pregrado UNI) - Estructura normalizada",
+    "version": "1.1",
+    "fecha": "2026-02-12"
+  },
+  "configuracion": {
+    "ruta_logo": "app/static/assets/LogoUNI.png"
   },
   "caratula": {
+    "universidad": "UNIVERSIDAD NACIONAL DE INGENIERÍA",
     "facultad": "FACULTAD DE [NOMBRE DE LA FACULTAD]",
     "tipo_documento": "PLAN DE TRABAJO DE TESIS",
-    "titulo": "“TÍTULO DE PROYECTO DE TESIS”",
+    "titulo_placeholder": "“TÍTULO DE PROYECTO DE TESIS”",
     "frase_grado": "PARA OBTENER EL TÍTULO PROFESIONAL DE:",
-    "carrera": "[CARRERA PROFESIONAL]",
+    "grado_objetivo": "[CARRERA PROFESIONAL]",
     "label_autor": "ELABORADO POR:",
-    "autor": "Bs. [NOMBRE Y APELLIDOS COMPLETOS]",
+    "autor_valor": "Bs. [NOMBRE Y APELLIDOS COMPLETOS]",
     "label_asesor": "ASESOR",
-    "asesor": "Dr. Ing. [NOMBRES Y APELLIDOS COMPLETOS]",
-    "lugar_fecha": "LIMA – PERÚ\n2026"
+    "asesor_valor": "Dr. Ing. [NOMBRES Y APELLIDOS COMPLETOS]",
+    "lugar": "LIMA – PERÚ",
+    "anio": "2026"
   },
-  "secciones": [
+  "preliminares": {
+    "indices": {
+      "contenido": "ÍNDICE",
+      "tablas": "ÍNDICE DE TABLAS",
+      "figuras": "ÍNDICE DE FIGURAS"
+    }
+  },
+  "cuerpo": [
     {
-      "numero": "1",
-      "titulo": "TÍTULO",
-      "instruccion": "El título del proyecto de investigación deberá ser claro, conciso y transmitir una idea completa del trabajo a realizar."
+      "titulo": "1. TÍTULO",
+      "nota_capitulo": "El título del proyecto de investigación deberá ser claro, conciso y transmitir una idea completa del trabajo a realizar.",
+      "contenido": []
     },
     {
-      "numero": "2",
-      "titulo": "RESUMEN DEL PROYECTO",
-      "instruccion": "Se describirán brevemente las características generales del proyecto, sin incluir objetivos, metas, alcances o referencias bibliográficas."
+      "titulo": "2. RESUMEN DEL PROYECTO",
+      "nota_capitulo": "Se describirán brevemente las características generales del proyecto, sin incluir objetivos, metas, alcances o referencias bibliográficas.",
+      "contenido": []
     },
     {
-      "numero": "3",
-      "titulo": "ANTECEDENTES",
-      "instruccion": "En este capítulo se plasmarán la evolución del conocimiento científico o tecnológico y el estado del arte relacionado con el área correspondiente... Es obligatorio la inclusión de bibliografía debidamente citada (libros y revistas internacionales). Evitar información anecdótica."
+      "titulo": "3. ANTECEDENTES",
+      "nota_capitulo": "En este capítulo se plasmarán la evolución del conocimiento científico o tecnológico y el estado del arte relacionado con el área correspondiente... Es obligatorio la inclusión de bibliografía debidamente citada (libros y revistas internacionales). Evitar información anecdótica.",
+      "contenido": []
     },
     {
-      "numero": "4",
-      "titulo": "JUSTIFICACIÓN",
-      "instruccion": "Se deberá señalar las consideraciones científicas, académicas, técnicas, económicas, sociales, culturales o políticas. Se describirá el problema a resolver, identificado como resultado de un análisis sistemático de causa y efecto."
+      "titulo": "4. JUSTIFICACIÓN",
+      "nota_capitulo": "Se deberá señalar las consideraciones científicas, académicas, técnicas, económicas, sociales, culturales o políticas. Se describirá el problema a resolver, identificado como resultado de un análisis sistemático de causa y efecto.",
+      "contenido": []
     },
     {
-      "numero": "5",
-      "titulo": "OBJETIVOS Y METAS",
-      "instruccion": "Se deberá plantear un objetivo general y objetivos específicos (claros y concisos). Las metas deberán ser indicadas en términos cuantitativos a corto, mediano y largo plazo."
+      "titulo": "5. OBJETIVOS Y METAS",
+      "nota_capitulo": "Se deberá plantear un objetivo general y objetivos específicos (claros y concisos). Las metas deberán ser indicadas en términos cuantitativos a corto, mediano y largo plazo.",
+      "contenido": []
     },
     {
-      "numero": "6",
-      "titulo": "METODOLOGÍA",
-      "instruccion": "Se indicará la metodología, técnicas, instrumentos e infraestructura requeridos. Debe incluir la descripción de las etapas teórico/experimentales.\n\nRequisito: Exponer por medio de un diagrama de flujo que incluya los pasos a seguir."
-    },
-    {
-      "numero": "7",
-      "titulo": "POTENCIALES BENEFICIARIOS",
-      "instruccion": "Indicar el o los usuarios finales del producto de la investigación. En proyectos vinculados con el sector productivo, este requisito es indispensable y deberá ser comprobado."
-    },
-    {
-      "numero": "8",
-      "titulo": "APORTES ESPERADOS",
-      "instruccion": "Se indicarán los aportes que se esperan obtener en los ámbitos de:",
-      "lista": [
-        "a) La universidad",
-        "b) La sociedad",
-        "c) El sector productivo",
-        "Productos tangibles: patentes, prototipos, hardware, software."
+      "titulo": "6. METODOLOGÍA",
+      "nota_capitulo": "Se indicará la metodología, técnicas, instrumentos e infraestructura requeridos. Debe incluir la descripción de las etapas teórico/experimentales.\n\nRequisito: Exponer por medio de un diagrama de flujo que incluya los pasos a seguir.",
+      "contenido": [
+        {
+          "tipo": "tabla",
+          "titulo": "Cronograma de Actividades",
+          "orientacion": "portrait",
+          "encabezados": [
+            "Actividad",
+            "Mes 1",
+            "Mes 2",
+            "Mes 3",
+            "Mes 4",
+            "Mes 5",
+            "Mes 6"
+          ],
+          "filas": [
+            [
+              "Revisión bibliográfica",
+              "X",
+              "X",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "Diseño metodológico",
+              "",
+              "X",
+              "X",
+              "",
+              "",
+              ""
+            ],
+            [
+              "Recolección de datos",
+              "",
+              "",
+              "X",
+              "X",
+              "",
+              ""
+            ],
+            [
+              "Análisis de resultados",
+              "",
+              "",
+              "",
+              "X",
+              "X",
+              ""
+            ],
+            [
+              "Redacción del informe",
+              "",
+              "",
+              "",
+              "",
+              "X",
+              "X"
+            ],
+            [
+              "Sustentación",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "X"
+            ]
+          ],
+          "estilo": {
+            "encabezado_color": "4472C4",
+            "fuente_size": 10
+          }
+        }
       ]
     },
     {
-      "numero": "9",
-      "titulo": "DESCRIPCIÓN TÉCNICA DEL PROYECTO",
-      "instruccion": "Se indicará en forma detallada:",
-      "lista": [
-        "El planteamiento del problema.",
-        "La Hipótesis.",
-        "Los procedimientos y metodologías.",
-        "El cronograma de actividades detalladas (incluyendo informes de avance).",
-        "Los recursos humanos (calificación, función y dedicación).",
-        "Recursos materiales (instrumentos, equipos y ubicación)."
+      "titulo": "7. POTENCIALES BENEFICIARIOS",
+      "nota_capitulo": "Indicar el o los usuarios finales del producto de la investigación. En proyectos vinculados con el sector productivo, este requisito es indispensable y deberá ser comprobado.",
+      "contenido": []
+    },
+    {
+      "titulo": "8. APORTES ESPERADOS",
+      "nota_capitulo": "Se indicarán los aportes que se esperan obtener en los ámbitos de:\n- a) La universidad\n- b) La sociedad\n- c) El sector productivo\n- Productos tangibles: patentes, prototipos, hardware, software.",
+      "contenido": []
+    },
+    {
+      "titulo": "9. DESCRIPCIÓN TÉCNICA DEL PROYECTO",
+      "nota_capitulo": "Se indicará en forma detallada:\n- El planteamiento del problema.\n- La Hipótesis.\n- Los procedimientos y metodologías.\n- El cronograma de actividades detalladas (incluyendo informes de avance).\n- Los recursos humanos (calificación, función y dedicación).\n- Recursos materiales (instrumentos, equipos y ubicación).",
+      "contenido": []
+    },
+    {
+      "titulo": "10. PRESUPUESTO",
+      "nota_capitulo": "El proyecto deberá formular al nivel de las partidas especificadas en el presupuesto fiscal de la UNI, adjuntándose un calendario de gastos:\n- Subvenciones.\n- Bienes.\n- Servicios.\n- Equipos e instrumentos.\n- Gastos de administración.\n- Gastos de imprevistos.",
+      "contenido": [
+        {
+          "tipo": "tabla",
+          "titulo": "Presupuesto del Proyecto",
+          "orientacion": "portrait",
+          "encabezados": [
+            "Rubro",
+            "Descripción",
+            "Cantidad",
+            "Costo Unit. (S/)",
+            "Total (S/)"
+          ],
+          "filas": [
+            [
+              "Materiales",
+              "Útiles de escritorio",
+              "1",
+              "50.00",
+              "50.00"
+            ],
+            [
+              "Impresiones",
+              "Copias y anillados",
+              "5",
+              "30.00",
+              "150.00"
+            ],
+            [
+              "Software",
+              "Licencia SPSS/NVivo",
+              "1",
+              "200.00",
+              "200.00"
+            ],
+            [
+              "Transporte",
+              "Movilidad para trabajo de campo",
+              "10",
+              "15.00",
+              "150.00"
+            ],
+            [
+              "Otros",
+              "Imprevistos",
+              "1",
+              "100.00",
+              "100.00"
+            ],
+            [
+              "",
+              "",
+              "",
+              "TOTAL",
+              "650.00"
+            ]
+          ],
+          "estilo": {
+            "encabezado_color": "4472C4",
+            "fuente_size": 10
+          }
+        }
       ]
-    },
-    {
-      "numero": "10",
-      "titulo": "PRESUPUESTO",
-      "instruccion": "El proyecto deberá formular al nivel de las partidas especificadas en el presupuesto fiscal de la UNI, adjuntándose un calendario de gastos:",
-      "lista": [
-        "Subvenciones.",
-        "Bienes.",
-        "Servicios.",
-        "Equipos e instrumentos.",
-        "Gastos de administración.",
-        "Gastos de imprevistos."
-      ]
-    },
-    {
-      "numero": "11",
-      "titulo": "REFERENCIAS BIBLIOGRÁFICAS",
-      "instruccion": "[Insertar referencias según norma]"
-    },
-    {
-      "numero": "12",
-      "titulo": "ANEXOS",
-      "instruccion": "[Adjuntar planos, datasheets, códigos, etc.]"
     }
   ],
-  "titulo": "Plan de Trabajo de Tesis",
-  "descripcion": "Formato para Proyecto de Tesis (Pregrado UNI)",
-  "facultad": "Centro de Formatos UNI",
-  "version": "1.0",
-  "fecha": "2026"
+  "finales": {
+    "referencias": {
+      "titulo": "11. REFERENCIAS BIBLIOGRÁFICAS",
+      "nota": "[Insertar referencias según norma]"
+    },
+    "anexos": {
+      "titulo_seccion": "ANEXOS",
+      "lista": [
+        {
+          "titulo": "Anexo 1: Matriz de consistencia"
+        }
+      ]
+    }
+  },
+  "matriz_consistencia": {
+    "problemas": {
+      "general": "¿[Problema general de la investigación]?",
+      "especificos": [
+        "¿[Problema específico 1]?",
+        "¿[Problema específico 2]?",
+        "¿[Problema específico 3]?"
+      ]
+    },
+    "objetivos": {
+      "general": "[Objetivo general de la investigación]",
+      "especificos": [
+        "[Objetivo específico 1]",
+        "[Objetivo específico 2]",
+        "[Objetivo específico 3]"
+      ]
+    },
+    "hipotesis": {
+      "general": "[Hipótesis general de la investigación]",
+      "especificos": [
+        "[Hipótesis específica 1]",
+        "[Hipótesis específica 2]",
+        "[Hipótesis específica 3]"
+      ]
+    },
+    "variables": {
+      "independiente": {
+        "nombre": "[Variable independiente]",
+        "dimensiones": [
+          "Dimensión 1",
+          "Dimensión 2"
+        ]
+      },
+      "dependiente": {
+        "nombre": "[Variable dependiente]",
+        "dimensiones": [
+          "Dimensión A",
+          "Dimensión B"
+        ]
+      }
+    },
+    "metodologia": {
+      "tipo": "[Tipo de investigación]",
+      "diseño": "[Diseño de investigación]",
+      "enfoque": "[Enfoque metodológico]",
+      "poblacion": "[Población y muestra]",
+      "tecnicas": "[Técnicas e instrumentos de recolección de datos]"
+    }
+  },
+  "pagina_respeto": {}
 }

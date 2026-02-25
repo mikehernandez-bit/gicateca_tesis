@@ -11,7 +11,7 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
-from app.core.generation_service import generate_artifacts, get_artifact_path
+from app.modules.generation.service import generate_artifacts, get_artifact_path
 
 
 router = APIRouter(prefix="/api/v1", tags=["generation"])

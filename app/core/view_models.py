@@ -132,10 +132,12 @@ def build_cover_view_model(format_data: Dict[str, Any], provider: Any) -> Dict[s
     guia = (c.get("guia") or c.get("nota") or "").strip()
     
     # =========================================================================
-    # AUTOR Y ASESOR
+    # AUTOR Y ASESOR (canonical: label_autor + autor_valor)
     # =========================================================================
-    autor = c.get("autor") or ""
-    asesor = c.get("asesor") or ""
+    autor_label = c.get("label_autor") or ""
+    autor = c.get("autor_valor") or c.get("autor") or ""
+    asesor_label = c.get("label_asesor") or ""
+    asesor = c.get("asesor_valor") or c.get("asesor") or ""
     
     # =========================================================================
     # LUGAR Y AÑO
@@ -199,7 +201,9 @@ def build_cover_view_model(format_data: Dict[str, Any], provider: Any) -> Dict[s
         "grado": grado,
         "lugar": lugar,
         "anio": anio,
+        "autor_label": autor_label,
         "autor": autor,
+        "asesor_label": asesor_label,
         "asesor": asesor,
         "guia": guia,
     }
