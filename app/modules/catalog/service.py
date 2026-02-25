@@ -27,34 +27,21 @@ Donde tocar si falla:
 
 from pathlib import Path
 import re
-import subprocess
-import sys
-import tempfile
 import unicodedata
-from typing import Dict, List, Optional, Sequence, Tuple, Union
+from typing import Dict, List, Optional
 
 from app.core.loaders import discover_format_files, load_format_by_id, load_json_file
-from app.core.registry import get_provider
-
-ALIASES = {
-    "pregrado": "informe",
-}
-
-
-TIPO_LABELS = {
-    "informe": "Informe de Tesis",
-    "maestria": "Tesis de Maestr\u00eda",
-    "posgrado": "Posgrado",
-    "proyecto": "Proyecto de Tesis",
-}
-ENFOQUE_LABELS = {"cual": "Cualitativo", "cuant": "Cuantitativo"}
-TIPO_FILTRO = {
-    # Ahora usamos las 3 categorías normalizadas de _meta.category
-    "informe": "Informe de Tesis",
-    "maestria": "Tesis de Postgrado",
-    "posgrado": "Tesis de Postgrado",
-    "proyecto": "Proyecto de Tesis",
-}
+from app.core.format_builder import (
+    TIPO_LABELS,
+    ENFOQUE_LABELS,
+    TIPO_FILTRO,
+    build_format_entry,
+    build_format_title,
+)
+from app.core.document_generator import (
+    generate_document_by_type,
+    cleanup_temp_file,
+)
 _REFERENCE_KEYWORDS = {
     "references",
     "referencias",
@@ -94,75 +81,10 @@ def _is_reference_like(item, data: Dict) -> bool:
     return False
 
 
-def _build_format_title(categoria: str, enfoque: str, raw_title: str, fallback_title: str) -> str:
-    """Calcula el titulo visible de un formato."""
-    if raw_title:
-        return raw_title
-    cat_label = TIPO_LABELS.get(categoria)
-    enfoque_label = ENFOQUE_LABELS.get(enfoque)
-    if cat_label and enfoque_label:
-        return f"{cat_label} - {enfoque_label}"
-    if cat_label:
-        return cat_label
-    return fallback_title or categoria.capitalize()
-
-
-def _build_format_entry(item, data: Dict) -> Dict:
-    """Construye el dict que alimenta el catalogo UI."""
-    # Preferir _meta si existe (fuente de verdad = JSON)
-    meta = data.get("_meta", {}) if isinstance(data, dict) else {}
-    
-    # Título: preferir _meta.title, luego data.titulo, luego generar
-    raw_title = meta.get("title") or (data.get("titulo") if isinstance(data, dict) else None)
-    titulo = _build_format_title(item.categoria, item.enfoque, raw_title, item.titulo)
-    
-    # Categoría: preferir _meta.category, luego usar TIPO_LABELS
-    category_from_meta = meta.get("category")
-    cat_label = category_from_meta or TIPO_LABELS.get(item.categoria, item.categoria.capitalize())
-    
-    enfoque_label = ENFOQUE_LABELS.get(item.enfoque)
-    resumen = None
-    if isinstance(data, dict):
-        resumen = data.get("descripcion")
-    caratula = data.get("caratula", {}) if isinstance(data, dict) else {}
-    facultad = None
-    escuela = None
-    if isinstance(data, dict):
-        facultad = data.get("facultad")
-        escuela = data.get("escuela")
-    if not facultad and isinstance(caratula, dict):
-        facultad = caratula.get("facultad")
-        escuela = escuela or caratula.get("escuela")
-    # Forzar leyenda uniforme y escalable por universidad.
-    uni_code = meta.get("university") or item.uni
-    if uni_code:
-        facultad = f"Centro de Formatos {uni_code.upper()}"
-    if not facultad:
-        facultad = "Centro de Formatos"
-    if not escuela:
-        escuela = "Dirección Académica"
-    if not resumen:
-        if enfoque_label:
-            resumen = f"Plantilla oficial de {cat_label} con enfoque {enfoque_label}"
-        else:
-            resumen = f"Plantilla oficial de {cat_label}"
-
-    return {
-        "id": meta.get("id") or item.format_id,
-        "uni": (meta.get("university") or item.uni).upper(),
-        "uni_code": meta.get("university") or item.uni,
-        "tipo": category_from_meta or TIPO_FILTRO.get(item.categoria, "Otros"),  # Preferir _meta.category
-        "categoria": category_from_meta or item.categoria,  # Nueva: categoria para filtros
-        "titulo": titulo,
-        "facultad": facultad,
-        "escuela": escuela,
-        "estado": "VIGENTE",
-        "version": data.get("version", "1.0.0") if isinstance(data, dict) else "1.0.0",
-        "fecha": (data.get("fecha") if isinstance(data, dict) and data.get("fecha") else "2026-01-17"),
-        "resumen": resumen,
-        "tipo_formato": item.categoria,
-        "enfoque": meta.get("documentType") or item.enfoque,
-    }
+# _build_format_title y _build_format_entry ahora viven en app.core.format_builder
+# Se re-exportan por compatibilidad de imports existentes.
+_build_format_title = build_format_title
+_build_format_entry = build_format_entry
 
 
 def build_catalog(uni: Optional[str] = None) -> Dict[str, Dict]:
@@ -198,73 +120,11 @@ def get_all_formatos() -> List[Dict]:
 
 
 
-def _normalize_format(fmt_type: str) -> str:
-    """Normaliza el tipo de formato (alias -> canonical)."""
-    fmt_type = (fmt_type or "").strip().lower()
-    if fmt_type in ALIASES:
-        fmt_type = ALIASES[fmt_type]
-    return fmt_type
-
-
-def _resolve_generator_command(
-    generator: Union[Path, Sequence[str]],
-    json_path: Path,
-    output_path: Path,
-) -> Tuple[List[str], Optional[Path]]:
-    """Resuelve el comando de generador y el directorio de trabajo."""
-    if isinstance(generator, (list, tuple)):
-        cmd = [str(part) for part in generator]
-        workdir = None
-        for part in reversed(generator):
-            part_str = str(part)
-            if part_str.endswith(".py"):
-                workdir = Path(part_str).resolve().parent
-                break
-        return cmd + [str(json_path), str(output_path)], workdir
-
-    script_path = Path(generator)
-    if not script_path.exists():
-        raise RuntimeError(f"Script no encontrado: {script_path}")
-    return [sys.executable, str(script_path), str(json_path), str(output_path)], script_path.parent
-
-
-def cleanup_temp_file(path: Path) -> None:
-    """Elimina un archivo temporal si existe."""
-    try:
-        path.unlink(missing_ok=True)
-    except Exception as exc:
-        print(f"[WARN] No se pudo eliminar temporal: {exc}")
-
-
+# generate_document y cleanup_temp_file ahora viven en app.core.document_generator
+# Se delegan para mantener compatibilidad con catalog/router.py
 def generate_document(fmt_type: str, sub_type: str, uni: str = "unac"):
     """Genera un DOCX para un formato y retorna su ruta temporal."""
-    fmt_type = _normalize_format(fmt_type)
-    sub_type = (sub_type or "").strip().lower()
-    provider = get_provider(uni)
-    generator = provider.get_generator_command(fmt_type)
-
-    # Resuelve el JSON del formato dentro de app/data/<uni>/<categoria>/.
-    json_path = provider.get_data_dir() / fmt_type / f"{provider.code}_{fmt_type}_{sub_type}.json"
-    if not json_path.exists():
-        raise RuntimeError(f"JSON no encontrado: {json_path}")
-
-    filename = f"{provider.code.upper()}_{fmt_type.upper()}_{sub_type.upper()}.docx"
-    tmp_file = tempfile.NamedTemporaryFile(prefix=f"{provider.code}_", suffix=".docx", delete=False)
-    output_path = Path(tmp_file.name)
-    tmp_file.close()
-
-    # Ejecuta el script generador sin modificar su logica interna.
-    cmd, workdir = _resolve_generator_command(generator, json_path, output_path)
-    result = subprocess.run(cmd, cwd=str(workdir) if workdir else None, capture_output=True, text=True)
-
-    if result.returncode != 0:
-        print("[ERROR PYTHON]", result.stderr)
-        raise RuntimeError("Fallo la generacion interna. Revisa consola.")
-
-    if not output_path.exists():
-        raise RuntimeError("El script corrio pero no genero el DOCX")
-
-    return output_path, filename
+    return generate_document_by_type(fmt_type, sub_type, uni)
 
 # NUEVA FUNCIÓN AGREGADA PARA LA VISTA PREVIA (CARÁTULAS)
 def get_format_json_content(format_id: str) -> Dict:

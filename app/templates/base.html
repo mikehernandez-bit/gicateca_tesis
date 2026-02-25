@@ -19,7 +19,7 @@ Donde tocar si falla: Includes de header/sidebar, active_nav y assets globales.
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <link rel="stylesheet" href="/static/css/extra.css">
-  <link rel="icon" type="image/png" href="/static/assets/LogoUNAC.png">
+  <link rel="icon" type="image/png" href="{{ favicon_url | default('/static/assets/LogoGeneric.png') }}">
 </head>
 
 <body class="flex h-screen overflow-hidden text-gray-800 bg-gray-50/50">

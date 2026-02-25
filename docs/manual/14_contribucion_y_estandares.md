@@ -1,6 +1,6 @@
-# Contribución y Estándares
+# Contribucion y Estandares
 
-## Cómo Contribuir
+## Como Contribuir
 
 ### 1. Clonar y Configurar
 
@@ -20,15 +20,15 @@ git checkout -b feature/mi-nueva-funcionalidad
 
 ### 3. Hacer Cambios
 
-- Seguir los estándares de código (ver abajo).
-- Agregar fuentes en la documentación.
+- Seguir los estandares de codigo (ver abajo).
+- Agregar fuentes en la documentacion.
 - Probar localmente.
 
 ### 4. Commit y Push
 
 ```bash
 git add .
-git commit -m "feat: descripción de la funcionalidad"
+git commit -m "feat: descripcion de la funcionalidad"
 git push origin feature/mi-nueva-funcionalidad
 ```
 
@@ -36,11 +36,11 @@ git push origin feature/mi-nueva-funcionalidad
 
 - Crear PR hacia `main` o `develop`.
 - Describir los cambios.
-- Esperar revisión.
+- Esperar revision.
 
 ---
 
-## Estándares de Código
+## Estandares de Codigo
 
 ### Python
 
@@ -89,20 +89,20 @@ Donde tocar si falla:
 | Regla | Detalle |
 |-------|---------|
 | Encoding | UTF-8 (sin BOM) |
-| Indentación | 2 espacios |
-| Keys | snake_case en español |
+| Indentacion | 2 espacios |
+| Keys | snake_case en espanol |
 
-### Documentación
+### Documentacion
 
 | Regla | Detalle |
 |-------|---------|
-| Fuentes | Citar archivo y líneas |
-| Idioma | Español |
+| Fuentes | Citar archivo y lineas |
+| Idioma | Espanol |
 | Formato | Markdown |
 
 ---
 
-## Agregar un Nuevo Módulo
+## Agregar un Nuevo Modulo
 
 ### Checklist
 
@@ -117,9 +117,9 @@ Donde tocar si falla:
 2. **Crear router:**
    ```python
    from fastapi import APIRouter
-   
+
    router = APIRouter()
-   
+
    @router.get("/nuevo")
    def nuevo_endpoint():
        return {"status": "ok"}
@@ -128,8 +128,8 @@ Donde tocar si falla:
 3. **Registrar en `main.py`:**
    ```python
    from app.modules.nuevo_modulo import router as nuevo_router
-   
-   # En la sección de includes:
+
+   # En la seccion de includes:
    app.include_router(nuevo_router.router, tags=["NuevoModulo"])
    ```
 
@@ -139,18 +139,20 @@ Donde tocar si falla:
    ```
 
 5. **Documentar:**
-   - Agregar sección en el manual.
+   - Agregar seccion en el manual.
    - Citar fuentes.
 
 ---
 
 ## Scripts de Utilidad
 
-| Script | Propósito |
+| Script | Proposito |
 |--------|-----------|
+| `scripts/check_encoding.py` | Verifica encoding de archivos |
 | `scripts/check_mojibake.py` | Detecta caracteres corruptos |
-| `scripts/fix_mojibake_json.py` | Corrige mojibake |
-| `scripts/fix_to_utf8.py` | Convierte a UTF-8 |
-| `scripts/test_pdf_concurrency.py` | Test de concurrencia PDF |
+| `scripts/fix_mojibake_json.py` | Corrige mojibake en JSON |
+| `scripts/fix_to_utf8.py` | Convierte archivos a UTF-8 |
+| `scripts/test_universal_gen.py` | Test rapido del generador unificado |
+| `scripts/validate_data.py` | Validacion de datos JSON |
 
-**Fuente:** `scripts/` (4 archivos)
+**Fuente:** `scripts/` (6 archivos)

@@ -28,18 +28,18 @@ from pathlib import Path
 from app.core.paths import get_data_dir
 from app.universities.contracts import SimpleUniversityProvider
 
-# Instancia principal que el registry descubre via PROVIDER.
-MODULE_DIR = Path(__file__).parent
+# Carpeta compartida que contiene el generador unificado.
+SHARED_DIR = Path(__file__).resolve().parent.parent / "shared"
 
 PROVIDER = SimpleUniversityProvider(
     code="uni",
     display_name="UNI",
     data_dir=get_data_dir("uni"),
     generator_map={
-        "informe": MODULE_DIR / "centro_formatos" / "generador_informe_tesis.py",
-        "maestria": MODULE_DIR / "centro_formatos" / "generador_maestria.py",
-        "posgrado": MODULE_DIR / "centro_formatos" / "generador_maestria.py",
-        "proyecto": MODULE_DIR / "centro_formatos" / "generador_proyecto_tesis.py",
+        "informe": SHARED_DIR / "universal_generator.py",
+        "maestria": SHARED_DIR / "universal_generator.py",
+        "posgrado": SHARED_DIR / "universal_generator.py",
+        "proyecto": SHARED_DIR / "universal_generator.py",
     },
     # Fase 2: Defaults para view-models de carátula
     default_logo_url="/static/assets/LogoUNI.png",

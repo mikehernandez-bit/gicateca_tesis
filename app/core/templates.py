@@ -28,3 +28,14 @@ from fastapi.templating import Jinja2Templates
 # Raiz de la carpeta app/ para resolver templates.
 BASE_DIR = Path(__file__).resolve().parents[1]  # app/
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
+
+
+def _get_favicon_url() -> str:
+    """Construye la URL del favicon basada en la universidad por defecto."""
+    from app.core.settings import get_default_uni_code
+    code = get_default_uni_code().upper()
+    return f"/static/assets/Logo{code}.png"
+
+
+# Inyectar favicon_url como variable global en todos los templates.
+templates.env.globals["favicon_url"] = _get_favicon_url()

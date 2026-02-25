@@ -1,76 +1,144 @@
-# Formatoteca
+# Formatoteca (GicaTesis)
 
-Este repositorio es una estructura base en **Python + FastAPI + Jinja2** para una “biblioteca de formatos de tesis”.
-La idea es que cada colaborador tome un **módulo** (Catálogo, Detalle, Alertas, etc.) y lo complete mediante Pull Requests.
+Plataforma de gestion y generacion de formatos de tesis universitarias. **Python + FastAPI + Block Engine DOCX**.
+
+**Version:** 1.0.0
 
 ## Ejecutar (local)
-# Windows: 
-.venv\Scripts\activate
-# Linux/Mac:
-source .venv/bin/activate
-# Visual Code:
+
+```bash
+# Crear y activar entorno virtual
+python -m venv .venv
+.venv\Scripts\activate          # Windows
+# source .venv/bin/activate     # Linux/Mac
+
+# Instalar dependencias
 pip install -r requirements.txt
-python uvicorn app.main:app --reload
+
+# Iniciar servidor
+py -m uvicorn app.main:app --reload
+```
 
 Luego abre:
 - Home: http://127.0.0.1:8000/
-- Catálogo: http://127.0.0.1:8000/catalog
-- Alertas: http://127.0.0.1:8000/alerts
+- Catalogo: http://127.0.0.1:8000/catalog
+- Referencias: http://127.0.0.1:8000/referencias
+- API docs: http://127.0.0.1:8000/docs
+
+---
+
+## Variables de Entorno
+
+| Variable | Requerida | Default | Descripcion |
+|----------|-----------|---------|-------------|
+| `GICATESIS_API_KEY` | No | (vacio) | Si se define, `/api/v1/*` exige header `X-GICATESIS-KEY` |
+| `GICATESIS_CORS_ORIGINS` | No | `http://localhost:3000,...` | Origenes CORS separados por coma |
+| `GICA_DEFAULT_UNI` | No | `unac` | Codigo de universidad por defecto |
+| `PDF_CACHE_MAX_AGE` | No | `3600` | Segundos de cache para PDFs |
+| `PDF_PREWARM_ON_STARTUP` | No | `false` | Si es `true`, genera PDFs al iniciar |
+| `PDF_CONVERSION_TIMEOUT` | No | `120` | Timeout en segundos para Word COM |
+
+---
+
+## Reglas de render para integracion con GicaGen
+
+El pipeline de render DOCX/PDF aplica estas reglas para evitar resultados
+engañosos o placeholders en el documento final:
+
+1. Caratula:
+   - Si el formato trae un placeholder literal de titulo, se usa `values.title`
+     (fallback: `project_title`, `projectTitle` o `values.project.title`).
+2. Indices:
+   - El TOC, indice de tablas e indice de figuras siempre cierran con salto de
+     pagina.
+3. Indice de abreviaturas:
+   - Se renderiza como tabla de 2 columnas (`SIGLA | SIGNIFICADO`), alineada a
+     la izquierda y sin numeracion.
+   - Formatos aceptados para entrada de abreviaturas:
+     - `IA: Inteligencia Artificial`
+     - `IA - Inteligencia Artificial`
+     - `IA<TAB>Inteligencia Artificial`
+4. Imagenes:
+   - Si `ruta` es `placeholder`, vacia o no existe, la figura se omite.
+   - No se imprime texto de ejemplo ni cajas de reemplazo.
+5. Texto IA:
+   - Antes de inyectar contenido IA al JSON de render, se limpia markdown
+     (`**`, encabezados `#`, tablas con `|`, fences ```), y se eliminan lineas
+     tipo `FIGURA DE EJEMPLO` o `[Insertar ...]`.
 
 ---
 
 ## Estructura del Proyecto
 
+### Motor de Bloques (`app/engine/`)
+Pipeline JSON -> Normalizer -> Block[] -> DOCX con 19 tipos de bloque y 12 renderers.
+- `normalizer.py` -- JSON -> `List[Block]`
+- `registry.py` -- `@register()` + `render_blocks()`
+- `primitives.py` -- Helpers DOCX atomicos
+- `types.py` -- Tipos Block y BlockRenderer
+- `renderers/` -- 12 modulos especializados
+
 ### Backend (Python/FastAPI)
-- `app/modules/home/` -> Pantalla de Inicio.
-- `app/modules/catalog/` -> **Controlador del Catálogo.** Gestiona la visualización de tarjetas de normas y carátulas.
-- `app/modules/formats/` -> Detalle de formatos específicos.
-- `app/modules/referencias/` -> **(Nuevo)** Lógica para la API y vistas de Normas (APA, IEEE, etc.).
-- `app/modules/alerts/` -> Sistema de notificaciones.
-- `app/modules/admin/` -> Panel de Administración.
+- `app/modules/home/` -- Pantalla de inicio
+- `app/modules/catalog/` -- Catalogo de formatos (tarjetas + generacion)
+- `app/modules/formats/` -- Detalle de formatos, PDF preview, versiones
+- `app/modules/references/` -- API y vistas de normas bibliograficas (APA, IEEE, etc.)
+- `app/modules/alerts/` -- Sistema de notificaciones
+- `app/modules/admin/` -- Panel de administracion
+- `app/modules/api/` -- API v1 (formatos, generacion, render)
+- `app/modules/generation/` -- Servicio de generacion de documentos
 
 ### Frontend (Templates & Static)
-- `app/templates/pages/` -> Vistas HTML (Jinja2).
-    - `catalog.html`: Grid principal de tarjetas con filtros por categoría.
-    - `references.html`: Vista de detalle de la norma (Layout optimizado sin sidebar).
-- `app/static/js/` -> **Lógica de Cliente (Actualizado):**
-    - `catalog.js`: Renderizado limpio de tarjetas (sin tags visuales ni cajas de previsualización), descripciones cortadas al primer punto.
-    - `references.js`: Controla el "ScrollSpy" (menú lateral derecho), la navegación de retorno forzada al catálogo y la lógica de desplazamiento suave calibrada (offset de 100px).
+- `app/templates/pages/` -- Vistas HTML (Jinja2)
+- `app/templates/components/` -- Componentes reutilizables (cover_modal, header, sidebar)
+- `app/static/js/` -- Logica de cliente (7 archivos)
+- `app/static/css/` -- Estilos
 
-- `data/seed/` -> JSON de ejemplo (contenido estático para pruebas sin BD).
+### Datos
+- `app/data/unac/` -- Formatos UNAC (informe, maestria, proyecto)
+- `app/data/uni/` -- Formatos UNI (informe, posgrado, proyecto)
+- `app/data/schemas/` -- JSON Schemas de validacion
+- `app/data/references/` -- Normas bibliograficas (APA7, IEEE, ISO690, Vancouver)
 
----
-
-## Estado Actual del Desarrollo (ChangeLog)
-
-### 1. Módulo Catálogo (`/catalog`)
-- **Limpieza Visual:** Se eliminaron los "tags" (círculos azules) y las cajas de previsualización gris de las tarjetas de referencias para una interfaz minimalista.
-- **Formato de Texto:** Las descripciones de las normas ahora se recortan automáticamente hasta el primer punto para mantener uniformidad.
-- **Navegación:** Los enlaces de "Ver guía" dirigen al usuario a la vista de detalle de referencia manteniendo el contexto.
-
-### 2. Módulo Referencias (`/referencias`)
-- **Flujo de Navegación:**
-    - El botón "Volver a normas" redirige forzosamente al Catálogo (`/catalog`), eliminando la vista intermedia de lista grid para un flujo más directo.
-    - Se ocultó permanentemente el contenedor `refs-grid-view` en el HTML.
-- **Layout (Diseño):**
-    - Se eliminó la barra lateral izquierda (Sidebar de lista de normas) para dar prioridad al contenido de lectura.
-    - Implementación de **CSS Grid** (`1fr` contenido / `320px` menú derecho) para aprovechar mejor el ancho de pantalla.
-- **Tabla de Contenidos (ScrollSpy):**
-    - Menú lateral derecho ("En esta guía") que se pinta de azul automáticamente según la sección visible al hacer scroll.
-    - **Navegación Precisa:** Implementación de lógica de clic con `scrollIntoView` y márgenes calibrados:
-        - **Offset:** 100px (para respetar el encabezado fijo y que el título no se tape).
-        - **Observer:** Margen de detección `-90px` para una sincronización perfecta al subir y bajar.
+### Universidades (`app/universities/`)
+- `shared/universal_generator.py` -- Generador unificado para todas las categorias
+- `unac/provider.py` -- Configuracion UNAC
+- `uni/provider.py` -- Configuracion UNI
+- `contracts.py` -- Contrato UniversityProvider
 
 ---
 
-## Reglas
-- No hacer push directo a `main`.
+## Tests
+
+```bash
+py -m pytest tests/ -v
+```
+
+## Validacion de datos
+
+```bash
+python scripts/validate_data.py
+```
 
 ## Verificacion de encoding
-- Ejecutar: `python scripts/check_mojibake.py`
-  
+
+```bash
+python scripts/check_encoding.py
+python scripts/check_mojibake.py
+```
+
+---
+
+## Documentacion
+
+- [CHANGELOG](docs/CHANGELOG.md)
+- [Manual completo](docs/manual/00_indice.md)
+- [Guia de integracion GicaGen](docs/GICAGEN_INTEGRATION_GUIDE.md)
+- [API de formatos](docs/api/formats-api.md)
+- [Contratos DTO](docs/contracts/format-dto.md)
+- [Block Engine](docs/manual/16_block_engine.md)
+- [Validacion y Tests](docs/manual/17_validacion_y_tests.md)
+
 ## Mockup original
-Está guardado en `ui/mockup/index.html` como referencia visual.
 
-
-
+Guardado en `ui/mockup/index.html` como referencia visual.

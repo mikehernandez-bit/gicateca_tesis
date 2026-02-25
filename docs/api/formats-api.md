@@ -1,12 +1,27 @@
 # Formats API v1
 
-API de solo lectura para consumir el catálogo de formatos de GicaTesis desde sistemas externos (GicaGen).
+API para consumir el catalogo de formatos de GicaTesis y generar documentos desde sistemas externos (GicaGen).
 
 ## Base URL
 
 ```
 /api/v1
 ```
+
+## Autenticacion
+
+Si la variable de entorno `GICATESIS_API_KEY` esta definida en el servidor,
+todos los endpoints `/api/v1/*` requieren el header:
+
+```
+X-GICATESIS-KEY: <valor-de-GICATESIS_API_KEY>
+```
+
+Si `GICATESIS_API_KEY` **no esta definida**, la API es publica.
+
+**Response sin API key (cuando es requerida):** `403 Forbidden`
+
+**Fuente:** `app/main.py` L69-84
 
 ## Regla de Publicación de Formatos
 
@@ -150,28 +165,121 @@ Sirve assets (logos, imágenes) de forma segura.
 - No permite path traversal (`../`)
 - Solo sirve desde directorio `/static`
 
-**Response: 200 OK** — Archivo binario con `Cache-Control: public, max-age=86400`
+**Response: 200 OK** -- Archivo binario con `Cache-Control: public, max-age=86400`
+
+---
+
+### GET /formats/validate
+
+Validar la integridad del catalogo de formatos.
+
+**Response 200:**
+```json
+{
+  "valid": true,
+  "issues": [],
+  "total_formats": 9
+}
+```
+
+---
+
+### POST /generate
+
+Generar un documento DOCX a partir de datos JSON.
+
+**Request:**
+```http
+POST /api/v1/generate HTTP/1.1
+Content-Type: application/json
+
+{
+  "format_id": "unac-informe-cuant",
+  "data": { ... }
+}
+```
+
+**Response 200:**
+```json
+{
+  "run_id": "gen-20260217120000",
+  "status": "completed",
+  "docx_url": "/api/v1/artifacts/gen-20260217120000/docx"
+}
+```
+
+**Fuente:** `app/modules/api/generation_router.py`
+
+---
+
+### GET /artifacts/{run_id}/docx
+
+Descargar el DOCX generado.
+
+**Response:** Archivo binario DOCX.
+
+---
+
+### GET /artifacts/{run_id}/pdf
+
+Descargar el PDF generado.
+
+**Response:** Archivo binario PDF.
+
+---
+
+### POST /render/docx
+
+Renderizar DOCX directamente desde JSON (sin almacenar artifacts).
+
+**Request:**
+```http
+POST /api/v1/render/docx HTTP/1.1
+Content-Type: application/json
+
+{
+  "format_id": "unac-proyecto-cual",
+  "data": { ... }
+}
+```
+
+**Response:** Archivo binario DOCX (descarga directa).
+
+**Fuente:** `app/modules/api/render_router.py`
+
+---
+
+### POST /render/pdf
+
+Renderizar PDF directamente desde JSON.
+
+**Request:** Igual que `/render/docx`.
+
+**Response:** Archivo binario PDF (descarga directa).
+
+**Nota:** Requiere Microsoft Word instalado en el servidor (conversion COM).
 
 ---
 
 ## Comportamiento de Cache
 
-| Escenario | Acción |
+| Escenario | Accion |
 |-----------|--------|
 | Primera request | Guardar `ETag` de la respuesta |
 | Requests siguientes | Enviar `If-None-Match: <ETag guardado>` |
-| Si catálogo no cambió | API responde `304` (sin body) |
-| Si catálogo cambió | API responde `200` con nuevo `ETag` |
+| Si catalogo no cambio | API responde `304` (sin body) |
+| Si catalogo cambio | API responde `200` con nuevo `ETag` |
 
-**TTL recomendado en cliente:** 60 segundos + validación con ETag.
+**TTL recomendado en cliente:** 60 segundos + validacion con ETag.
 
 ---
 
-## Códigos de Estado
+## Codigos de Estado
 
-| Código | Significado |
+| Codigo | Significado |
 |--------|-------------|
-| `200` | OK — Datos en body |
-| `304` | Not Modified — ETag coincide, usar cache |
-| `400` | Bad Request — Path inválido |
-| `404` | Not Found — Formato/asset no existe |
+| `200` | OK -- Datos en body |
+| `304` | Not Modified -- ETag coincide, usar cache |
+| `400` | Bad Request -- Path invalido |
+| `403` | Forbidden -- API key invalida o faltante |
+| `404` | Not Found -- Formato/asset no existe |

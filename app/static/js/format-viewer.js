@@ -539,6 +539,12 @@ async function hydrateRequirementsList() {
 
                 // Extraer número romano o arábigo del título
                 const rawTitle = capitulo?.titulo || capitulo?.title || "";
+
+                // Saltar capítulos de referencias — se agregan en el paso 5
+                const upperTitle = rawTitle.toUpperCase();
+                if (upperTitle.includes('REFERENCIAS') || upperTitle.includes('BIBLIOGRAF')) {
+                    return;
+                }
                 const match = rawTitle.match(/^([IVXLCDM0-9]+)[\.\s]/);
                 const prefijo = capitulo?.numero ? `${capitulo.numero}.` : (match ? match[1] + '.' : '');
                 const displayTitle = buildDisplayTitle(capitulo);

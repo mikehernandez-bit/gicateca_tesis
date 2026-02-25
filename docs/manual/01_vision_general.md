@@ -1,48 +1,54 @@
-# Visión General
+# Vision General
 
-## ¿Qué es GicaTesis/Formatoteca?
+## Que es GicaTesis/Formatoteca?
 
-**Formatoteca** es un sistema web para gestionar, visualizar y generar documentos académicos (tesis, informes, proyectos) para múltiples universidades peruanas (UNAC, UNI). Permite:
+**Formatoteca** es un sistema web para gestionar, visualizar y generar documentos academicos (tesis, informes, proyectos) para multiples universidades peruanas (UNAC, UNI). Permite:
 
-1. **Explorar** un catálogo de formatos disponibles.
-2. **Previsualizar** carátulas e índices directamente en el navegador.
-3. **Descargar** documentos DOCX generados automáticamente.
-4. **Ver** normativa de referencias bibliográficas (APA, IEEE, ISO, Vancouver).
+1. **Explorar** un catalogo de formatos disponibles.
+2. **Previsualizar** caratulas e indices directamente en el navegador.
+3. **Descargar** documentos DOCX generados automaticamente.
+4. **Ver** normativa de referencias bibliograficas (APA, IEEE, ISO, Vancouver).
+5. **Generar** documentos via API para integracion con sistemas externos (GicaGen, n8n).
 
-**Fuente:** `app/main.py` L39: `app = FastAPI(title="Formatoteca", version="0.1.0")`
+**Fuente:** `app/main.py` L46: `app = FastAPI(title="Formatoteca", version="1.0.0")`
 
 ---
 
 ## Enfoque Data-Driven
 
-El sistema NO hardcodea los formatos ni las normas en el código Python. En su lugar:
+El sistema NO hardcodea los formatos ni las normas en el codigo Python. En su lugar:
 
 1. **JSON define la estructura** de cada formato (`app/data/{uni}/{categoria}/*.json`).
-2. **Generadores Python** (`app/universities/{uni}/centro_formatos/*.py`) leen el JSON y producen DOCX.
-3. **Word COM** convierte DOCX a PDF para previsualizaciones.
-4. **Cache** almacena PDFs generados para reutilización.
+2. **Block Engine** (`app/engine/`) normaliza el JSON en bloques tipados y los renderiza a DOCX.
+3. **Generador unificado** (`app/universities/shared/universal_generator.py`) orquesta la generacion.
+4. **Word COM** convierte DOCX a PDF para previsualizaciones.
+5. **Cache** almacena PDFs generados para reutilizacion.
 
 ```mermaid
 flowchart LR
-    JSON["JSON (app/data)"] --> Generador["Generador .py"]
-    Generador --> DOCX["Archivo DOCX"]
+    JSON["JSON (app/data)"] --> Normalizer["Normalizer (engine)"]
+    Normalizer --> Blocks["Block[]"]
+    Blocks --> Renderers["12 Renderers"]
+    Renderers --> DOCX["Archivo DOCX"]
     DOCX --> WordCOM["Word COM"]
     WordCOM --> PDF["PDF Cache"]
     PDF --> UI["Vista Previa Web"]
 ```
 
 **Fuentes:**
-- Discovery de JSON: `app/core/loaders.py` L194-275
-- Conversión PDF: `app/core/pdf_converter.py` L215-217
+- Block Engine: `app/engine/__init__.py`
+- Normalizer: `app/engine/normalizer.py`
+- Generador unificado: `app/universities/shared/universal_generator.py`
+- Conversion PDF: `app/core/pdf_converter.py`
 
 ---
 
-## Flujo de Usuario Típico
+## Flujo de Usuario Tipico
 
-1. **Ingresa a `/catalog`** → ve listado de formatos.
-2. **Selecciona un formato** → va a `/formatos/{format_id}`.
-3. **Previsualiza carátula** (botón "ojo") → Modal con datos del JSON.
-4. **Previsualiza PDF** → PDF generado en cache.
-5. **Descarga DOCX** → POST a `/formatos/{format_id}/generate`.
+1. **Ingresa a `/catalog`** -> ve listado de formatos.
+2. **Selecciona un formato** -> va a `/formatos/{format_id}`.
+3. **Previsualiza caratula** (boton "ojo") -> Modal con datos del JSON.
+4. **Previsualiza PDF** -> PDF generado en cache.
+5. **Descarga DOCX** -> POST a `/formatos/{format_id}/generate`.
 
-**Fuente:** `app/static/js/format-viewer.js` L35-80 (downloadDocument), L83-101 (openPdfModal), L104-195 (previewCover)
+**Fuente:** `app/static/js/format-viewer.js` (downloadDocument, openPdfModal, previewCover)

@@ -27,6 +27,7 @@ Donde tocar si falla:
 
 import os
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -42,7 +43,21 @@ from app.modules.api.router import router as api_router
 from app.modules.api.generation_router import router as generation_router
 from app.modules.api.render_router import router as render_router
 
-app = FastAPI(title="Formatoteca", version="0.1.0")
+app = FastAPI(title="Formatoteca", version="1.0.0")
+
+# ── CORS ────────────────────────────────────────────────────────
+_CORS_ORIGINS = os.getenv(
+    "GICATESIS_CORS_ORIGINS",
+    "http://localhost:3000,http://localhost:5678,http://127.0.0.1:5678",
+).split(",")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[o.strip() for o in _CORS_ORIGINS if o.strip()],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.on_event("startup")
@@ -85,11 +100,13 @@ async def ensure_utf8_charset(request: Request, call_next):
 
 # Static files
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
-app.mount("/recursos_data", StaticFiles(directory="app/data/unac"), name="data_unac")
+app.mount("/recursos_data", StaticFiles(directory="app/data"), name="data_resources")
 
 @app.get("/favicon.ico", include_in_schema=False)
 def favicon():
-    return RedirectResponse(url="/static/assets/LogoUNAC.png")
+    from app.core.settings import get_default_uni_code
+    code = get_default_uni_code().upper()
+    return RedirectResponse(url=f"/static/assets/Logo{code}.png")
 
 # Routers (cada modulo es una seccion del mockup)
 app.include_router(home_router)

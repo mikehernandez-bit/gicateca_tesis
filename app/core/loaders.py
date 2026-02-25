@@ -330,7 +330,7 @@ def load_format_by_id(format_id: str) -> Dict[str, Any]:
         if "_meta" not in payload:
             payload["_meta"] = {
                 "format_id": item.format_id,
-                "uni": item.uni,
+                "university": item.uni,
                 "categoria": item.categoria,
                 "enfoque": item.enfoque,
                 "titulo": item.titulo,
@@ -338,6 +338,6 @@ def load_format_by_id(format_id: str) -> Dict[str, Any]:
             }
         _warn_if_mojibake(payload, item.format_id, item.path)
         return payload
-    payload = {"_meta": {"format_id": item.format_id, "uni": item.uni, "path": str(item.path)}, "data": data}
+    payload = {"_meta": {"format_id": item.format_id, "university": item.uni, "path": str(item.path)}, "data": data}
     _warn_if_mojibake(payload, item.format_id, item.path)
     return payload

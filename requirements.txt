@@ -1,10 +1,11 @@
 fastapi==0.115.0
 uvicorn[standard]==0.30.6
 jinja2==3.1.4
-pydantic
-python-docx
-docx2pdf
-pywin32
-pytest>=7.0
-jsonschema>=4.0
+pydantic==2.10.6
+python-docx==1.1.2
+python-multipart==0.0.20
+docx2pdf==0.1.8
+pywin32==308
+pytest==8.3.4
+jsonschema==4.23.0
 

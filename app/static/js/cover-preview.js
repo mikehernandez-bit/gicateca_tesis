@@ -117,12 +117,20 @@
             }
 
             // Autor/Asesor UI
+            var autorLabelEl = Dom.byId('c-label-autor');
             var autorEl = Dom.byId('c-autor');
+            var asesorLabelEl = Dom.byId('c-label-asesor');
             var asesorEl = Dom.byId('c-asesor');
 
+            if (autorLabelEl && data.autor_label) {
+                autorLabelEl.textContent = data.autor_label;
+            }
             if (autorEl) {
                 autorEl.textContent = data.autor || "[Nombres y Apellidos]";
                 autorEl.classList.toggle('text-gray-400', !data.autor);
+            }
+            if (asesorLabelEl && data.asesor_label) {
+                asesorLabelEl.textContent = data.asesor_label;
             }
             if (asesorEl) {
                 asesorEl.textContent = data.asesor || "[Grado y Nombre del Asesor]";

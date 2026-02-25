@@ -28,8 +28,8 @@ from pathlib import Path
 from app.core.paths import get_data_dir
 from app.universities.contracts import SimpleUniversityProvider
 
-# Carpeta local que contiene los generadores DOCX de UNAC.
-BASE_DIR = Path(__file__).resolve().parent / "centro_formatos"
+# Carpeta compartida que contiene el generador unificado.
+SHARED_DIR = Path(__file__).resolve().parent.parent / "shared"
 
 # Instancia principal que el registry descubre via PROVIDER.
 PROVIDER = SimpleUniversityProvider(
@@ -37,9 +37,9 @@ PROVIDER = SimpleUniversityProvider(
     display_name="UNAC",
     data_dir=get_data_dir("unac"),
     generator_map={
-        "informe": BASE_DIR / "generador_informe_tesis.py",
-        "maestria": BASE_DIR / "generador_maestria.py",
-        "proyecto": BASE_DIR / "generador_proyecto_tesis.py",
+        "informe": SHARED_DIR / "universal_generator.py",
+        "maestria": SHARED_DIR / "universal_generator.py",
+        "proyecto": SHARED_DIR / "universal_generator.py",
     },
     # Fase 2: Defaults para view-models de carátula
     default_logo_url="/static/assets/LogoUNAC.png",
