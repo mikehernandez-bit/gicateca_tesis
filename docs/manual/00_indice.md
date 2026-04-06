@@ -1,5 +1,9 @@
 # Indice General de Documentacion
 
+## Documentos de contexto
+
+- [Paquete de contexto GicaTesis](../GICATESIS_CONTEXT.md)
+
 ## Rutas Principales del Sistema
 
 | Ruta | Descripcion | Fuente |

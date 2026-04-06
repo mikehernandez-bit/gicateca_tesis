@@ -1,7 +1,7 @@
 # GicaGen Integration Guide - Formats API v1
 
 > **Documento completo** para integrar GicaGen con la API de Formatos de GicaTesis.  
-> Ultima actualizacion: 2026-02-17
+> Ultima actualizacion: 2026-03-10
 
 ---
 
@@ -96,6 +96,7 @@ HTTP Status: `403 Forbidden`
 app/modules/api/
 +-- __init__.py              # Inicializacion del modulo
 +-- dtos.py                  # Pydantic DTOs (contratos)
++-- ai_content_contract.py   # Contrato compartido para aiResult/content estructurado
 +-- service.py               # Logica de negocio (load, hash, map)
 +-- router.py                # Endpoints: formats, version, validate, assets
 +-- generation_router.py     # Endpoints: generate, artifacts
@@ -288,7 +289,7 @@ Host: localhost:8000
 
 ### 6. POST /api/v1/generate
 
-**Propósito:** Generar un documento DOCX a partir de datos JSON personalizados.
+**Propósito:** Generar artifacts persistidos (`docx` y `pdf`) desde el mismo payload de render.
 
 **Request:**
 ```http
@@ -297,8 +298,34 @@ Host: localhost:8000
 Content-Type: application/json
 
 {
-  "format_id": "unac-informe-cuant",
-  "data": { ... }
+  "formatId": "unac-informe-cuant",
+  "values": {
+    "title": "Titulo del proyecto"
+  },
+  "mode": "simulation",
+  "aiResult": {
+    "sections": [
+      {
+        "path": "Introduccion",
+        "content": "Texto plano compatible."
+      },
+      {
+        "path": "Cronograma",
+        "content": [
+          {
+            "tipo": "parrafo",
+            "texto": "Se presenta el cronograma del proyecto."
+          },
+          {
+            "tipo": "tabla",
+            "titulo": "Tabla 1. Cronograma",
+            "encabezados": ["Actividad", "Mes 1", "Mes 2"],
+            "filas": [["Revision", "X", ""]]
+          }
+        ]
+      }
+    ]
+  }
 }
 ```
 
@@ -340,18 +367,49 @@ Host: localhost:8000
 Content-Type: application/json
 
 {
-  "format_id": "unac-proyecto-cual",
-  "data": { ... }
+  "formatId": "unac-proyecto-cual",
+  "values": {
+    "title": "Titulo del proyecto"
+  },
+  "mode": "simulation",
+  "aiResult": {
+    "sections": [
+      {
+        "path": "Introduccion",
+        "content": "Texto plano compatible."
+      },
+      {
+        "path": "II. MARCO TEORICO/2.1 Bases teoricas",
+        "content": [
+          {
+            "tipo": "parrafo",
+            "texto": "Texto del marco teorico."
+          },
+          {
+            "tipo": "figura",
+            "caption": "Figura 1. Modelo conceptual.",
+            "ruta_placeholder": "assets/placeholder_figura.png"
+          }
+        ]
+      }
+    ]
+  }
 }
 ```
 
 **Response:** Archivo binario DOCX (descarga directa).
 
+**Notas:**
+- `content` acepta `string` o `AIBlock[]`.
+- Las tablas válidas se renderizan como tablas reales.
+- Las figuras válidas se renderizan como `caption + placeholder`.
+- Si un bloque estructurado es inválido, la API responde `422`.
+
 ---
 
 ### 10. POST /api/v1/render/pdf
 
-**Propósito:** Renderizar PDF directamente desde JSON.
+**Propósito:** Renderizar PDF directamente desde el mismo contrato de `/render/docx`.
 
 **Request:** Igual que `/render/docx`.
 
@@ -453,6 +511,47 @@ interface CatalogVersionResponse {
   generatedAt: string;   // ISO timestamp (ej: "2026-02-05T16:39:41+00:00")
 }
 ```
+
+### Contrato de render (`/generate`, `/render/docx`, `/render/pdf`)
+
+`aiResult.sections[].content` acepta texto plano o bloques estructurados.
+
+```typescript
+type AIContent = string | AIBlock[];
+
+type AIBlock =
+  | { tipo: "parrafo"; texto: string }
+  | {
+      tipo: "tabla";
+      id?: string;
+      titulo?: string;
+      encabezados: string[];
+      filas: string[][];
+      nota_pie?: string;
+      orientacion?: "portrait" | "landscape";
+    }
+  | {
+      tipo: "figura";
+      id?: string;
+      caption: string;
+      ruta_placeholder: string;
+      titulo?: string;
+      fuente?: string;
+    };
+
+interface AISection {
+  sectionId?: string;
+  path?: string;
+  content: AIContent;
+}
+```
+
+Notas operativas:
+- `string` sigue siendo valido para compatibilidad con clientes legacy.
+- El placeholder canonico de figura es `assets/placeholder_figura.png`.
+- El valor legacy `"placeholder"` se acepta de entrada y se normaliza al valor canonico.
+- Si un bloque estructurado es invalido, la API responde `422`.
+- GicaTesis no convierte listas o diccionarios crudos a texto visible.
 
 ---
 

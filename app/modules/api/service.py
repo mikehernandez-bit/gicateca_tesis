@@ -21,6 +21,7 @@ Dependencias:
 Puntos de extensión:
 - Agregar caché en memoria si el rendimiento lo requiere.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -32,7 +33,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from app.core.loaders import discover_format_files, load_format_by_id, FormatIndexItem
-from app.core.registry import get_provider
 from app.modules.api.dtos import (
     AssetRef,
     CatalogValidationResponse,
@@ -51,9 +51,11 @@ from app.modules.api.dtos import (
 # INTERNAL FORMAT REPRESENTATION
 # -----------------------------------------------------------------------------
 
+
 @dataclass
 class InternalFormat:
     """Representación interna de un formato cargado."""
+
     id: str
     title: str
     university: str
@@ -71,6 +73,7 @@ class InternalFormat:
 # -----------------------------------------------------------------------------
 # HASH UTILITIES (DETERMINISTIC)
 # -----------------------------------------------------------------------------
+
 
 def canonical_json_bytes(obj: Any) -> bytes:
     """
@@ -137,6 +140,7 @@ def make_stable_format_id(uni: str, category: str, title: str, raw_id: str) -> s
 # FORMAT LOADING AND NORMALIZATION
 # -----------------------------------------------------------------------------
 
+
 def _extract_fields(data: Dict[str, Any]) -> List[Dict[str, Any]]:
     """
     Extrae campos del wizard desde la estructura del formato.
@@ -157,7 +161,9 @@ def _extract_fields(data: Dict[str, Any]) -> List[Dict[str, Any]]:
                 "label": _humanize_label(key),
                 "type": _infer_field_type(key, value),
                 "required": False,
-                "default": value if isinstance(value, (str, int, float, bool)) else None,
+                "default": value
+                if isinstance(value, (str, int, float, bool))
+                else None,
                 "order": order,
             }
             fields.append(field_def)
@@ -186,7 +192,11 @@ def _infer_field_type(key: str, value: Any) -> str:
     key_lower = key.lower()
     if "fecha" in key_lower or "date" in key_lower:
         return "date"
-    if "numero" in key_lower or "number" in key_lower or isinstance(value, (int, float)):
+    if (
+        "numero" in key_lower
+        or "number" in key_lower
+        or isinstance(value, (int, float))
+    ):
         return "number"
     if "descripcion" in key_lower or "observ" in key_lower or "notas" in key_lower:
         return "textarea"
@@ -207,11 +217,13 @@ def _extract_assets(data: Dict[str, Any], uni: str) -> List[Dict[str, Any]]:
     if ruta_logo:
         # Generar ID estable basado en el path lógico
         logo_id = f"{uni}:logo:main"
-        assets.append({
-            "id": logo_id,
-            "kind": "logo",
-            "original_path": ruta_logo,
-        })
+        assets.append(
+            {
+                "id": logo_id,
+                "kind": "logo",
+                "original_path": ruta_logo,
+            }
+        )
 
     return assets
 
@@ -226,7 +238,9 @@ def _resolve_asset_url(asset: Dict[str, Any], base_url: str = "/api/v1/assets") 
     return f"{base_url}/{safe_id}"
 
 
-def _extract_template_info(data: Dict[str, Any], uni: str) -> Tuple[Optional[str], Optional[Path]]:
+def _extract_template_info(
+    data: Dict[str, Any], uni: str
+) -> Tuple[Optional[str], Optional[Path]]:
     """
     Extrae información de la plantilla asociada.
     """
@@ -270,7 +284,9 @@ def load_internal_format(item: FormatIndexItem) -> InternalFormat:
     # Extraer reglas (si existen)
     rules = None
     config = data.get("configuracion") or {}
-    if any(k in config for k in ("margenes", "margins", "fuente", "font", "interlineado")):
+    if any(
+        k in config for k in ("margenes", "margins", "fuente", "font", "interlineado")
+    ):
         rules = {
             "margins": config.get("margenes") or config.get("margins"),
             "font": config.get("fuente") or config.get("font"),
@@ -284,7 +300,9 @@ def load_internal_format(item: FormatIndexItem) -> InternalFormat:
         title=meta.get("title") or item.titulo,
         university=meta.get("university") or item.uni,
         category=meta.get("category") or item.categoria,
-        document_type=meta.get("documentType") or meta.get("tipo_documento") or item.enfoque,
+        document_type=meta.get("documentType")
+        or meta.get("tipo_documento")
+        or item.enfoque,
         raw_data=data,
         source_path=item.path,
         fields=fields,
@@ -345,14 +363,16 @@ def is_publishable_format(fmt: InternalFormat) -> bool:
     return classify_format_visibility(fmt) == "publicable"
 
 
-def load_all_formats(university: Optional[str] = None, include_unpublished: bool = False) -> List[InternalFormat]:
+def load_all_formats(
+    university: Optional[str] = None, include_unpublished: bool = False
+) -> List[InternalFormat]:
     """
     Carga todos los formatos disponibles (opcionalmente filtrados por universidad).
-    
+
     Args:
         university: Filtrar por código de universidad
         include_unpublished: Si True, incluye formatos no publicables (para diagnóstico)
-    
+
     Returns:
         Lista de formatos. Por defecto solo los publicables.
     """
@@ -374,6 +394,7 @@ def load_all_formats(university: Optional[str] = None, include_unpublished: bool
 # -----------------------------------------------------------------------------
 # CATALOG VERSIONING
 # -----------------------------------------------------------------------------
+
 
 def get_catalog_version(formats: Optional[List[InternalFormat]] = None) -> str:
     """
@@ -399,6 +420,7 @@ def get_catalog_version(formats: Optional[List[InternalFormat]] = None) -> str:
 # -----------------------------------------------------------------------------
 # DTO MAPPING
 # -----------------------------------------------------------------------------
+
 
 def map_to_dto_summary(fmt: InternalFormat) -> FormatSummary:
     """Mapea formato interno a DTO de resumen."""
@@ -437,26 +459,30 @@ def map_to_dto_detail(fmt: InternalFormat) -> FormatDetail:
                 # Si select no tiene opciones válidas, convertir a text
                 field_type = FieldType.TEXT
 
-        fields.append(FormatField(
-            name=f.get("name", ""),
-            label=f.get("label", f.get("name", "")),
-            type=field_type,
-            required=f.get("required", False),
-            default=f.get("default"),
-            options=options,
-            validation=f.get("validation"),
-            order=f.get("order"),
-            section=f.get("section"),
-        ))
+        fields.append(
+            FormatField(
+                name=f.get("name", ""),
+                label=f.get("label", f.get("name", "")),
+                type=field_type,
+                required=f.get("required", False),
+                default=f.get("default"),
+                options=options,
+                validation=f.get("validation"),
+                order=f.get("order"),
+                section=f.get("section"),
+            )
+        )
 
     # Mapear assets
     assets = []
     for a in fmt.assets:
-        assets.append(AssetRef(
-            id=a.get("id", ""),
-            kind=a.get("kind", "unknown"),
-            url=_resolve_asset_url(a),
-        ))
+        assets.append(
+            AssetRef(
+                id=a.get("id", ""),
+                kind=a.get("kind", "unknown"),
+                url=_resolve_asset_url(a),
+            )
+        )
 
     # Template ref
     template_ref = None
@@ -495,6 +521,7 @@ def map_to_dto_detail(fmt: InternalFormat) -> FormatDetail:
 # PUBLIC SERVICE API
 # -----------------------------------------------------------------------------
 
+
 def list_formats(
     university: Optional[str] = None,
     category: Optional[str] = None,
@@ -510,10 +537,18 @@ def list_formats(
     if category:
         formats = [f for f in formats if f.category.lower() == category.lower()]
     if document_type:
-        formats = [f for f in formats if f.document_type and f.document_type.lower() == document_type.lower()]
+        formats = [
+            f
+            for f in formats
+            if f.document_type and f.document_type.lower() == document_type.lower()
+        ]
 
     # Calcular versión
-    catalog_version = get_catalog_version(formats) if formats else hashlib.sha256(b"empty").hexdigest()
+    catalog_version = (
+        get_catalog_version(formats)
+        if formats
+        else hashlib.sha256(b"empty").hexdigest()
+    )
 
     # Mapear a DTOs
     summaries = [map_to_dto_summary(f) for f in formats]
@@ -521,7 +556,9 @@ def list_formats(
     return summaries, catalog_version
 
 
-def get_format_detail_by_id(format_id: str) -> Tuple[Optional[FormatDetail], Optional[str]]:
+def get_format_detail_by_id(
+    format_id: str,
+) -> Tuple[Optional[FormatDetail], Optional[str]]:
     """
     Obtiene el detalle de un formato por ID.
     Retorna: (FormatDetail, formatHash) o (None, None) si no existe.
@@ -568,28 +605,34 @@ def validate_format_dict(fmt: InternalFormat) -> List[FormatValidationError]:
 
     # Validar campos requeridos
     if not fmt.id or fmt.id.strip() == "":
-        errors.append(FormatValidationError(
-            format_id=fmt.id or "unknown",
-            field=None,
-            error="Format ID is empty or missing",
-            error_type="missing_id",
-        ))
+        errors.append(
+            FormatValidationError(
+                format_id=fmt.id or "unknown",
+                field=None,
+                error="Format ID is empty or missing",
+                error_type="missing_id",
+            )
+        )
 
     if not fmt.title or fmt.title.strip() == "":
-        errors.append(FormatValidationError(
-            format_id=fmt.id,
-            field="title",
-            error="Format title is empty or missing",
-            error_type="missing_field",
-        ))
+        errors.append(
+            FormatValidationError(
+                format_id=fmt.id,
+                field="title",
+                error="Format title is empty or missing",
+                error_type="missing_field",
+            )
+        )
 
     if not fmt.university or fmt.university.strip() == "":
-        errors.append(FormatValidationError(
-            format_id=fmt.id,
-            field="university",
-            error="University code is empty or missing",
-            error_type="missing_field",
-        ))
+        errors.append(
+            FormatValidationError(
+                format_id=fmt.id,
+                field="university",
+                error="University code is empty or missing",
+                error_type="missing_field",
+            )
+        )
 
     # Validar campos del wizard
     for i, field in enumerate(fmt.fields):
@@ -598,50 +641,60 @@ def validate_format_dict(fmt: InternalFormat) -> List[FormatValidationError]:
         # Validar tipo
         field_type = field.get("type", "text")
         if field_type not in VALID_FIELD_TYPES:
-            errors.append(FormatValidationError(
-                format_id=fmt.id,
-                field=field_name,
-                error=f"Invalid field type '{field_type}'. Valid types: {VALID_FIELD_TYPES}",
-                error_type="invalid_type",
-            ))
+            errors.append(
+                FormatValidationError(
+                    format_id=fmt.id,
+                    field=field_name,
+                    error=f"Invalid field type '{field_type}'. Valid types: {VALID_FIELD_TYPES}",
+                    error_type="invalid_type",
+                )
+            )
 
         # Validar select/options
         options = field.get("options")
         if field_type == "select":
             if not options or not isinstance(options, list) or len(options) == 0:
-                errors.append(FormatValidationError(
+                errors.append(
+                    FormatValidationError(
+                        format_id=fmt.id,
+                        field=field_name,
+                        error="Field type 'select' requires non-empty 'options' list",
+                        error_type="missing_options",
+                    )
+                )
+        elif options is not None:
+            errors.append(
+                FormatValidationError(
                     format_id=fmt.id,
                     field=field_name,
-                    error="Field type 'select' requires non-empty 'options' list",
-                    error_type="missing_options",
-                ))
-        elif options is not None:
-            errors.append(FormatValidationError(
-                format_id=fmt.id,
-                field=field_name,
-                error=f"Field type '{field_type}' should not have 'options'",
-                error_type="unexpected_options",
-            ))
+                    error=f"Field type '{field_type}' should not have 'options'",
+                    error_type="unexpected_options",
+                )
+            )
 
     # Validar assets
     for i, asset in enumerate(fmt.assets):
         asset_id = asset.get("id", f"asset_{i}")
 
         if not asset_id or asset_id.strip() == "":
-            errors.append(FormatValidationError(
-                format_id=fmt.id,
-                field=f"asset_{i}",
-                error="Asset ID is empty",
-                error_type="missing_asset_id",
-            ))
+            errors.append(
+                FormatValidationError(
+                    format_id=fmt.id,
+                    field=f"asset_{i}",
+                    error="Asset ID is empty",
+                    error_type="missing_asset_id",
+                )
+            )
 
         if not asset.get("kind"):
-            errors.append(FormatValidationError(
-                format_id=fmt.id,
-                field=asset_id,
-                error="Asset kind is missing",
-                error_type="missing_asset_kind",
-            ))
+            errors.append(
+                FormatValidationError(
+                    format_id=fmt.id,
+                    field=asset_id,
+                    error="Asset kind is missing",
+                    error_type="missing_asset_kind",
+                )
+            )
 
     return errors
 
@@ -658,12 +711,14 @@ def validate_catalog() -> CatalogValidationResponse:
     for fmt in formats:
         # Check for duplicate IDs
         if fmt.id in seen_ids:
-            all_errors.append(FormatValidationError(
-                format_id=fmt.id,
-                field=None,
-                error=f"Duplicate format ID. Also found in: {seen_ids[fmt.id]}",
-                error_type="duplicate_id",
-            ))
+            all_errors.append(
+                FormatValidationError(
+                    format_id=fmt.id,
+                    field=None,
+                    error=f"Duplicate format ID. Also found in: {seen_ids[fmt.id]}",
+                    error_type="duplicate_id",
+                )
+            )
         else:
             seen_ids[fmt.id] = str(fmt.source_path)
 
@@ -680,4 +735,3 @@ def validate_catalog() -> CatalogValidationResponse:
         invalid_formats=len(formats) - valid_count,
         errors=all_errors,
     )
-

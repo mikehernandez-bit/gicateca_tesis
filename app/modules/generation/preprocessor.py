@@ -27,6 +27,7 @@ Donde tocar si falla:
 - Si un campo de guia no se limpia, agregarlo a EXCLUDED_KEYS.
 - Si un placeholder no se reemplaza, agregar patron en merge_values.
 """
+
 from __future__ import annotations
 
 import re
@@ -37,18 +38,31 @@ from typing import Any, Dict, List, Set
 
 
 # Keys that should NOT appear in the final document
-EXCLUDED_KEYS: Set[str] = frozenset({
-    "nota", "nota_capitulo", "nota_general",
-    "notas",
-    "instruccion", "instrucciones", "instruccion_detallada",
-    "guia", "guias",
-    "ejemplo", "ejemplos",
-    "comentario", "comentarios",
-    "observacion", "observaciones",
-    "placeholder",
-    "tipo_vista", "vista_previa",
-    "_meta", "version", "descripcion",
-})
+EXCLUDED_KEYS: Set[str] = frozenset(
+    {
+        "nota",
+        "nota_capitulo",
+        "nota_general",
+        "notas",
+        "instruccion",
+        "instrucciones",
+        "instruccion_detallada",
+        "guia",
+        "guias",
+        "ejemplo",
+        "ejemplos",
+        "comentario",
+        "comentarios",
+        "observacion",
+        "observaciones",
+        "placeholder",
+        "tipo_vista",
+        "vista_previa",
+        "_meta",
+        "version",
+        "descripcion",
+    }
+)
 
 _FENCE_RE = re.compile(r"```[\s\S]*?```")
 _MARKDOWN_HEADER_RE = re.compile(r"^\s{0,3}#{1,6}\s+")
@@ -57,6 +71,7 @@ _TABLE_SEPARATOR_RE = re.compile(r"^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)+\|?
 _TABLA_PLACEHOLDER_RE = re.compile(r"^\s*tabla\s+de\s+ejemplo\b", re.IGNORECASE)
 _PATH_SEPARATOR_RE = re.compile(r"\s*/\s*")
 _WHITESPACE_RE = re.compile(r"\s+")
+_ANNEX_PREFIX_RE = re.compile(r"^(ANEXO\s+\d+)\b")
 
 
 def _strip_accents(text: str) -> str:
@@ -79,6 +94,8 @@ def _normalize_path(path: str) -> str:
 def _is_index_path(path: str) -> bool:
     normalized = _normalize_path(path)
     if not normalized:
+        return False
+    if "ABREVIATURAS" in normalized:
         return False
     parts = [part.strip() for part in normalized.split("/") if part.strip()]
     return any(part.startswith("INDICE") for part in parts)
@@ -133,7 +150,9 @@ def _apply_cover_fallbacks(data: Dict[str, Any], values: Dict[str, Any]) -> None
         if nested_title is not None and str(nested_title).strip():
             title_value = str(nested_title).strip()
     if title_value:
-        current_title = str(caratula.get("titulo") or caratula.get("titulo_placeholder") or "")
+        current_title = str(
+            caratula.get("titulo") or caratula.get("titulo_placeholder") or ""
+        )
         if _looks_like_placeholder(current_title):
             caratula["titulo"] = title_value
 
@@ -214,6 +233,7 @@ def merge_values(
     Looks for placeholder patterns like "[TITULO]" or "{autor}"
     and replaces with actual values.
     """
+
     def _replace_placeholders(obj: Any) -> Any:
         if isinstance(obj, str):
             result = obj
@@ -244,18 +264,47 @@ def merge_values(
 
 def apply_ai_content(
     data: Dict[str, Any],
-    ai_sections: List[Dict[str, str]],
+    ai_sections: List[Dict[str, Any]],
 ) -> Dict[str, Any]:
     """
     Apply AI content to the document structure.
 
     Maps AI sections to document sections by canonical path and injects
     content into renderable body fields without overwriting heading labels.
+
+    Content may be a plain string (sanitized text) or a list of structured
+    objects (paragraphs, tables, figures) which are passed through directly.
     """
-    content_map: Dict[str, str] = {}
+
+    def _coerce_visible_text(value: Any) -> str:
+        """Extract visible text from block-like objects without stringifying raw dict/list values."""
+        if isinstance(value, str):
+            return value
+        if not isinstance(value, dict):
+            return ""
+        for key in ("texto", "caption", "titulo"):
+            text = value.get(key)
+            if isinstance(text, str) and text.strip():
+                return text.strip()
+        return ""
+
+    content_map: Dict[str, Any] = {}  # str or List[dict]
+    content_display_map: Dict[str, str] = {}
     for section in ai_sections:
-        raw_content = sanitize_ai_text(section.get("content", ""))
-        if not raw_content:
+        raw_content = section.get("content", "")
+
+        # Structured content (list of typed objects): pass through as-is
+        if isinstance(raw_content, list) and raw_content:
+            processed_content = raw_content
+        elif isinstance(raw_content, dict):
+            processed_content = _coerce_visible_text(raw_content)
+            if not processed_content:
+                continue
+        elif isinstance(raw_content, str):
+            processed_content = sanitize_ai_text(raw_content)
+            if not processed_content:
+                continue
+        else:
             continue
 
         for locator_key in ("path", "sectionId", "section_id"):
@@ -263,9 +312,13 @@ def apply_ai_content(
             normalized_locator = _normalize_path(locator)
             if not normalized_locator or _is_index_path(normalized_locator):
                 continue
-            content_map[normalized_locator] = raw_content
+            content_map[normalized_locator] = processed_content
+            if locator_key == "path":
+                content_display_map[normalized_locator] = (
+                    locator.replace("\\", "/").split("/")[-1].strip()
+                )
 
-    def _consume_content(*candidates: str) -> str:
+    def _consume_content(*candidates: str) -> Any:  # str or List[dict]
         for candidate in candidates:
             normalized_candidate = _normalize_path(candidate)
             if normalized_candidate and normalized_candidate in content_map:
@@ -275,20 +328,104 @@ def apply_ai_content(
             leaf = _normalize_path(candidate).split("/")[-1]
             if not leaf:
                 continue
-            matches = [key for key in content_map if key == leaf or key.endswith(f"/{leaf}")]
+            matches = [
+                key for key in content_map if key == leaf or key.endswith(f"/{leaf}")
+            ]
             if len(matches) == 1:
                 return content_map.pop(matches[0])
 
         return ""
 
+    def _consume_annex_content(
+        candidate: str,
+        *,
+        annex_position: int | None = None,
+    ) -> tuple[Any, str]:  # str or List[dict], matched leaf
+        normalized_candidate = _normalize_path(candidate)
+        leaf = normalized_candidate.split("/")[-1] if normalized_candidate else ""
+        match = _ANNEX_PREFIX_RE.match(leaf)
+        if match:
+            annex_prefix = match.group(1)
+        elif annex_position is not None:
+            annex_prefix = f"ANEXO {annex_position}"
+        else:
+            return "", ""
+        matches = [
+            key
+            for key in content_map
+            if _ANNEX_PREFIX_RE.match(key.split("/")[-1] if key else "")
+            and _ANNEX_PREFIX_RE.match(key.split("/")[-1]).group(1) == annex_prefix
+        ]
+        if len(matches) == 1:
+            matched_key = matches[0]
+            return (
+                content_map.pop(matched_key),
+                content_display_map.get(matched_key, matched_key.split("/")[-1]),
+            )
+        return "", ""
+
+    def _flatten_to_text(content: Any) -> str:
+        """Convert structured content to plain text, discarding non-paragraph structural blocks."""
+        if isinstance(content, str):
+            return content
+        if isinstance(content, dict):
+            return _coerce_visible_text(content)
+        if not isinstance(content, list):
+            return ""
+        parts: List[str] = []
+        for item in content:
+            if isinstance(item, str):
+                parts.append(item)
+                continue
+            if isinstance(item, dict) and item.get("tipo") == "parrafo":
+                texto = item.get("texto", "")
+                if texto:
+                    parts.append(texto)
+                continue
+            fallback = _coerce_visible_text(item)
+            if (
+                fallback
+                and isinstance(item, dict)
+                and item.get("tipo") not in {"tabla", "figura"}
+            ):
+                parts.append(fallback)
+        return "\n\n".join(parts)
+
     def _inject_into_render_fields(
         target: Dict[str, Any],
-        content: str,
+        content: Any,
         *,
         allow_text_override: bool = False,
     ) -> None:
-        """Inject AI text into renderable fields while preserving heading fields."""
-        if not content.strip():
+        """Inject AI content into renderable fields while preserving heading fields.
+
+        Handles both plain strings and structured content lists.
+        """
+        def _tag_ai_generated_blocks(value: Any) -> Any:
+            if not isinstance(value, list):
+                return value
+            tagged: List[Any] = []
+            for item in value:
+                if isinstance(item, dict):
+                    block = dict(item)
+                    block["_ai_generated"] = True
+                    tagged.append(block)
+                else:
+                    tagged.append(item)
+            return tagged
+
+        # Structured content (list of typed objects): inject into contenido[]
+        if isinstance(content, list):
+            ai_blocks = _tag_ai_generated_blocks(content)
+            existing = target.get("contenido")
+            if isinstance(existing, list):
+                target["contenido"] = ai_blocks + existing
+            else:
+                target["contenido"] = ai_blocks
+            return
+
+        # Plain string path
+        if not isinstance(content, str) or not content.strip():
             return
 
         parrafos = target.get("parrafos")
@@ -311,7 +448,32 @@ def apply_ai_content(
         # Last resort for blocks without explicit paragraph fields.
         target["parrafos"] = [content]
 
-    def _inject_chapter_content(capitulo: Dict[str, Any], content: str) -> None:
+    def _inject_chapter_content(capitulo: Dict[str, Any], content: Any) -> None:
+        """Inject content into a chapter. Handles both str and list."""
+        def _tag_ai_generated_blocks(value: Any) -> Any:
+            if not isinstance(value, list):
+                return value
+            tagged: List[Any] = []
+            for item in value:
+                if isinstance(item, dict):
+                    block = dict(item)
+                    block["_ai_generated"] = True
+                    tagged.append(block)
+                else:
+                    tagged.append(item)
+            return tagged
+
+        # Structured content: inject directly into contenido[]
+        if isinstance(content, list):
+            ai_blocks = _tag_ai_generated_blocks(content)
+            existing = capitulo.get("contenido")
+            if isinstance(existing, list):
+                capitulo["contenido"] = ai_blocks + existing
+            else:
+                capitulo["contenido"] = ai_blocks
+            return
+
+        # Plain string: original behavior
         contenido = capitulo.get("contenido")
         if not isinstance(contenido, list):
             capitulo["contenido"] = [{"parrafos": [content]}]
@@ -332,22 +494,75 @@ def apply_ai_content(
 
     preliminares = result.get("preliminares")
     if isinstance(preliminares, dict):
-        introduccion = preliminares.get("introduccion")
-        if isinstance(introduccion, dict):
-            intro_title = str(introduccion.get("titulo", "INTRODUCCION") or "INTRODUCCION")
-            intro_content = _consume_content(
-                intro_title,
-                f"PRELIMINARES/{intro_title}",
-                "INTRODUCCION",
-                "PRELIMINARES/INTRODUCCION",
+        def _preliminary_title(item: Any, default_title: str) -> str:
+            if isinstance(item, dict):
+                return str(item.get("titulo", default_title) or default_title).strip()
+            if isinstance(item, str):
+                return str(item or default_title).strip() or default_title
+            return default_title
+
+        def _inject_text_preliminary(key: str, default_title: str) -> None:
+            item = preliminares.get(key)
+            if item is None:
+                return
+            title = _preliminary_title(item, default_title)
+            item_content = _consume_content(
+                title,
+                f"PRELIMINARES/{title}",
+                default_title,
+                f"PRELIMINARES/{default_title}",
             )
-            if intro_content:
+            if not item_content:
+                return
+            safe_text = _flatten_to_text(item_content)
+            if not safe_text:
+                return
+            if isinstance(item, dict):
                 _inject_into_render_fields(
-                    introduccion,
-                    intro_content,
+                    item,
+                    safe_text,
                     allow_text_override=True,
                 )
-                introduccion["_ai_content"] = intro_content
+                item["_ai_content"] = safe_text
+            else:
+                preliminares[key] = {
+                    "titulo": title,
+                    "texto": safe_text,
+                    "_ai_content": safe_text,
+                }
+
+        for prelim_key, default_title in (
+            ("dedicatoria", "DEDICATORIA"),
+            ("agradecimiento", "AGRADECIMIENTO"),
+            ("agradecimientos", "AGRADECIMIENTOS"),
+            ("resumen", "RESUMEN"),
+            ("introduccion", "INTRODUCCION"),
+        ):
+            _inject_text_preliminary(prelim_key, default_title)
+
+        abbreviations = preliminares.get("abreviaturas")
+        abbreviations_title = _preliminary_title(
+            abbreviations,
+            "INDICE DE ABREVIATURAS",
+        )
+        abbreviations_content = _consume_content(
+            abbreviations_title,
+            f"PRELIMINARES/{abbreviations_title}",
+            "ABREVIATURAS",
+            "INDICE DE ABREVIATURAS",
+            "PRELIMINARES/ABREVIATURAS",
+            "PRELIMINARES/INDICE DE ABREVIATURAS",
+        )
+        if abbreviations_content:
+            safe_abbreviations = _flatten_to_text(abbreviations_content)
+            if safe_abbreviations:
+                if isinstance(abbreviations, dict):
+                    abbreviations["_ai_content"] = safe_abbreviations
+                else:
+                    preliminares["abreviaturas"] = {
+                        "titulo": abbreviations_title,
+                        "_ai_content": safe_abbreviations,
+                    }
 
     cuerpo = result.get("cuerpo")
     if isinstance(cuerpo, list):
@@ -384,20 +599,56 @@ def apply_ai_content(
                 )
                 if not item_content:
                     continue
-                _inject_into_render_fields(item, item_content, allow_text_override=False)
+                _inject_into_render_fields(
+                    item, item_content, allow_text_override=False
+                )
                 item["_ai_content"] = item_content
 
     finales = result.get("finales")
     if isinstance(finales, dict):
+        referencias = finales.get("referencias")
+        if isinstance(referencias, dict):
+            referencias_titulo = str(
+                referencias.get("titulo", "REFERENCIAS BIBLIOGRAFICAS")
+                or "REFERENCIAS BIBLIOGRAFICAS"
+            )
+            referencias_content = _consume_content(
+                referencias_titulo,
+                f"FINALES/{referencias_titulo}",
+                "REFERENCIAS",
+                "REFERENCIAS BIBLIOGRAFICAS",
+            )
+            if referencias_content:
+                safe_references = _flatten_to_text(referencias_content)
+                if safe_references:
+                    referencias["_ai_content"] = safe_references
+        elif isinstance(referencias, str):
+            referencias_titulo = str(referencias or "REFERENCIAS BIBLIOGRAFICAS").strip()
+            referencias_content = _consume_content(
+                referencias_titulo,
+                f"FINALES/{referencias_titulo}",
+                "REFERENCIAS",
+                "REFERENCIAS BIBLIOGRAFICAS",
+            )
+            if referencias_content:
+                safe_references = _flatten_to_text(referencias_content)
+                if safe_references:
+                    finales["referencias"] = {
+                        "titulo": referencias_titulo,
+                        "_ai_content": safe_references,
+                    }
+
         anexos = finales.get("anexos")
         if isinstance(anexos, dict):
             anexos_titulo = str(anexos.get("titulo", "ANEXOS") or "ANEXOS")
             anexos_lista = anexos.get("lista")
             if isinstance(anexos_lista, list):
-                for item in anexos_lista:
+                for position, item in enumerate(anexos_lista, start=1):
                     if not isinstance(item, dict):
                         continue
-                    item_titulo = str(item.get("texto") or item.get("titulo") or "").strip()
+                    item_titulo = str(
+                        item.get("texto") or item.get("titulo") or ""
+                    ).strip()
                     if not item_titulo:
                         continue
                     item_content = _consume_content(
@@ -405,9 +656,19 @@ def apply_ai_content(
                         f"ANEXOS/{item_titulo}",
                         item_titulo,
                     )
+                    resolved_annex_title = ""
+                    if not item_content:
+                        item_content, resolved_annex_title = _consume_annex_content(
+                            f"ANEXOS/{item_titulo}",
+                            annex_position=position,
+                        )
                     if not item_content:
                         continue
-                    _inject_into_render_fields(item, item_content, allow_text_override=False)
+                    if resolved_annex_title:
+                        item["titulo"] = resolved_annex_title
+                    _inject_into_render_fields(
+                        item, item_content, allow_text_override=False
+                    )
                     item["_ai_content"] = item_content
 
     return result

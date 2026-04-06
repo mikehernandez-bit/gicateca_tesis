@@ -22,6 +22,7 @@ Puntos de extension:
 Donde tocar si falla:
 - Verificar que BlockRenderer coincide con la firma de los renderers.
 """
+
 from __future__ import annotations
 
 from typing import Any, Dict, Protocol

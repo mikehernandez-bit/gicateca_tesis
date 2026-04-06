@@ -25,23 +25,19 @@ Donde tocar si falla:
 - Revisar resolucion de JSON y ejecucion de generadores.
 """
 
-from pathlib import Path
 import re
 import unicodedata
 from typing import Dict, List, Optional
 
 from app.core.loaders import discover_format_files, load_format_by_id, load_json_file
 from app.core.format_builder import (
-    TIPO_LABELS,
-    ENFOQUE_LABELS,
-    TIPO_FILTRO,
     build_format_entry,
     build_format_title,
 )
 from app.core.document_generator import (
     generate_document_by_type,
-    cleanup_temp_file,
 )
+
 _REFERENCE_KEYWORDS = {
     "references",
     "referencias",
@@ -104,13 +100,15 @@ def build_catalog(uni: Optional[str] = None) -> Dict[str, Dict]:
 
         entry = _build_format_entry(item, data)
         formatos.append(entry)
-        grouped.setdefault(item.uni, {}).setdefault(item.categoria, {}).setdefault(item.enfoque, []).append(entry)
+        grouped.setdefault(item.uni, {}).setdefault(item.categoria, {}).setdefault(
+            item.enfoque, []
+        ).append(entry)
 
     # Implement custom sorting for UNI
     if uni == "uni" or uni is None:
         PRIORITY = {"proyecto": 1, "informe": 2, "posgrado": 3, "maestria": 3}
         formatos.sort(key=lambda x: PRIORITY.get(x.get("tipo_formato", ""), 99))
-    
+
     return {"formatos": formatos, "grouped": grouped}
 
 
@@ -119,12 +117,12 @@ def get_all_formatos() -> List[Dict]:
     return build_catalog(None)["formatos"]
 
 
-
 # generate_document y cleanup_temp_file ahora viven en app.core.document_generator
 # Se delegan para mantener compatibilidad con catalog/router.py
 def generate_document(fmt_type: str, sub_type: str, uni: str = "unac"):
     """Genera un DOCX para un formato y retorna su ruta temporal."""
     return generate_document_by_type(fmt_type, sub_type, uni)
+
 
 # NUEVA FUNCIÓN AGREGADA PARA LA VISTA PREVIA (CARÁTULAS)
 def get_format_json_content(format_id: str) -> Dict:

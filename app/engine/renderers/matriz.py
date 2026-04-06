@@ -1,4 +1,5 @@
 """Renderer: matriz — Matriz de Consistencia como tabla landscape."""
+
 from __future__ import annotations
 
 from docx.document import Document
@@ -77,7 +78,13 @@ def render_matriz(doc: Document, block: Block) -> None:
     tabla_data = {
         "tipo": "tabla",
         "orientacion": "landscape" if landscape else "portrait",
-        "encabezados": ["PROBLEMAS", "OBJETIVOS", "HIPÓTESIS", "VARIABLES", "METODOLOGÍA"],
+        "encabezados": [
+            "PROBLEMAS",
+            "OBJETIVOS",
+            "HIPÓTESIS",
+            "VARIABLES",
+            "METODOLOGÍA",
+        ],
         "filas": filas,
         "celdas_fusionadas": [
             {"fila": 0, "col": 3, "filas_span": 2},

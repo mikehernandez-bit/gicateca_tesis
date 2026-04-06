@@ -23,6 +23,7 @@ Puntos de extension:
 Donde tocar si falla:
 - Revisar _load_json, rutas de data y reglas de order/enabled.
 """
+
 from __future__ import annotations
 
 import json
@@ -121,8 +122,12 @@ def get_uni_config(uni: str, available: Iterable[str]) -> Dict[str, Any]:
 
     # Filtra enabled/order a IDs disponibles.
     available_set = set(available)
-    config["enabled"] = [ref_id for ref_id in config.get("enabled", []) if ref_id in available_set]
-    config["order"] = [ref_id for ref_id in config.get("order", []) if ref_id in available_set]
+    config["enabled"] = [
+        ref_id for ref_id in config.get("enabled", []) if ref_id in available_set
+    ]
+    config["order"] = [
+        ref_id for ref_id in config.get("order", []) if ref_id in available_set
+    ]
     if not config["order"]:
         config["order"] = list(config["enabled"])
     return config
@@ -134,7 +139,10 @@ def build_reference_index(uni: str) -> Dict[str, Any]:
     config = get_uni_config(uni, available)
 
     summaries: List[Dict[str, Any]] = []
-    available_map = {item.get("id") or item.get("id_ref") or item.get("codigo"): item for item in list_references()}
+    available_map = {
+        item.get("id") or item.get("id_ref") or item.get("codigo"): item
+        for item in list_references()
+    }
 
     ordered_ids = [ref_id for ref_id in config["order"] if ref_id in available]
     # Asegura que se muestren todas las normas aunque no estén en order.

@@ -60,6 +60,7 @@ TIPO_FILTRO: Dict[str, str] = {
 # FUNCIONES DE CONSTRUCCION
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 def normalize_format_type(fmt_type: str) -> str:
     """Normaliza el tipo de formato aplicando aliases (pregrado -> informe)."""
     fmt_type = (fmt_type or "").strip().lower()
@@ -99,12 +100,16 @@ def build_format_entry(item, data: Dict) -> Dict:
     meta = data.get("_meta", {}) if isinstance(data, dict) else {}
 
     # Titulo: preferir _meta.title > data.titulo > generar
-    raw_title = meta.get("title") or (data.get("titulo") if isinstance(data, dict) else None)
+    raw_title = meta.get("title") or (
+        data.get("titulo") if isinstance(data, dict) else None
+    )
     titulo = build_format_title(item.categoria, item.enfoque, raw_title, item.titulo)
 
     # Categoria: preferir _meta.category > TIPO_LABELS
     category_from_meta = meta.get("category")
-    cat_label = category_from_meta or TIPO_LABELS.get(item.categoria, item.categoria.capitalize())
+    cat_label = category_from_meta or TIPO_LABELS.get(
+        item.categoria, item.categoria.capitalize()
+    )
 
     enfoque_label = ENFOQUE_LABELS.get(item.enfoque)
 
@@ -149,7 +154,11 @@ def build_format_entry(item, data: Dict) -> Dict:
         "escuela": escuela,
         "estado": "VIGENTE",
         "version": data.get("version", "1.0.0") if isinstance(data, dict) else "1.0.0",
-        "fecha": (data.get("fecha") if isinstance(data, dict) and data.get("fecha") else "2026-01-17"),
+        "fecha": (
+            data.get("fecha")
+            if isinstance(data, dict) and data.get("fecha")
+            else "2026-01-17"
+        ),
         "resumen": resumen,
         "tipo_formato": item.categoria,
         "enfoque": meta.get("documentType") or item.enfoque,

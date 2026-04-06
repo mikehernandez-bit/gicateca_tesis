@@ -186,7 +186,7 @@ Validar la integridad del catalogo de formatos.
 
 ### POST /generate
 
-Generar un documento DOCX a partir de datos JSON.
+Generar artifacts persistidos (`docx` y `pdf`) a partir del payload de render.
 
 **Request:**
 ```http
@@ -194,10 +194,45 @@ POST /api/v1/generate HTTP/1.1
 Content-Type: application/json
 
 {
-  "format_id": "unac-informe-cuant",
-  "data": { ... }
+  "formatId": "unac-informe-cuant",
+  "values": {
+    "title": "Titulo del proyecto"
+  },
+  "mode": "simulation",
+  "aiResult": {
+    "sections": [
+      {
+        "sectionId": "sec-0001",
+        "path": "Introduccion",
+        "content": "Texto plano compatible."
+      },
+      {
+        "sectionId": "sec-0002",
+        "path": "Cronograma",
+        "content": [
+          {
+            "tipo": "parrafo",
+            "texto": "Se presenta el cronograma del proyecto."
+          },
+          {
+            "tipo": "tabla",
+            "titulo": "Tabla 1. Cronograma",
+            "encabezados": ["Actividad", "Mes 1", "Mes 2"],
+            "filas": [["Revision", "X", ""]]
+          }
+        ]
+      }
+    ]
+  }
 }
 ```
+
+**Contrato de `aiResult.sections[].content`:**
+- `string`
+- `AIBlock[]`, donde cada bloque puede ser:
+  - `{"tipo":"parrafo","texto":"..."}`
+  - `{"tipo":"tabla","encabezados":[...],"filas":[...]...}`
+  - `{"tipo":"figura","caption":"...","ruta_placeholder":"assets/placeholder_figura.png"...}`
 
 **Response 200:**
 ```json
@@ -238,12 +273,44 @@ POST /api/v1/render/docx HTTP/1.1
 Content-Type: application/json
 
 {
-  "format_id": "unac-proyecto-cual",
-  "data": { ... }
+  "formatId": "unac-proyecto-cual",
+  "values": {
+    "title": "Titulo del proyecto"
+  },
+  "mode": "simulation",
+  "aiResult": {
+    "sections": [
+      {
+        "path": "Introduccion",
+        "content": "Texto plano compatible."
+      },
+      {
+        "path": "II. MARCO TEORICO/2.1 Bases teoricas",
+        "content": [
+          {
+            "tipo": "parrafo",
+            "texto": "Texto del marco teorico."
+          },
+          {
+            "tipo": "figura",
+            "caption": "Figura 1. Modelo conceptual.",
+            "ruta_placeholder": "assets/placeholder_figura.png"
+          }
+        ]
+      }
+    ]
+  }
 }
 ```
 
 **Response:** Archivo binario DOCX (descarga directa).
+
+**Notas de contrato:**
+- `content` acepta texto plano o bloques estructurados.
+- El literal legacy `"placeholder"` se normaliza a `assets/placeholder_figura.png`.
+- Las tablas validas se renderizan como tablas reales.
+- Las figuras validas se renderizan como `caption + placeholder`.
+- Si un bloque estructurado es invalido, el endpoint responde `422` con el error de validacion; no convierte listas/diccionarios a texto visible.
 
 **Fuente:** `app/modules/api/render_router.py`
 
@@ -251,7 +318,7 @@ Content-Type: application/json
 
 ### POST /render/pdf
 
-Renderizar PDF directamente desde JSON.
+Renderizar PDF directamente desde el mismo contrato de `/render/docx`.
 
 **Request:** Igual que `/render/docx`.
 

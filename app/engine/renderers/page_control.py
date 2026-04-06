@@ -2,6 +2,7 @@
 
 Agrupados porque todos controlan la estructura de páginas/secciones del documento.
 """
+
 from __future__ import annotations
 
 from docx.document import Document

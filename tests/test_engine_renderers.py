@@ -571,7 +571,7 @@ class TestAbbreviationsTable:
     def test_empty_rows_show_discreet_note(self):
         doc = _render({"type": "abbreviations_table", "rows": []})
         texts = [p.text for p in doc.paragraphs]
-        assert "(Completar abreviaturas)" in texts
+        assert "No se identificaron abreviaturas relevantes en el documento." in texts
 
 
 # ─────────────────────────────────────────────────────────────

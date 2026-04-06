@@ -29,6 +29,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]  # formatoteca_scaffold/
 SEED_DIR = ROOT / "app" / "data"
 
+
 def load_json(filename: str) -> Any:
     """Carga un JSON de data y retorna [] si no existe."""
     path = SEED_DIR / filename

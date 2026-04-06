@@ -27,6 +27,7 @@ NOTA: Estas funciones son COPIAS de las que existen en universal_generator.py.
       El generador viejo sigue usando sus propias copias hasta la Fase 5.
       Los renderers nuevos (Fase 4) importarán de aquí.
 """
+
 from __future__ import annotations
 
 import logging
@@ -38,12 +39,10 @@ from docx.enum.section import WD_SECTION
 from docx.enum.table import WD_CELL_VERTICAL_ALIGNMENT
 from docx.enum.text import (
     WD_ALIGN_PARAGRAPH,
-    WD_TAB_ALIGNMENT,
-    WD_TAB_LEADER,
 )
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
-from docx.shared import Cm, Inches, Pt, RGBColor
+from docx.shared import Cm, Pt, RGBColor
 
 logger = logging.getLogger(__name__)
 
@@ -75,6 +74,7 @@ ASSETS_PATHS = [
 # RESOLUCIÓN DE ASSETS
 # ═══════════════════════════════════════════════════════════════
 
+
 def resolve_asset(filename: str) -> Optional[str]:
     """Busca un archivo de asset en las ubicaciones conocidas.
 
@@ -82,14 +82,25 @@ def resolve_asset(filename: str) -> Optional[str]:
     """
     if not filename:
         return None
-    # Ruta absoluta directa
-    if Path(filename).exists():
-        return str(Path(filename).resolve())
+    raw = str(filename).strip()
+    candidates = [raw]
+
+    normalized = raw.replace("\\", "/").lstrip("./")
+    for prefix in ("assets/", "static/assets/", "app/static/assets/"):
+        if normalized.lower().startswith(prefix):
+            candidates.append(normalized[len(prefix):])
+
+    # Ruta absoluta o relativa directa
+    for candidate_name in candidates:
+        candidate_path = Path(candidate_name)
+        if candidate_path.exists():
+            return str(candidate_path.resolve())
     # Buscar en rutas de assets
     for p in ASSETS_PATHS:
-        candidate = p / filename
-        if candidate.exists():
-            return str(candidate)
+        for candidate_name in candidates:
+            candidate = p / candidate_name
+            if candidate.exists():
+                return str(candidate)
     return None
 
 
@@ -126,7 +137,10 @@ def resolve_logo_path(data: dict) -> Optional[str]:
 # CONFIGURACIÓN DEL DOCUMENTO
 # ═══════════════════════════════════════════════════════════════
 
-def configure_styles(doc: Document, font_name: str = "Arial", font_size: int = 11) -> None:
+
+def configure_styles(
+    doc: Document, font_name: str = "Arial", font_size: int = 11
+) -> None:
     """Configura el estilo Normal del documento."""
     style = doc.styles["Normal"]
     font = style.font
@@ -157,6 +171,7 @@ def configure_margins(doc: Document) -> None:
 # ═══════════════════════════════════════════════════════════════
 # PÁRRAFOS Y ENCABEZADOS
 # ═══════════════════════════════════════════════════════════════
+
 
 def add_p_centered(
     doc: Document,
@@ -233,6 +248,7 @@ def add_black_heading(
 # NOTAS ESTILIZADAS (BLUE BOX)
 # ═══════════════════════════════════════════════════════════════
 
+
 def add_styled_note(doc: Document, text: str) -> None:
     """Agrega una nota en caja azul (instrucciones/validación)."""
     if not text:
@@ -294,6 +310,7 @@ def add_styled_note(doc: Document, text: str) -> None:
 # ═══════════════════════════════════════════════════════════════
 # CAMPOS WORD (TOC, SEQ, PAGE)
 # ═══════════════════════════════════════════════════════════════
+
 
 def add_fld_page(paragraph) -> None:
     """Agrega un campo PAGE para numeración de páginas."""
@@ -400,6 +417,7 @@ def add_seq_field(paragraph, seq_name: str) -> None:
 # TABLA: HELPERS DE CELDA
 # ═══════════════════════════════════════════════════════════════
 
+
 def apply_cell_shading(cell, color_hex: str) -> None:
     """Aplica sombreado de fondo a una celda de tabla."""
     tc_pr = cell._tc.get_or_add_tcPr()
@@ -452,6 +470,7 @@ def format_cell_text(
 # ═══════════════════════════════════════════════════════════════
 # SECCIONES: ORIENTACIÓN LANDSCAPE / PORTRAIT
 # ═══════════════════════════════════════════════════════════════
+
 
 def _shrink_section_break_paragraph(doc: Document) -> None:
     """Minimiza el párrafo que contiene el section-break para evitar páginas en blanco.

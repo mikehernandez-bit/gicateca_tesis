@@ -35,7 +35,10 @@ API_KEY = os.getenv("GICATESIS_API_KEY")
 
 from app.modules.home.router import router as home_router
 from app.modules.catalog.router import router as catalog_router
-from app.modules.formats.router import router as formats_router, prewarm_pdfs as _prewarm_pdfs
+from app.modules.formats.router import (
+    router as formats_router,
+    prewarm_pdfs as _prewarm_pdfs,
+)
 from app.modules.alerts.router import router as alerts_router
 from app.modules.references.router import router as references_router
 from app.modules.admin.router import router as admin_router
@@ -65,6 +68,7 @@ def _prewarm_pdf_cache() -> None:
     # Precalienta PDFs solo si el flag de entorno esta activo.
     _prewarm_pdfs()
 
+
 @app.middleware("http")
 async def verify_api_key(request: Request, call_next):
     """
@@ -76,12 +80,15 @@ async def verify_api_key(request: Request, call_next):
         # Permitir docs y openapi sin clave
         if "docs" in request.url.path or "openapi" in request.url.path:
             return await call_next(request)
-            
+
         client_key = request.headers.get("X-GICATESIS-KEY")
         if client_key != API_KEY:
-            return JSONResponse(status_code=403, content={"detail": "Forbidden: Invalid API Key"})
-            
+            return JSONResponse(
+                status_code=403, content={"detail": "Forbidden: Invalid API Key"}
+            )
+
     return await call_next(request)
+
 
 @app.middleware("http")
 async def ensure_utf8_charset(request: Request, call_next):
@@ -98,15 +105,19 @@ async def ensure_utf8_charset(request: Request, call_next):
             response.headers["content-type"] = f"{content_type}; charset=utf-8"
     return response
 
+
 # Static files
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 app.mount("/recursos_data", StaticFiles(directory="app/data"), name="data_resources")
 
+
 @app.get("/favicon.ico", include_in_schema=False)
 def favicon():
     from app.core.settings import get_default_uni_code
+
     code = get_default_uni_code().upper()
     return RedirectResponse(url=f"/static/assets/Logo{code}.png")
+
 
 # Routers (cada modulo es una seccion del mockup)
 app.include_router(home_router)

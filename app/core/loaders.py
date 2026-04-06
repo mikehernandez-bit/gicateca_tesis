@@ -23,6 +23,7 @@ Puntos de extension:
 Donde tocar si falla:
 - Revisar discovery, normalizacion de IDs o lectura JSON.
 """
+
 import json
 import re
 import unicodedata
@@ -52,6 +53,7 @@ def get_data_dir(uni: str = "unac") -> Path:
 @dataclass(frozen=True)
 class FormatIndexItem:
     """Entrada inmutable del indice de formatos descubiertos."""
+
     format_id: str
     uni: str
     categoria: str
@@ -100,7 +102,9 @@ def _contains_mojibake(text: str) -> bool:
     return any(token in text for token in _MOJIBAKE_PATTERNS)
 
 
-def _scan_mojibake(value: Any, path: str, hits: list[tuple[str, str]], limit: int = 5) -> None:
+def _scan_mojibake(
+    value: Any, path: str, hits: list[tuple[str, str]], limit: int = 5
+) -> None:
     if len(hits) >= limit:
         return
     if isinstance(value, str):
@@ -207,7 +211,9 @@ def _discover_for_uni(uni: str) -> List[FormatIndexItem]:
             continue
 
         rel_path = path.relative_to(data_dir)
-        categoria = rel_path.parent.name.lower() if rel_path.parent != Path(".") else "general"
+        categoria = (
+            rel_path.parent.name.lower() if rel_path.parent != Path(".") else "general"
+        )
         stem = path.stem
         tokens = [t for t in re.split(r"[_-]+", stem.lower()) if t]
         enfoque = _derive_enfoque(tokens)
@@ -223,16 +229,26 @@ def _discover_for_uni(uni: str) -> List[FormatIndexItem]:
             for idx, entry in enumerate(data):
                 if not isinstance(entry, dict):
                     continue
-                raw_id = entry.get("id") or entry.get("format_id") or f"{stem}-{idx + 1}"
+                raw_id = (
+                    entry.get("id") or entry.get("format_id") or f"{stem}-{idx + 1}"
+                )
                 entry_tokens = [t for t in re.split(r"[_-]+", str(raw_id).lower()) if t]
-                entry_categoria = (entry.get("tipo_formato") or entry.get("categoria") or categoria).lower()
-                entry_enfoque = (entry.get("enfoque") or _derive_enfoque(entry_tokens)).lower()
+                entry_categoria = (
+                    entry.get("tipo_formato") or entry.get("categoria") or categoria
+                ).lower()
+                entry_enfoque = (
+                    entry.get("enfoque") or _derive_enfoque(entry_tokens)
+                ).lower()
                 format_id = _normalize_format_id(str(raw_id), uni)
                 if format_id in seen_ids:
                     continue
                 seen_ids.add(format_id)
 
-                titulo = entry.get("titulo") or entry.get("title") or _humanize_id(format_id, uni)
+                titulo = (
+                    entry.get("titulo")
+                    or entry.get("title")
+                    or _humanize_id(format_id, uni)
+                )
                 items.append(
                     FormatIndexItem(
                         format_id=format_id,
@@ -271,7 +287,14 @@ def _discover_for_uni(uni: str) -> List[FormatIndexItem]:
             )
         )
 
-    items.sort(key=lambda item: (item.categoria, item.enfoque, item.titulo.lower(), item.format_id))
+    items.sort(
+        key=lambda item: (
+            item.categoria,
+            item.enfoque,
+            item.titulo.lower(),
+            item.format_id,
+        )
+    )
     return items
 
 
@@ -286,7 +309,15 @@ def discover_format_files(uni: Optional[str] = None) -> List[FormatIndexItem]:
     for code in list_universities():
         items.extend(_discover_for_uni(code))
 
-    items.sort(key=lambda item: (item.uni, item.categoria, item.enfoque, item.titulo.lower(), item.format_id))
+    items.sort(
+        key=lambda item: (
+            item.uni,
+            item.categoria,
+            item.enfoque,
+            item.titulo.lower(),
+            item.format_id,
+        )
+    )
     return items
 
 
@@ -338,6 +369,13 @@ def load_format_by_id(format_id: str) -> Dict[str, Any]:
             }
         _warn_if_mojibake(payload, item.format_id, item.path)
         return payload
-    payload = {"_meta": {"format_id": item.format_id, "university": item.uni, "path": str(item.path)}, "data": data}
+    payload = {
+        "_meta": {
+            "format_id": item.format_id,
+            "university": item.uni,
+            "path": str(item.path),
+        },
+        "data": data,
+    }
     _warn_if_mojibake(payload, item.format_id, item.path)
     return payload

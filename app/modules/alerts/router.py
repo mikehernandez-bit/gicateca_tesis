@@ -29,6 +29,7 @@ from app.core.university_registry import get_provider
 
 router = APIRouter()
 
+
 @router.get("/alerts", response_class=HTMLResponse)
 def alerts(request: Request):
     """Renderiza la vista de alertas para la universidad activa."""

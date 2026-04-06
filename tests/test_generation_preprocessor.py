@@ -71,6 +71,42 @@ def test_apply_ai_content_injects_sanitized_text_in_target_section() -> None:
     assert "FIGURA DE EJEMPLO" not in intro_text.upper()
 
 
+def test_apply_ai_content_injects_preliminares_sections_beyond_introduccion() -> None:
+    data = {
+        "preliminares": {
+            "dedicatoria": {"titulo": "DEDICATORIA", "texto": "[Escriba aqui su dedicatoria...]"},
+            "agradecimientos": {"titulo": "AGRADECIMIENTO", "texto": "[Escriba aqui su agradecimiento...]"},
+        }
+    }
+    ai_sections = [
+        {"path": "DEDICATORIA", "content": "Dedico este trabajo a mi familia por su apoyo constante."},
+        {"path": "AGRADECIMIENTO", "content": "Agradezco a mi asesor y a la universidad por el acompanamiento brindado."},
+    ]
+
+    result = apply_ai_content(data, ai_sections)
+
+    assert result["preliminares"]["dedicatoria"]["_ai_content"].startswith("Dedico este trabajo")
+    assert result["preliminares"]["agradecimientos"]["_ai_content"].startswith("Agradezco a mi asesor")
+
+
+def test_apply_ai_content_injects_abbreviations_preliminary() -> None:
+    data = {
+        "preliminares": {
+            "indices": {"abreviaturas": "INDICE DE ABREVIATURAS"},
+        }
+    }
+    ai_sections = [
+        {
+            "path": "INDICE DE ABREVIATURAS",
+            "content": "IA: Inteligencia Artificial\nERP: Planificacion de recursos empresariales",
+        }
+    ]
+
+    result = apply_ai_content(data, ai_sections)
+
+    assert result["preliminares"]["abreviaturas"]["_ai_content"].startswith("IA: Inteligencia Artificial")
+
+
 def test_apply_ai_content_keeps_index_items_unchanged_when_titles_overlap() -> None:
     data = {
         "preliminares": {
@@ -134,3 +170,148 @@ def test_apply_ai_content_ignores_index_paths_from_ai_result() -> None:
 
     assert result["preliminares"]["indices"][0]["items"][0]["texto"] == "INTRODUCCION"
     assert result["preliminares"]["introduccion"]["texto"] == "Texto base"
+
+
+def test_apply_ai_content_tags_structured_chapter_blocks_as_ai_generated() -> None:
+    data = {
+        "cuerpo": [
+            {
+                "titulo": "V. CRONOGRAMA DE ACTIVIDADES",
+                "contenido": [
+                    {
+                        "tipo": "tabla",
+                        "titulo": "Cronograma base",
+                        "encabezados": ["Actividad", "Mes 1"],
+                        "filas": [["Base", "X"]],
+                    }
+                ],
+            }
+        ]
+    }
+    ai_sections = [
+        {
+            "path": "V. CRONOGRAMA DE ACTIVIDADES",
+            "content": [
+                {
+                    "tipo": "tabla",
+                    "titulo": "Cronograma final",
+                    "encabezados": ["Actividad", "Mes 1"],
+                    "filas": [["Real", "X"]],
+                }
+            ],
+        }
+    ]
+
+    result = apply_ai_content(data, ai_sections)
+    contenido = result["cuerpo"][0]["contenido"]
+
+    assert contenido[0]["titulo"] == "Cronograma final"
+    assert contenido[0]["_ai_generated"] is True
+    assert contenido[1]["titulo"] == "Cronograma base"
+    assert "_ai_generated" not in contenido[1]
+
+
+def test_apply_ai_content_injects_final_references_section() -> None:
+    data = {
+        "finales": {
+            "referencias": {
+                "titulo": "IX. REFERENCIAS BIBLIOGRAFICAS",
+                "ejemplos_apa": ["Base 1"],
+            }
+        }
+    }
+    ai_sections = [
+        {
+            "path": "IX. REFERENCIAS BIBLIOGRAFICAS",
+            "content": (
+                "Las siguientes referencias son propuestas academicas simuladas.\n\n"
+                "Morales, J. (2024). Texto uno.\n\n"
+                "Rojas, M. (2023). Texto dos."
+            ),
+        }
+    ]
+
+    result = apply_ai_content(data, ai_sections)
+    referencias = result["finales"]["referencias"]
+
+    assert referencias["_ai_content"].startswith("Las siguientes referencias")
+    assert "ejemplos_apa" in referencias
+
+
+def test_apply_ai_content_matches_annex_by_prefix_when_title_changes() -> None:
+    data = {
+        "finales": {
+            "anexos": {
+                "titulo_seccion": "ANEXOS",
+                "lista": [
+                    {
+                        "titulo": "Anexo 1: Matriz de consistencia",
+                        "tabla": {"headers": ["Base"], "rows": [["Ejemplo"]]},
+                    }
+                ],
+            }
+        }
+    }
+    ai_sections = [
+        {
+            "path": "ANEXOS/Anexo 1: Matriz de consistencia final",
+            "content": [
+                {"tipo": "parrafo", "texto": "Contenido final del anexo."},
+                {
+                    "tipo": "tabla",
+                    "titulo": "Matriz de consistencia final",
+                    "encabezados": ["Problema", "Objetivo"],
+                    "filas": [["P1", "O1"]],
+                },
+            ],
+        }
+    ]
+
+    result = apply_ai_content(data, ai_sections)
+    anexo = result["finales"]["anexos"]["lista"][0]
+
+    assert anexo["titulo"] == "Anexo 1: Matriz de consistencia final"
+    assert anexo["_ai_content"][0]["texto"] == "Contenido final del anexo."
+    assert anexo["_ai_content"][1]["titulo"] == "Matriz de consistencia final"
+
+
+def test_apply_ai_content_matches_annex_by_position_when_base_title_is_not_annex() -> None:
+    data = {
+        "finales": {
+            "anexos": {
+                "titulo_seccion": "ANEXOS",
+                "lista": [
+                    {"titulo": "Figura A1. Registro fotográfico"},
+                    {"titulo": "Tabla 15. Tabla de resultados complementarios"},
+                ],
+            }
+        }
+    }
+    ai_sections = [
+        {
+            "path": "ANEXOS/Anexo 1: Registro fotográfico",
+            "content": [
+                {"tipo": "parrafo", "texto": "Evidencia 1. Vista frontal del equipo."}
+            ],
+        },
+        {
+            "path": "ANEXOS/Anexo 2: Tabla de resultados complementarios",
+            "content": [
+                {
+                    "tipo": "tabla",
+                    "titulo": "Tabla 15. Tabla de resultados complementarios",
+                    "encabezados": ["Indicador", "Valor"],
+                    "filas": [["Disponibilidad", "96%"]],
+                }
+            ],
+        },
+    ]
+
+    result = apply_ai_content(data, ai_sections)
+    foto = result["finales"]["anexos"]["lista"][0]
+    tabla = result["finales"]["anexos"]["lista"][1]
+
+    assert foto["titulo"] == "Anexo 1: Registro fotográfico"
+    assert foto["_ai_content"][0]["texto"] == "Evidencia 1. Vista frontal del equipo."
+    assert tabla["titulo"] == "Anexo 2: Tabla de resultados complementarios"
+    assert tabla["_ai_content"][0]["titulo"] == "Tabla 15. Tabla de resultados complementarios"

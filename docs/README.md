@@ -1,6 +1,8 @@
 ﻿# Documentacion del Sistema GicaTesis (Formatoteca)
 
-Esta carpeta contiene la documentacion tecnica completa del sistema **GicaTesis/Formatoteca**.
+Esta carpeta contiene la documentacion tecnica completa del sistema
+**GicaTesis/Formatoteca** y el paquete de contexto autocontenido para otro
+agente o ChatGPT.
 
 ## Como Navegar
 
@@ -36,6 +38,7 @@ py -m uvicorn app.main:app --reload
 
 | Archivo | Contenido |
 |---------|-----------|
+| [GICATESIS_CONTEXT.md](GICATESIS_CONTEXT.md) | Paquete autocontenido de contexto |
 | [00_indice.md](manual/00_indice.md) | Indice navegable |
 | [01_vision_general.md](manual/01_vision_general.md) | Que es GicaTesis y flujo de usuario |
 | [02_instalacion_y_ejecucion.md](manual/02_instalacion_y_ejecucion.md) | Setup del entorno |

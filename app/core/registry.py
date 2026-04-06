@@ -22,6 +22,7 @@ Puntos de extension:
 Donde tocar si falla:
 - Verificar rutas de providers o errores de import en discovery.
 """
+
 from __future__ import annotations
 
 import logging

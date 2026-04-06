@@ -1,4 +1,5 @@
 """Renderer: centered_text — texto centrado con formato personalizado."""
+
 from __future__ import annotations
 
 from docx.document import Document

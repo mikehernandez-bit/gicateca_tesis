@@ -4,6 +4,14 @@ Plataforma de gestion y generacion de formatos de tesis universitarias. **Python
 
 **Version:** 1.0.0
 
+## Contexto rapido
+
+Si vas a entregar este repo a otro agente o a ChatGPT, empieza por estos dos
+documentos:
+
+- `docs/GICATESIS_CONTEXT.md`
+- `docs/GICAGEN_INTEGRATION_GUIDE.md`
+
 ## Ejecutar (local)
 
 ```bash
