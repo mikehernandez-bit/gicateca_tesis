@@ -21,3 +21,9 @@ El `preprocessor.py` debe inyectar metadatos críticos de forma redundante tanto
 
 ## 4. Inyección de IA Estructural
 Las secciones especiales como "Información Básica" deben soportar un campo `_ai_content` que renderiza contenido plano generado por IA sin necesidad de que el usuario lo mapee manualmente en cada placeholder.
+
+## 5. Regla de Comunicación Ejecutiva (Reporting)
+Para informes de avance y resúmenes de actividad dirigidos a stakeholders:
+- **Formato**: Entregar siempre la información en **exactamente 3 puntos**.
+- **Lenguaje**: Usar **lenguaje no técnico**, enfocado en el valor de negocio o progreso del trabajo, evitando términos internos de programación.
+- **Contexto**: Los resúmenes deben estar listos para ser copiados directamente en un **informe de trabajo**.
