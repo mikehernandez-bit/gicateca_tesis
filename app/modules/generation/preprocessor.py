@@ -32,9 +32,12 @@ from __future__ import annotations
 
 import re
 import unicodedata
+import logging
 from copy import deepcopy
 from pathlib import Path
 from typing import Any, Dict, List, Set
+
+logger = logging.getLogger(__name__)
 
 
 # Keys that should NOT appear in the final document
@@ -58,9 +61,6 @@ EXCLUDED_KEYS: Set[str] = frozenset(
         "placeholder",
         "tipo_vista",
         "vista_previa",
-        "_meta",
-        "version",
-        "descripcion",
     }
 )
 
@@ -140,21 +140,44 @@ def _apply_cover_fallbacks(data: Dict[str, Any], values: Dict[str, Any]) -> None
     if not isinstance(caratula, dict):
         return
 
+    # 1. Autor(es)
+    autores = []
+    for prefix in ("autor1", "autor2"):
+        nombre = str(values.get(f"{prefix}_nombres", "") or "").strip()
+        if nombre:
+            autores.append(nombre)
+    if autores:
+        caratula["autores"] = autores
+
+    # 2. Asesor
+    asesor_nombre = str(values.get("asesor_nombres", "") or "").strip()
+    if asesor_nombre:
+        caratula["asesor"] = asesor_nombre
+
+    # 3. Línea de investigación
+    linea = str(values.get("linea_investigacion", "") or "").strip()
+    if linea:
+        caratula["linea_investigacion"] = linea
+
+    # 4. Título
     project_obj = values.get("project")
     title_value = _pick_first_nonempty(
         values,
-        ["title", "project_title", "projectTitle"],
+        ["titulo", "title", "project_title", "projectTitle"],
     )
     if not title_value and isinstance(project_obj, dict):
         nested_title = project_obj.get("title")
         if nested_title is not None and str(nested_title).strip():
             title_value = str(nested_title).strip()
     if title_value:
-        current_title = str(
-            caratula.get("titulo") or caratula.get("titulo_placeholder") or ""
-        )
-        if _looks_like_placeholder(current_title):
-            caratula["titulo"] = title_value
+        caratula["titulo"] = title_value
+
+    # 5. Año/Lugar
+    lugar = str(values.get("lugar_caratula", "") or "").strip()
+    anio = str(values.get("anio", "") or "").strip()
+    if lugar or anio:
+        parts = [p for p in (lugar, anio) if p]
+        caratula["lugar"] = ", ".join(parts)
 
     fallback_map = {
         "facultad": ["facultad", "faculty"],
@@ -163,12 +186,154 @@ def _apply_cover_fallbacks(data: Dict[str, Any], values: Dict[str, Any]) -> None
         "asesor_valor": ["asesor_valor", "asesor", "advisor"],
     }
     for cover_key, candidates in fallback_map.items():
+        if cover_key in caratula and not _looks_like_placeholder(str(caratula[cover_key])):
+            continue # Already filled by user directly or by new logic
         picked = _pick_first_nonempty(values, candidates)
-        if not picked:
-            continue
-        existing = str(caratula.get(cover_key, "") or "")
-        if _looks_like_placeholder(existing):
+        if picked:
             caratula[cover_key] = picked
+
+    # New institutional direct mappings
+    for dest, src in [
+        ("universidad", "universidad"),
+        ("escuela", "escuela"),
+        ("tipo_documento", "tipo_documento"),
+        ("frase_grado", "frase_grado"),
+        ("titulo", "titulo"),
+        ("titulo_investigacion", "titulo"),
+        ("autor1_nombres", "autor1_nombres"),
+        ("asesor_nombres", "asesor_nombres"),
+        ("linea_investigacion", "linea_investigacion"),
+        ("anio", "anio"),
+        ("lugar", "lugar_caratula"),
+    ]:
+        val = str(values.get(src, "") or "").strip()
+        if val:
+            caratula[dest] = val
+            # ALSO INJECT AT ROOT LEVEL FOR FLEXIBILITY
+            data[dest] = val
+
+
+def _apply_unac_maestria_smart_replacements(data: Dict[str, Any], values: Dict[str, Any]) -> None:
+    """
+    Last-mile hardcoded placeholder replacement for UNAC Master's thesis.
+    Targets exact strings seen in institutional templates.
+    """
+    v = values or {}
+    
+    # 1. Define replacements map
+    # Key: Placeholder string to find
+    # Value: Variable name in 'values' to replace with
+    replacements = {
+        # Carátula
+        "[TÍTULO DE LA TESIS]": v.get("titulo"),
+        "\"[TÍTULO DE LA TESIS]\"": v.get("titulo"),
+        # NOTA: Se elimina "[Apellidos y nombres]" global porque causaba que el asesor 
+        # reemplazara al autor si este último faltaba. El renderizado estructural ya 
+        # maneja los nombres en sus lugares correctos.
+        "[Nombre de la línea]": v.get("linea_investigacion"),
+        "[AÑO]": v.get("anio"),
+        
+        # Información Básica
+        "[Nombre de Facultad]": v.get("facultad"),
+        "[Nombre Unidad de Investigación]": v.get("unidad_investigacion"),
+        "[Título de tesis]": v.get("titulo"),
+        "Bach. [Apellidos y nombres]": f"Bach. {v.get('autor1_nombres')}" if v.get("autor1_nombres") else None,
+        "Dr. [Apellidos y nombres]": f"Dr. {v.get('asesor_nombres')}" if v.get("asesor_nombres") else None,
+        "[Lugar de ejecución]": v.get("lugar_ejecucion"),
+        "[Unidad de análisis]": v.get("unidad_analisis"),
+        "[TIPO]": v.get("tipo"),
+        "[ENFOQUE]": v.get("enfoque"),
+        "[DISEÑO DE INVESTIGACIÓN]": v.get("diseno_investigacion"),
+        "[LÍNEA OCDE 1]": v.get("tema_ocde_1"),
+        "[LÍNEA OCDE 2]": v.get("tema_ocde_2"),
+        "[LÍNEA OCDE 3]": v.get("tema_ocde_3"),
+
+        # Matriz de Consistencia y otros apartados técnicos
+        "¿[Problema general de la investigación]?": f"¿{v.get('problema_general')}?" if v.get("problema_general") else None,
+        "[Objetivo general de la investigación]": v.get("objetivo_general"),
+        "[Hipótesis general de la investigación]": v.get("hipotesis_general"),
+        "[Variable independiente]": v.get("vi"),
+        "[Variable dependiente]": v.get("vd"),
+        "[Línea de investigación]": v.get("linea_investigacion"),
+        "[Población y muestra]": f"{v.get('poblacion', '')} / {v.get('muestra', '')}".strip() if v.get("poblacion") or v.get("muestra") else None,
+
+        # Carátula - Reemplazos genéricos post-enfocados
+        # Se aplican al final para no interferir con los prefijados (Bach./Dr.)
+        "[Apellidos y nombres]": v.get("autor1_nombres") or v.get("asesor_nombres"),
+        "[Nombre de la facultad]": v.get("facultad"),
+        "[AÑO]": v.get("anio"),
+
+        # Hoja de Jurado y Actas
+        "[ASESOR]": v.get("asesor_nombres"),
+        "[dd de mes de aaaa]": v.get("fecha_sustentacion"),
+    }
+
+    def _recursive_replace(obj: Any) -> Any:
+        if isinstance(obj, str):
+            res = obj
+            for placeholder, val in replacements.items():
+                if val and placeholder in res:
+                    res = res.replace(placeholder, str(val))
+            return res
+        elif isinstance(obj, dict):
+            return {k: _recursive_replace(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [_recursive_replace(item) for item in obj]
+        return obj
+
+    # Apply replacement recursively to the whole doc structure (caratula, info_basica, matriz, etc.)
+    for key in list(data.keys()):
+        data[key] = _recursive_replace(data[key])
+
+def _apply_informacion_basica_values(data: Dict[str, Any], values: Dict[str, Any]) -> None:
+    informacion_basica = data.get("informacion_basica")
+    if not isinstance(informacion_basica, dict):
+        return
+
+    # 1. Autor(es)
+    autores_info = []
+    for prefix in ("autor1", "autor2"):
+        nombre = str(values.get(f"{prefix}_nombres", "") or "").strip()
+        if not nombre:
+            continue
+        prefix_label = "Bach. " if prefix.startswith("autor") else "Dr. "
+        autores_info.append({
+            "nombre": f"{prefix_label}{nombre}",
+            "dni": str(values.get(f"{prefix}_dni", "") or "[DNI]").strip(),
+            "orcid": str(values.get(f"{prefix}_orcid", "") or "[ORCID]").strip(),
+        })
+    if autores_info:
+        informacion_basica["autores"] = autores_info
+
+    # 2. Asesor
+    asesor_nombre = str(values.get("asesor_nombres", "") or "").strip()
+    if asesor_nombre:
+        informacion_basica["asesor"] = {
+            "nombre": f"Dr. {asesor_nombre}",
+            "dni": str(values.get("asesor_dni", "") or "[DNI]").strip(),
+            "orcid": str(values.get("asesor_orcid", "") or "[ORCID]").strip(),
+        }
+
+    # 3. Campos directos
+    for dest, src in [
+        ("titulo_investigacion", "titulo"),
+        ("lugar_ejecucion", "lugar_ejecucion"),
+        ("unidad_analisis", "unidad_analisis"),
+        ("tipo", "tipo"),
+        ("enfoque", "enfoque"),
+        ("diseno_investigacion", "diseno_investigacion"),
+        ("facultad", "facultad"),
+        ("unidad_investigacion", "unidad_investigacion"),
+    ]:
+        val = str(values.get(src, "") or "").strip()
+        if val:
+            informacion_basica[dest] = val
+
+    # 4. Temas OCDE
+    temas = [str(values.get(f"tema_ocde_{i}", "") or "").strip() for i in (1, 2, 3)]
+    temas = [t for t in temas if t]
+    if temas:
+        informacion_basica["tema_ocde"] = temas
 
 
 def sanitize_ai_text(content: str) -> str:
@@ -240,6 +405,11 @@ def merge_values(
             for key, value in values.items():
                 if value is None:
                     continue
+                # Skip empty strings to prevent accidental clearing of placeholders
+                # when data is missing but the key exists.
+                val_str = str(value).strip()
+                if not val_str:
+                    continue
                 patterns = [
                     f"[{key.upper()}]",
                     f"[{key}]",
@@ -248,7 +418,7 @@ def merge_values(
                 ]
                 for pattern in patterns:
                     if pattern in result:
-                        result = result.replace(pattern, str(value))
+                        result = result.replace(pattern, val_str)
             return result
         elif isinstance(obj, dict):
             return {k: _replace_placeholders(v) for k, v in obj.items()}
@@ -258,8 +428,37 @@ def merge_values(
 
     merged = _replace_placeholders(data)
     if isinstance(merged, dict):
+        # DIAGNOSTIC: Log the keys in values
+        logger.info(f"PREPROCESSOR: Received values keys: {list((values or {}).keys())}")
+        if values and "autor1_nombres" in values:
+             logger.info(f"PREPROCESSOR: autor1_nombres found: {values.get('autor1_nombres')}")
+
         _apply_cover_fallbacks(merged, values or {})
+        _apply_informacion_basica_values(merged, values or {})
+
+        # Smart UNAC-Maestria replacement for hardcoded institutional placeholders
+        try:
+            _apply_unac_maestria_smart_replacements(merged, values or {})
+        except Exception as e:
+            logger.error(f"PREPROCESSOR: Smart replacement failed: {e}")
     return merged
+
+
+def _inject_ai_into_informacion_basica(data: Dict[str, Any], content: Any) -> None:
+    """Inject AI content specialized for the informacion_basica block."""
+    info = data.get("informacion_basica")
+    if not isinstance(info, dict):
+        return
+    
+    # Store it in a hidden/internal key that the renderer can pick up
+    info["_ai_content"] = content
+    
+    # Also attempt to replace common placeholders if content is text
+    if isinstance(content, str) and content.strip():
+        # This is a fallback: if the AI generated a block of text for the basic info,
+        # we might want to show it somewhere. 
+        # For now, we just ensure it's available for the renderer.
+        pass
 
 
 def apply_ai_content(
@@ -447,6 +646,14 @@ def apply_ai_content(
 
         # Last resort for blocks without explicit paragraph fields.
         target["parrafos"] = [content]
+
+    # --- INFORMACION BASICA SPECIAL HANDLING ---
+    # Many formats treat 'Información Básica' as a top-level block, not a section.
+    ib_content = _consume_content("INFORMACION BASICA", "DATOS GENERALES")
+    if ib_content:
+        _inject_ai_into_informacion_basica(data, ib_content)
+
+    # --- BODY INJECTION ---
 
     def _inject_chapter_content(capitulo: Dict[str, Any], content: Any) -> None:
         """Inject content into a chapter. Handles both str and list."""

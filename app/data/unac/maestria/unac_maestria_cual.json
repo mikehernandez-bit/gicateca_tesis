@@ -15,17 +15,22 @@
   },
   "caratula": {
     "universidad": "UNIVERSIDAD NACIONAL DEL CALLAO",
-    "facultad": "ESCUELA DE POSGRADO",
-    "escuela": "UNIDAD DE POSGRADO DE LA FACULTAD DE [FACULTAD]",
-    "tipo_documento": "TESIS DE MAESTRÍA",
-    "titulo_placeholder": "\"[TÍTULO COMPLETO DEL TRABAJO]\"",
-    "frase_grado": "PARA OPTAR EL GRADO ACADÉMICO DE:",
-    "grado_objetivo": "MAESTRO EN [NOMBRE EXACTO DEL PROGRAMA]",
-    "label_autor": "AUTOR(ES)\n[NOMBRES Y APELLIDOS]",
-    "label_asesor": "ASESOR\n[NOMBRES Y APELLIDOS]",
-    "label_linea": "LÍNEA DE INVESTIGACIÓN: [NOMBRE DE LA LÍNEA]",
-    "lugar": "Callao, [AÑO]",
-    "anio": "PERÚ"
+    "facultad": "Facultad de Ingeniería Mecánica y de Energía",
+    "escuela": "Unidad de Posgrado de la Facultad de Ingeniería Mecánica y de Energía",
+    "tipo_documento": "PROYECTO DE INVESTIGACIÓN",
+    "titulo_placeholder": "\"[TÍTULO DE LA TESIS]\"",
+    "frase_grado": "PARA OPTAR EL GRADO ACADÉMICO DE MAESTRO EN GERENCIA DE MANTENIMIENTO",
+    "label_autor": "AUTORES:",
+    "autores": [
+      "[Apellidos y nombres]"
+    ],
+    "label_asesor": "ASESOR:",
+    "asesor": "[Apellidos y nombres]",
+    "label_linea": "LÍNEA DE INVESTIGACIÓN:",
+    "linea_investigacion": "[Nombre de la línea]",
+    "lugar": "Callao, 2026",
+    "anio": "2026",
+    "pais": "PERÚ"
   },
   "preliminares": {
     "dedicatoria": {
@@ -496,43 +501,30 @@
   },
   "informacion_basica": {
     "titulo": "INFORMACIÓN BÁSICA",
-    "elementos": [
+    "facultad": "Facultad de Ingeniería Mecánica y de Energía",
+    "unidad_investigacion": "Unidad de Posgrado de la Facultad de Ingeniería Mecánica y de Energía",
+    "titulo_investigacion": "[Título de tesis]",
+    "autores": [
       {
-        "label": "FACULTAD:",
-        "valor": "[FACULTAD]"
-      },
-      {
-        "label": "UNIDAD DE INVESTIGACIÓN:",
-        "valor": "[Unidad de Investigación]"
-      },
-      {
-        "label": "TÍTULO:",
-        "valor": "[TÍTULO DE TESIS]"
-      },
-      {
-        "label": "AUTOR(ES) / CÓDIGO ORCID / DNI:",
-        "valor": "[AUTOR]\nCódigo orcid:[0000-0000-0000-0000]\nDNI:[00000000]"
-      },
-      {
-        "label": "ASESOR / COASESOR / CÓDIGO ORCID / DNI:",
-        "valor": "[ASESOR]\nCódigo orcid:[0000-0000-0000-0000]\nDNI:[00000000]"
-      },
-      {
-        "label": "LUGAR DE EJECUCIÓN:",
-        "valor": "[Lugar de ejecución]"
-      },
-      {
-        "label": "UNIDAD DE ANÁLISIS:",
-        "valor": "[Unidad de análisis]"
-      },
-      {
-        "label": "INVESTIGACIÓN:",
-        "valor": "TIPO: [Tipo] / ENFOQUE: CUALITATIVO / DISEÑO: [Diseño] / NIVEL: [Nivel]"
-      },
-      {
-        "label": "TEMA OCDE:",
-        "valor": "[Código y descripción OCDE]"
+        "nombre": "Bach. [Apellidos y nombres]",
+        "dni": "[00000000]",
+        "orcid": "[0000-0000-0000-0000]"
       }
+    ],
+    "asesor": {
+      "nombre": "Dr. [Apellidos y nombres]",
+      "dni": "[00000000]",
+      "orcid": "[0000-0000-0000-0000]"
+    },
+    "lugar_ejecucion": "[Lugar de ejecución]",
+    "unidad_analisis": "[Unidad de análisis]",
+    "tipo": "[TIPO]",
+    "enfoque": "[ENFOQUE]",
+    "diseno_investigacion": "[DISEÑO DE INVESTIGACIÓN]",
+    "tema_ocde": [
+      "[LÍNEA OCDE 1]",
+      "[LÍNEA OCDE 2]",
+      "[LÍNEA OCDE 3]"
     ]
   },
   "pagina_respeto": {}

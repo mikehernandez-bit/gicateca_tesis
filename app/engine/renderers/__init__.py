@@ -16,7 +16,7 @@ Donde tocar si falla:
 from app.engine.renderers import (  # noqa: F401
     apa_examples,
     centered_text,
-    headings,
+     headings,
     image,
     info_table,
     logo,
@@ -26,4 +26,6 @@ from app.engine.renderers import (  # noqa: F401
     paragraphs,
     table,
     toc,
+    caratula_unac_maestria,
+    info_basica_unac_maestria,
 )

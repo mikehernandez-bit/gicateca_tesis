@@ -743,6 +743,10 @@ def _normalize_caratula(data: dict) -> List[Block]:
     if not c:
         return []
 
+    is_unac_maestria = data.get("_meta", {}).get("id", "").startswith("unac-maestria")
+    if is_unac_maestria:
+        return [{"type": "caratula_unac_maestria", "data": data, "caratula": c}]
+
     blocks: List[Block] = []
 
     # Universidad (con fallback desde _meta)
@@ -981,6 +985,10 @@ def _normalize_informacion_basica(data: dict) -> List[Block]:
     info = data.get("informacion_basica", {})
     if not info:
         return []
+
+    is_unac_maestria = data.get("_meta", {}).get("id", "").startswith("unac-maestria")
+    if is_unac_maestria:
+        return [{"type": "info_basica_unac_maestria", "data": data, "info": info}]
 
     blocks: List[Block] = []
 
