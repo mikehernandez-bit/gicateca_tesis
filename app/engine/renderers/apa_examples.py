@@ -1,4 +1,5 @@
 """Renderer: apa_examples — ejemplos APA 7 con hanging indent."""
+
 from __future__ import annotations
 
 from docx.document import Document

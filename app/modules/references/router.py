@@ -22,6 +22,7 @@ Puntos de extension:
 Donde tocar si falla:
 - Revisar service.py y templates/pages/references.html.
 """
+
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 
@@ -79,4 +80,3 @@ def get_reference_detail(ref_id: str, request: Request):
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
     return JSONResponse(content=payload)
-

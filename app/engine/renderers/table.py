@@ -10,6 +10,7 @@ la función original del universal_generator.py, incluyendo:
 
 La función _render_tabla_impl es reutilizada por el renderer de matriz.
 """
+
 from __future__ import annotations
 
 import re
@@ -38,6 +39,7 @@ from app.engine.types import Block
 # ─────────────────────────────────────────────────────────────
 # IMPLEMENTACIÓN COMPARTIDA
 # ─────────────────────────────────────────────────────────────
+
 
 def _render_tabla_impl(doc: Document, tabla_data: dict) -> None:
     """Renderiza una tabla completa. Replica ``render_tabla()`` del generador.
@@ -83,7 +85,9 @@ def _render_tabla_impl(doc: Document, tabla_data: dict) -> None:
 
     # 2. Caption / Title with SEQ field
     if titulo:
-        clean_title = re.sub(r"^Tabla\s*[\d.]+\s*[:.]*\s*", "", titulo).strip() or titulo
+        clean_title = (
+            re.sub(r"^Tabla\s*[\d.]+\s*[:.]*\s*", "", titulo).strip() or titulo
+        )
         p = doc.add_paragraph()
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
         p.paragraph_format.space_after = Pt(6)
@@ -123,8 +127,11 @@ def _render_tabla_impl(doc: Document, tabla_data: dict) -> None:
     for i, header_text in enumerate(encabezados):
         cell = table.rows[0].cells[i]
         format_cell_text(
-            cell, header_text, font_size,
-            bold=True, alignment=WD_ALIGN_PARAGRAPH.CENTER,
+            cell,
+            header_text,
+            font_size,
+            bold=True,
+            alignment=WD_ALIGN_PARAGRAPH.CENTER,
         )
         apply_cell_shading(cell, header_color)
         set_cell_vertical_alignment(cell)
@@ -170,6 +177,7 @@ def _render_tabla_impl(doc: Document, tabla_data: dict) -> None:
 # ─────────────────────────────────────────────────────────────
 # RENDERERS REGISTRADOS
 # ─────────────────────────────────────────────────────────────
+
 
 @register("table")
 def render_table(doc: Document, block: Block) -> None:

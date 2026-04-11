@@ -43,6 +43,7 @@ from app.core.format_builder import normalize_format_type
 # RESOLUCION DE GENERADORES
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 def resolve_generator_command(
     generator: Union[Path, Sequence[str]],
     json_path: Path,
@@ -70,12 +71,18 @@ def resolve_generator_command(
     script_path = Path(generator)
     if not script_path.exists():
         raise RuntimeError(f"Generator script not found: {script_path}")
-    return [sys.executable, str(script_path), str(json_path), str(output_path)], script_path.parent
+    return [
+        sys.executable,
+        str(script_path),
+        str(json_path),
+        str(output_path),
+    ], script_path.parent
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # GENERACION DE DOCUMENTOS
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 def generate_document_by_id(
     format_id: str,
@@ -127,14 +134,18 @@ def generate_document_by_id(
 
         # 3. Nos quedamos SOLO con el bloque que tenga "PLANTEAMIENTO"
         data["cuerpo"] = [
-            cap for cap in data.get("cuerpo", [])
+            cap
+            for cap in data.get("cuerpo", [])
             if "PLANTEAMIENTO" in cap.get("titulo", "").upper()
         ]
 
         # 4. Guardamos el JSON filtrado
         tmp_json = tempfile.NamedTemporaryFile(
-            prefix="filtered_", suffix=".json",
-            delete=False, mode="w", encoding="utf-8",
+            prefix="filtered_",
+            suffix=".json",
+            delete=False,
+            mode="w",
+            encoding="utf-8",
         )
         json.dump(data, tmp_json, ensure_ascii=False, indent=2)
         tmp_json.close()
@@ -145,15 +156,19 @@ def generate_document_by_id(
     # ─── GENERACION ───
     filename = f"{provider.code.upper()}_{tipo.upper()}_{enfoque.upper()}.docx"
     tmp_file = tempfile.NamedTemporaryFile(
-        prefix=f"{provider.code}_", suffix=".docx", delete=False,
+        prefix=f"{provider.code}_",
+        suffix=".docx",
+        delete=False,
     )
     output_path = Path(tmp_file.name)
     tmp_file.close()
 
     cmd, workdir = resolve_generator_command(generator, path_to_use, output_path)
     result = subprocess.run(
-        cmd, cwd=str(workdir) if workdir else None,
-        capture_output=True, text=True,
+        cmd,
+        cwd=str(workdir) if workdir else None,
+        capture_output=True,
+        text=True,
     )
 
     # Limpiamos el JSON temporal si fue creado por el filtro
@@ -190,21 +205,29 @@ def generate_document_by_type(
     provider = get_provider(uni)
     generator = provider.get_generator_command(fmt_type)
 
-    json_path = provider.get_data_dir() / fmt_type / f"{provider.code}_{fmt_type}_{sub_type}.json"
+    json_path = (
+        provider.get_data_dir()
+        / fmt_type
+        / f"{provider.code}_{fmt_type}_{sub_type}.json"
+    )
     if not json_path.exists():
         raise RuntimeError(f"JSON no encontrado: {json_path}")
 
     filename = f"{provider.code.upper()}_{fmt_type.upper()}_{sub_type.upper()}.docx"
     tmp_file = tempfile.NamedTemporaryFile(
-        prefix=f"{provider.code}_", suffix=".docx", delete=False,
+        prefix=f"{provider.code}_",
+        suffix=".docx",
+        delete=False,
     )
     output_path = Path(tmp_file.name)
     tmp_file.close()
 
     cmd, workdir = resolve_generator_command(generator, json_path, output_path)
     result = subprocess.run(
-        cmd, cwd=str(workdir) if workdir else None,
-        capture_output=True, text=True,
+        cmd,
+        cwd=str(workdir) if workdir else None,
+        capture_output=True,
+        text=True,
     )
 
     if result.returncode != 0:
@@ -220,6 +243,7 @@ def generate_document_by_type(
 # ─────────────────────────────────────────────────────────────────────────────
 # UTILIDADES
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 def cleanup_temp_file(path: Path) -> None:
     """Elimina un archivo temporal si existe."""

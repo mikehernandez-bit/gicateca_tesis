@@ -1,0 +1,7 @@
+INFO:     Will watch for changes in these directories: ['C:\\Users\\jhoan\\Documents\\gicateca_tesis']
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [87012] using WatchFiles
+INFO:     Started server process [79208]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'app\modules\api\ai_content_contract.py', 'app\modules\api\render_router.py', 'app\modules\api\generation_router.py'. Reloading...

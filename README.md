@@ -4,6 +4,14 @@ Plataforma de gestion y generacion de formatos de tesis universitarias. **Python
 
 **Version:** 1.0.0
 
+## Contexto rapido
+
+Si vas a entregar este repo a otro agente o a ChatGPT, empieza por estos dos
+documentos:
+
+- `docs/GICATESIS_CONTEXT.md`
+- `docs/GICAGEN_INTEGRATION_GUIDE.md`
+
 ## Ejecutar (local)
 
 ```bash
@@ -116,6 +124,53 @@ py -m pytest tests/ -v
 
 ## Validacion de datos
 
+
+### Motor de Bloques (`app/engine/`)
+Pipeline JSON -> Normalizer -> Block[] -> DOCX con 19 tipos de bloque y 12 renderers.
+- `normalizer.py` -- JSON -> `List[Block]`
+- `registry.py` -- `@register()` + `render_blocks()`
+- `primitives.py` -- Helpers DOCX atomicos
+- `types.py` -- Tipos Block y BlockRenderer
+- `renderers/` -- 12 modulos especializados
+
+### Backend (Python/FastAPI)
+- `app/modules/home/` -- Pantalla de inicio
+- `app/modules/catalog/` -- Catalogo de formatos (tarjetas + generacion)
+- `app/modules/formats/` -- Detalle de formatos, PDF preview, versiones
+- `app/modules/references/` -- API y vistas de normas bibliograficas (APA, IEEE, etc.)
+- `app/modules/alerts/` -- Sistema de notificaciones
+- `app/modules/admin/` -- Panel de administracion
+- `app/modules/api/` -- API v1 (formatos, generacion, render)
+- `app/modules/generation/` -- Servicio de generacion de documentos
+
+### Frontend (Templates & Static)
+- `app/templates/pages/` -- Vistas HTML (Jinja2)
+- `app/templates/components/` -- Componentes reutilizables (cover_modal, header, sidebar)
+- `app/static/js/` -- Logica de cliente (7 archivos)
+- `app/static/css/` -- Estilos
+
+### Datos
+- `app/data/unac/` -- Formatos UNAC (informe, maestria, proyecto)
+- `app/data/uni/` -- Formatos UNI (informe, posgrado, proyecto)
+- `app/data/schemas/` -- JSON Schemas de validacion
+- `app/data/references/` -- Normas bibliograficas (APA7, IEEE, ISO690, Vancouver)
+
+### Universidades (`app/universities/`)
+- `shared/universal_generator.py` -- Generador unificado para todas las categorias
+- `unac/provider.py` -- Configuracion UNAC
+- `uni/provider.py` -- Configuracion UNI
+- `contracts.py` -- Contrato UniversityProvider
+
+---
+
+## Tests
+
+```bash
+py -m pytest tests/ -v
+```
+
+## Validacion de datos
+
 ```bash
 python scripts/validate_data.py
 ```
@@ -131,6 +186,7 @@ python scripts/check_mojibake.py
 
 ## Documentacion
 
+- [Reglas de Arquitectura (Generación)](docs/architecture_rules.md): Reglas fundamentales de identidad y flexibilidad.
 - [CHANGELOG](docs/CHANGELOG.md)
 - [Manual completo](docs/manual/00_indice.md)
 - [Guia de integracion GicaGen](docs/GICAGEN_INTEGRATION_GUIDE.md)
@@ -138,6 +194,7 @@ python scripts/check_mojibake.py
 - [Contratos DTO](docs/contracts/format-dto.md)
 - [Block Engine](docs/manual/16_block_engine.md)
 - [Validacion y Tests](docs/manual/17_validacion_y_tests.md)
+
 
 ## Mockup original
 

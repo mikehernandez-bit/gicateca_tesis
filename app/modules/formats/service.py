@@ -31,7 +31,6 @@ from app.core.loaders import find_format_index, load_json_file, load_format_by_i
 from app.core.format_builder import build_format_entry
 from app.core.document_generator import (
     generate_document_by_id,
-    cleanup_temp_file,
 )
 
 

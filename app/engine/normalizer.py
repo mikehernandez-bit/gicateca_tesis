@@ -29,6 +29,7 @@ Donde tocar si falla:
 - Verificar que la lógica coincide exactamente con universal_generator.py.
 - Comparar el orden de blocks con el orden de rendering del generador actual.
 """
+
 from __future__ import annotations
 
 import re
@@ -58,10 +59,60 @@ _LIST_FIELD_MAP: Dict[str, tuple] = {
     "ÍNDICE DE ABREVIATURAS": (None, False),
 }
 
-_ABBR_LINE_RE = re.compile(
-    r"^\s*([A-Za-z0-9./-]{2,})\s*(?:\t|:|[-–—])\s*(.+?)\s*$"
-)
+_ABBR_LINE_RE = re.compile(r"^\s*([A-Za-z0-9./-]{2,})\s*(?:\t|:|[-–—])\s*(.+?)\s*$")
 _ABBR_PAREN_RE = re.compile(r"^\s*(.+?)\s*\(([^()]{2,20})\)\s*$")
+
+
+_ABBR_IN_TEXT_RE = re.compile(r"([A-Za-z][^()\n]{3,120}?)\s*\(([A-Za-z][A-Za-z0-9./-]{1,19})\)")
+_ABBR_REVERSED_IN_TEXT_RE = re.compile(r"\b([A-Za-z][A-Za-z0-9./-]{1,19})\s*\(([^()]{3,120})\)")
+_ABBR_MEANING_TOKEN_RE = re.compile(r"[A-Za-zÃÃ‰ÃÃ“ÃšÃœÃ‘Ã¡Ã©Ã­Ã³ÃºÃ¼Ã±]+")
+_ABBR_REFERENCE_RE = re.compile(r"\b(?:19|20)\d{2}\b")
+_ABBR_AUTHOR_LIKE_RE = re.compile(
+    r"^[A-ZÃÃ‰ÃÃ“ÃšÃ‘][a-zÃ¡Ã©Ã­Ã³ÃºÃ±]+(?:\s+[A-ZÃÃ‰ÃÃ“ÃšÃ‘][a-zÃ¡Ã©Ã­Ã³ÃºÃ±]+){0,3}(?:\s+et al\.?)?(?:,\s*(?:19|20)\d{2})?$",
+    re.IGNORECASE,
+)
+_ABBR_STOPWORDS = {
+    "A",
+    "AL",
+    "AN",
+    "AND",
+    "DE",
+    "DEL",
+    "EL",
+    "EN",
+    "ET",
+    "LA",
+    "LAS",
+    "LOS",
+    "OF",
+    "PARA",
+    "POR",
+    "THE",
+    "Y",
+}
+_COMMON_ABBREVIATIONS: Dict[str, tuple[str, str]] = {
+    "IA": ("IA", "Inteligencia Artificial"),
+    "AI": ("AI", "Artificial Intelligence"),
+    "ML": ("ML", "Machine Learning"),
+    "DL": ("DL", "Deep Learning"),
+    "IOT": ("IoT", "Internet de las Cosas"),
+    "CNN": ("CNN", "Convolutional Neural Network"),
+    "RNN": ("RNN", "Recurrent Neural Network"),
+    "ODS": ("ODS", "Objetivos de Desarrollo Sostenible"),
+    "SAE": ("SAE", "Society of Automotive Engineers"),
+    "SPSS": ("SPSS", "Statistical Package for the Social Sciences"),
+    "KPI": ("KPI", "Key Performance Indicator"),
+    "FMEA": ("FMEA", "Failure Mode and Effects Analysis"),
+    "MTBF": ("MTBF", "Mean Time Between Failures"),
+    "UNAC": ("UNAC", "Universidad Nacional del Callao"),
+    "ERP": ("ERP", "Enterprise Resource Planning"),
+    "API": ("API", "Application Programming Interface"),
+    "SQL": ("SQL", "Structured Query Language"),
+    "PLC": ("PLC", "Programmable Logic Controller"),
+    "SCADA": ("SCADA", "Supervisory Control and Data Acquisition"),
+    "GPS": ("GPS", "Global Positioning System"),
+    "CAD": ("CAD", "Computer-Aided Design"),
+}
 
 
 def _first_nonempty_text(candidates: List[Any]) -> str:
@@ -81,6 +132,198 @@ def _strip_accents(text: str) -> str:
 
 def _norm_upper(text: str) -> str:
     return _strip_accents(str(text or "")).upper().strip()
+
+
+def _looks_like_template_example_title(text: Any) -> bool:
+    normalized = _norm_upper(str(text or ""))
+    return bool(normalized and "EJEMPLO" in normalized)
+
+
+def _looks_like_template_example_image(image: dict[str, Any]) -> bool:
+    ruta = str(image.get("ruta", "") or "").strip().lower()
+    titulo = image.get("titulo")
+    return "figura_ejemplo" in ruta or _looks_like_template_example_title(titulo)
+
+
+def _looks_like_template_placeholder_text(text: Any) -> bool:
+    raw = str(text or "").strip()
+    if not raw:
+        return False
+    normalized = _norm_upper(raw)
+    if ("[" in raw and "]" in raw) or ("{{" in raw and "}}" in raw):
+        return True
+    markers = (
+        "ESCRIBA AQUI",
+        "COMPLETE",
+        "COMPLETAR",
+        "INSERTAR",
+        "AGREGAR",
+        "LLENAR",
+        "COLOCAR EL SIGNIFICADO",
+        "REEMPLACE POR",
+    )
+    return any(marker in normalized for marker in markers)
+
+
+def _looks_like_placeholder_table_cell(value: Any) -> bool:
+    raw = str(value or "").strip()
+    if not raw:
+        return False
+    normalized = _norm_upper(raw)
+    if raw.startswith("[") and raw.endswith("]"):
+        return True
+    markers = (
+        "COMPLETAR",
+        "AUTOR 1",
+        "AUTOR 2",
+        "VARIABLE",
+        "RESULTADO",
+        "SI/NO",
+        "NOMBRE",
+        "INDICADOR",
+    )
+    return any(marker in normalized for marker in markers)
+
+
+def _looks_like_placeholder_table_data(table_like: Any) -> bool:
+    if not isinstance(table_like, dict):
+        return False
+    rows = table_like.get("rows")
+    if not isinstance(rows, list):
+        rows = table_like.get("filas")
+    if not isinstance(rows, list):
+        return False
+
+    visible_cells: list[str] = []
+    placeholder_cells = 0
+    for row in rows:
+        if not isinstance(row, (list, tuple)):
+            continue
+        for cell in row:
+            text = str(cell or "").strip()
+            if not text:
+                continue
+            visible_cells.append(text)
+            if _looks_like_placeholder_table_cell(text):
+                placeholder_cells += 1
+
+    if not visible_cells:
+        return True
+    return placeholder_cells == len(visible_cells)
+
+
+def _looks_like_annex_filler_text(text: Any) -> bool:
+    normalized = _norm_upper(str(text or ""))
+    if not normalized:
+        return False
+    markers = (
+        "ESTA SECCION CONTIENE",
+        "EN ESTA SECCION SE PRESENTA",
+        "EN ESTA SECCION SE PRESENTAN",
+        "EN PRIMER LUGAR",
+        "A CONTINUACI",
+        "A CONTINUACION SE PRESENTAN LOS ANEXOS",
+        "ADEMAS SE ADJUNTA",
+        "ADEMAS, SE ADJUNTA",
+        "ADICIONALMENTE",
+        "ASIMISMO",
+        "FINALMENTE",
+        "EL PRIMER ANEXO INCLUYE",
+        "OTRO ANEXO RELEVANTE",
+        "LOS ANEXOS TAMBIEN CONTIENEN",
+        "SE ADJUNTA",
+    )
+    return any(marker in normalized for marker in markers)
+
+
+def _looks_like_annex_useful_paragraph(text: Any) -> bool:
+    normalized = _norm_upper(str(text or ""))
+    if not normalized:
+        return False
+    useful_prefixes = (
+        "PREGUNTA",
+        "ITEM",
+        "ITEMS",
+        "EVIDENCIA",
+        "REGISTRO",
+        "CODIGO",
+        "COD.",
+    )
+    if any(normalized.startswith(prefix) for prefix in useful_prefixes):
+        return True
+    return bool(re.match(r"^\s*(\d+[\).:-]|[A-Z]{2,}-\d+)", str(text or "").strip()))
+
+
+def _strip_annex_inner_title_prefix(text: Any) -> str:
+    raw = str(text or "").strip()
+    if not raw:
+        return ""
+    if _norm_upper(raw).startswith("ANEXO"):
+        return raw
+    cleaned = re.sub(
+        r"^\s*(TABLA|FIGURA)\s*[A-Z0-9.-]*\s*[:.)-]*\s*",
+        "",
+        raw,
+        flags=re.IGNORECASE,
+    ).strip(" .:-")
+    return cleaned or raw
+
+
+def _strip_figure_caption_prefix(text: Any) -> str:
+    raw = str(text or "").strip()
+    if not raw:
+        return ""
+    cleaned = re.sub(
+        r"^\s*FIGURA\s*[A-Z0-9.-]*\s*[:.)-]*\s*",
+        "",
+        raw,
+        flags=re.IGNORECASE,
+    ).strip(" .:-")
+    return cleaned or raw
+
+
+def _resolve_annex_heading_text(item: dict[str, Any], position: int) -> str:
+    raw = str(item.get("titulo", "") or "").strip()
+    if raw and _norm_upper(raw).startswith("ANEXO"):
+        return raw
+    cleaned = _strip_annex_inner_title_prefix(raw)
+    if cleaned:
+        return f"Anexo {position}: {cleaned}"
+    return f"Anexo {position}"
+
+
+def _normalize_annex_blocks(blocks: List[Block]) -> List[Block]:
+    cleaned: List[Block] = []
+    has_structural_blocks = any(
+        block.get("type") in {"table", "legacy_table", "matriz", "image"}
+        for block in blocks
+    )
+
+    for block in blocks:
+        block_type = block.get("type")
+        text = str(block.get("text", "") or "").strip()
+
+        if block_type in {"paragraph", "note"}:
+            if not text or _looks_like_annex_filler_text(text):
+                continue
+            if has_structural_blocks and not _looks_like_annex_useful_paragraph(text):
+                continue
+
+        normalized = dict(block)
+        if block_type == "table":
+            normalized.pop("titulo", None)
+        elif block_type == "legacy_table":
+            normalized["titulo"] = ""
+        elif block_type == "image":
+            normalized["omit_caption"] = True
+
+        cleaned.append(normalized)
+
+    return cleaned
+
+
+def _normalize_annex_content(content: Any) -> List[Block]:
+    return _normalize_annex_blocks(_normalize_ai_content(content))
 
 
 def _looks_like_cover_title_placeholder(text: str) -> bool:
@@ -137,24 +380,223 @@ def _parse_abbreviation_line(line: str) -> tuple[str, str] | None:
 
     tab_split = raw.split("\t", 1)
     if len(tab_split) == 2 and tab_split[0].strip() and tab_split[1].strip():
-        return tab_split[0].strip().upper(), tab_split[1].strip()
+        return tab_split[0].strip(), tab_split[1].strip()
 
     match = _ABBR_LINE_RE.match(raw)
     if match:
-        return match.group(1).strip().upper(), match.group(2).strip()
+        return match.group(1).strip(), match.group(2).strip()
 
     paren_match = _ABBR_PAREN_RE.match(raw)
     if paren_match:
         meaning = paren_match.group(1).strip()
-        sigla = paren_match.group(2).strip().upper()
+        sigla = paren_match.group(2).strip()
         return sigla, meaning
 
     return None
 
 
-def _collect_abbreviation_rows(source: Any) -> List[Dict[str, str]]:
+def _normalize_abbreviation_display(sigla: str) -> str:
+    raw = str(sigla or "").strip()
+    if not raw:
+        return ""
+    canonical = _COMMON_ABBREVIATIONS.get(_norm_upper(raw))
+    if canonical:
+        return canonical[0]
+    return raw.upper()
+
+
+def _is_valid_abbreviation_candidate(sigla: str) -> bool:
+    raw = str(sigla or "").strip()
+    if not raw:
+        return False
+    normalized = _norm_upper(raw)
+    if normalized in _COMMON_ABBREVIATIONS:
+        return True
+    if not 2 <= len(raw) <= 8:
+        return False
+    if not re.fullmatch(r"[A-Za-z0-9./-]+", raw):
+        return False
+    if re.fullmatch(r"(?:19|20)\d{2}", raw):
+        return False
+
+    letters = [char for char in raw if char.isalpha()]
+    if len(letters) < 2:
+        return False
+
+    upper_count = sum(char.isupper() for char in letters)
+    lower_count = sum(char.islower() for char in letters)
+    if lower_count and upper_count < 2:
+        return False
+    if raw.isalpha() and raw[0].isupper() and raw[1:].islower():
+        return False
+    if raw.islower():
+        return False
+
+    return True
+
+
+def _looks_like_reference_like_meaning(meaning: str) -> bool:
+    text = re.sub(r"\s+", " ", str(meaning or "").strip())
+    if not text:
+        return True
+    if re.fullmatch(r"(?:19|20)\d{2}", text):
+        return True
+    if _ABBR_AUTHOR_LIKE_RE.match(text) and _ABBR_REFERENCE_RE.search(text):
+        return True
+    return False
+
+
+def _meaning_matches_sigla(meaning: str, sigla: str) -> bool:
+    normalized_sigla = _norm_upper(sigla)
+    if normalized_sigla in _COMMON_ABBREVIATIONS:
+        return True
+    tokens = [
+        token
+        for token in _ABBR_MEANING_TOKEN_RE.findall(str(meaning or ""))
+        if _norm_upper(token) not in _ABBR_STOPWORDS
+    ]
+    if len(tokens) < 2:
+        return False
+    acronym = "".join(token[0].upper() for token in tokens if token)
+    return acronym == normalized_sigla
+
+
+def _append_abbreviation_row(
+    rows: List[Dict[str, str]],
+    seen: set[str],
+    sigla: str,
+    meaning: str,
+) -> None:
+    raw_sigla = str(sigla or "").strip()
+    display = _normalize_abbreviation_display(raw_sigla)
+    expanded = re.sub(r"\s+", " ", str(meaning or "").strip()).strip(" .;:-")
+    normalized_key = _norm_upper(display)
+    canonical = _COMMON_ABBREVIATIONS.get(normalized_key)
+    if canonical:
+        display, expanded = canonical
+        normalized_key = _norm_upper(display)
+    if (
+        not normalized_key
+        or not expanded
+        or not _is_valid_abbreviation_candidate(raw_sigla)
+        or _looks_like_reference_like_meaning(expanded)
+        or not _meaning_matches_sigla(expanded, display)
+    ):
+        return
+    if normalized_key in seen:
+        return
+    seen.add(normalized_key)
+    rows.append({"sigla": display, "meaning": expanded})
+
+
+def _extract_generated_text_fragments(data: dict) -> List[str]:
+    fragments: List[str] = []
+
+    def add_content(value: Any) -> None:
+        if value is None:
+            return
+        if isinstance(value, str):
+            text = value.strip()
+            if text:
+                fragments.append(text)
+            return
+        if isinstance(value, list):
+            for item in value:
+                add_content(item)
+            return
+        if not isinstance(value, dict):
+            return
+
+        block_type = _norm_upper(value.get("tipo", ""))
+        if block_type == "PARRAFO":
+            add_content(value.get("texto"))
+            return
+        if block_type == "FIGURA":
+            add_content(value.get("titulo") or value.get("caption"))
+            return
+        if block_type == "TABLA":
+            add_content(value.get("titulo"))
+            return
+
+        for key in ("_ai_content", "parrafos"):
+            add_content(value.get(key))
+
+    preliminares = data.get("preliminares", {})
+    if isinstance(preliminares, dict):
+        for key, item in preliminares.items():
+            if key in {"indices", "abreviaturas"}:
+                continue
+            if isinstance(item, dict):
+                add_content(item.get("_ai_content"))
+                add_content(item.get("parrafos"))
+
+    for chapter in data.get("cuerpo", []) if isinstance(data.get("cuerpo"), list) else []:
+        if not isinstance(chapter, dict):
+            continue
+        add_content(chapter.get("_ai_content"))
+        for item in chapter.get("contenido", []) if isinstance(chapter.get("contenido"), list) else []:
+            if not isinstance(item, dict):
+                continue
+            add_content(item.get("_ai_content"))
+            add_content(item.get("parrafos"))
+
+    finales = data.get("finales", {})
+    if isinstance(finales, dict):
+        anexos = finales.get("anexos")
+        if isinstance(anexos, dict):
+            for item in anexos.get("lista", []) if isinstance(anexos.get("lista"), list) else []:
+                if isinstance(item, dict):
+                    add_content(item.get("_ai_content"))
+
+    return fragments
+
+
+def _derive_document_abbreviation_rows(data: dict | None) -> List[Dict[str, str]]:
+    if not isinstance(data, dict):
+        return []
+
     rows: List[Dict[str, str]] = []
     seen: set[str] = set()
+
+    for fragment in _extract_generated_text_fragments(data):
+        for line in fragment.replace("\r\n", "\n").replace("\r", "\n").split("\n"):
+            parsed = _parse_abbreviation_line(line)
+            if parsed:
+                sigla, meaning = parsed
+                canonical = _COMMON_ABBREVIATIONS.get(_norm_upper(sigla))
+                if canonical:
+                    sigla, meaning = canonical
+                _append_abbreviation_row(rows, seen, sigla, meaning)
+
+        for meaning, sigla in _ABBR_IN_TEXT_RE.findall(fragment):
+            cleaned_meaning = re.sub(r"\s+", " ", meaning).strip(" .;:-")
+            if len(cleaned_meaning.split()) > 12:
+                continue
+            canonical = _COMMON_ABBREVIATIONS.get(_norm_upper(sigla))
+            if canonical:
+                sigla, cleaned_meaning = canonical
+            _append_abbreviation_row(rows, seen, sigla, cleaned_meaning)
+
+        for sigla, meaning in _ABBR_REVERSED_IN_TEXT_RE.findall(fragment):
+            cleaned_meaning = re.sub(r"\s+", " ", meaning).strip(" .;:-")
+            if len(cleaned_meaning.split()) > 12:
+                continue
+            canonical = _COMMON_ABBREVIATIONS.get(_norm_upper(sigla))
+            if canonical:
+                sigla, cleaned_meaning = canonical
+            _append_abbreviation_row(rows, seen, sigla, cleaned_meaning)
+
+        normalized_fragment = _norm_upper(fragment)
+        for key, (display, meaning) in _COMMON_ABBREVIATIONS.items():
+            if re.search(rf"(?<![A-Z0-9]){re.escape(key)}(?![A-Z0-9])", normalized_fragment):
+                _append_abbreviation_row(rows, seen, display, meaning)
+
+    return rows
+
+
+def _collect_abbreviation_rows(source: Any, *, document_source: dict | None = None) -> List[Dict[str, str]]:
+    source_rows: List[Dict[str, str]] = []
+    source_seen: set[str] = set()
     lines: List[str] = []
 
     def add_line(value: Any) -> None:
@@ -176,9 +618,13 @@ def _collect_abbreviation_rows(source: Any) -> List[Dict[str, str]]:
             if sigla and meaning:
                 lines.append(f"{sigla}: {meaning}")
             else:
-                for key in ("texto", "contenido", "parrafos", "ejemplo"):
+                for key in ("_ai_content", "texto", "contenido", "parrafos", "ejemplo"):
                     add_line(value.get(key))
-                for item in value.get("items", []) if isinstance(value.get("items"), list) else []:
+                for item in (
+                    value.get("items", [])
+                    if isinstance(value.get("items"), list)
+                    else []
+                ):
                     if isinstance(item, dict):
                         if item.get("sigla") and item.get("significado"):
                             lines.append(f"{item['sigla']}: {item['significado']}")
@@ -194,36 +640,72 @@ def _collect_abbreviation_rows(source: Any) -> List[Dict[str, str]]:
         if not parsed:
             continue
         sigla, meaning = parsed
-        if not sigla or not meaning:
-            continue
-        if sigla in seen:
-            continue
-        seen.add(sigla)
-        rows.append({"sigla": sigla, "meaning": meaning})
+        canonical = _COMMON_ABBREVIATIONS.get(_norm_upper(sigla))
+        if canonical:
+            sigla, meaning = canonical
+        _append_abbreviation_row(source_rows, source_seen, sigla, meaning)
+
+    derived_rows = _derive_document_abbreviation_rows(document_source)
+    if derived_rows:
+        derived_siglas = {_norm_upper(row["sigla"]) for row in derived_rows}
+        source_rows = [
+            row for row in source_rows if _norm_upper(row["sigla"]) in derived_siglas
+        ]
+
+    rows: List[Dict[str, str]] = []
+    seen: set[str] = set()
+    for row in source_rows:
+        _append_abbreviation_row(rows, seen, row["sigla"], row["meaning"])
+    for row in derived_rows:
+        _append_abbreviation_row(rows, seen, row["sigla"], row["meaning"])
 
     return rows
 
 
-def _build_abbreviations_blocks(title: str, source: Any) -> List[Block]:
+def _build_abbreviations_blocks(
+    title: str,
+    source: Any,
+    *,
+    document_source: dict | None = None,
+) -> List[Block]:
     heading = str(title or "").strip() or "INDICE DE ABREVIATURAS"
-    return [
+    rows = _collect_abbreviation_rows(source, document_source=document_source)
+    blocks: List[Block] = [
         {
             "type": "heading",
             "text": heading,
             "level": 1,
             "centered": True,
-        },
-        {
-            "type": "abbreviations_table",
-            "rows": _collect_abbreviation_rows(source),
-        },
-        {"type": "page_break"},
+        }
     ]
+
+    if rows:
+        blocks.append(
+            {
+                "type": "abbreviations_table",
+                "rows": rows,
+            }
+        )
+    else:
+        fallback_text = "No se identificaron abreviaturas relevantes en el presente documento."
+        if isinstance(source, dict):
+            ai_text = str(source.get("_ai_content") or "").strip()
+            if ai_text and not _looks_like_template_placeholder_text(ai_text):
+                fallback_text = ai_text
+        elif isinstance(source, str):
+            source_text = str(source or "").strip()
+            if source_text and not _looks_like_template_placeholder_text(source_text):
+                fallback_text = source_text
+        blocks.append({"type": "paragraph", "text": fallback_text})
+
+    blocks.append({"type": "page_break"})
+    return blocks
 
 
 # ═══════════════════════════════════════════════════════════════
 # PUNTO DE ENTRADA
 # ═══════════════════════════════════════════════════════════════
+
 
 def normalize(data: dict) -> List[Block]:
     """Transforma un JSON canónico v2 completo en una lista plana de Blocks.
@@ -255,10 +737,15 @@ def normalize(data: dict) -> List[Block]:
 # CARÁTULA
 # ═══════════════════════════════════════════════════════════════
 
+
 def _normalize_caratula(data: dict) -> List[Block]:
     c = data.get("caratula", {})
     if not c:
         return []
+
+    is_unac_maestria = data.get("_meta", {}).get("id", "").startswith("unac-maestria")
+    if is_unac_maestria:
+        return [{"type": "caratula_unac_maestria", "data": data, "caratula": c}]
 
     blocks: List[Block] = []
 
@@ -273,48 +760,72 @@ def _normalize_caratula(data: dict) -> List[Block]:
         uni_name = _UNI_NAMES.get(meta.get("university", ""), "")
 
     if uni_name:
-        blocks.append({
-            "type": "centered_text", "text": uni_name,
-            "bold": True, "size": 16, "space_after": 6,
-        })
+        blocks.append(
+            {
+                "type": "centered_text",
+                "text": uni_name,
+                "bold": True,
+                "size": 16,
+                "space_after": 6,
+            }
+        )
 
     if c.get("facultad"):
-        blocks.append({
-            "type": "centered_text", "text": c["facultad"].upper(),
-            "bold": True, "size": 14, "space_after": 6,
-        })
+        blocks.append(
+            {
+                "type": "centered_text",
+                "text": c["facultad"].upper(),
+                "bold": True,
+                "size": 14,
+                "space_after": 6,
+            }
+        )
     if c.get("escuela"):
-        blocks.append({
-            "type": "centered_text", "text": c["escuela"].upper(),
-            "bold": True, "size": 14, "space_after": 24,
-        })
+        blocks.append(
+            {
+                "type": "centered_text",
+                "text": c["escuela"].upper(),
+                "bold": True,
+                "size": 14,
+                "space_after": 24,
+            }
+        )
 
     # Logo — el renderer resolverá el path usando resolve_logo_path(data)
-    blocks.append({
-        "type": "logo",
-        "data": {
-            "configuracion": data.get("configuracion", {}),
-            "_meta": data.get("_meta", {}),
-        },
-        "width_inches": 2.0,
-    })
+    blocks.append(
+        {
+            "type": "logo",
+            "data": {
+                "configuracion": data.get("configuracion", {}),
+                "_meta": data.get("_meta", {}),
+            },
+            "width_inches": 2.0,
+        }
+    )
 
     if c.get("tipo_documento"):
-        blocks.append({
-            "type": "centered_text", "text": c["tipo_documento"].upper(),
-            "bold": True, "size": 16, "space_before": 40,
-        })
+        blocks.append(
+            {
+                "type": "centered_text",
+                "text": c["tipo_documento"].upper(),
+                "bold": True,
+                "size": 16,
+                "space_before": 40,
+            }
+        )
 
     raw_title = _first_nonempty_text([c.get("titulo")])
-    fallback_title = _first_nonempty_text([
-        data.get("title"),
-        (data.get("project") or {}).get("title")
-        if isinstance(data.get("project"), dict)
-        else None,
-        (data.get("values") or {}).get("title")
-        if isinstance(data.get("values"), dict)
-        else None,
-    ])
+    fallback_title = _first_nonempty_text(
+        [
+            data.get("title"),
+            (data.get("project") or {}).get("title")
+            if isinstance(data.get("project"), dict)
+            else None,
+            (data.get("values") or {}).get("title")
+            if isinstance(data.get("values"), dict)
+            else None,
+        ]
+    )
     placeholder_title = _first_nonempty_text([c.get("titulo_placeholder")])
 
     if raw_title and not _looks_like_cover_title_placeholder(raw_title):
@@ -325,52 +836,89 @@ def _normalize_caratula(data: dict) -> List[Block]:
         titulo = raw_title or placeholder_title
 
     if titulo:
-        blocks.append({
-            "type": "centered_text", "text": titulo,
-            "bold": True, "size": 14, "space_before": 30, "space_after": 30,
-        })
+        blocks.append(
+            {
+                "type": "centered_text",
+                "text": titulo,
+                "bold": True,
+                "size": 14,
+                "space_before": 30,
+                "space_after": 30,
+            }
+        )
 
     frase_grado = c.get("frase_grado")
     if frase_grado and not _is_instructional_cover_phrase(frase_grado):
-        blocks.append({
-            "type": "centered_text", "text": frase_grado,
-            "size": 12, "space_before": 10,
-        })
+        blocks.append(
+            {
+                "type": "centered_text",
+                "text": frase_grado,
+                "size": 12,
+                "space_before": 10,
+            }
+        )
 
     grado = c.get("grado_objetivo") or c.get("grado") or c.get("carrera")
     if grado:
-        blocks.append({
-            "type": "centered_text", "text": grado.upper(),
-            "bold": True, "size": 13, "space_after": 40,
-        })
+        blocks.append(
+            {
+                "type": "centered_text",
+                "text": grado.upper(),
+                "bold": True,
+                "size": 13,
+                "space_after": 40,
+            }
+        )
 
     # Autor / Asesor
     if c.get("label_autor"):
-        blocks.append({
-            "type": "centered_text", "text": c["label_autor"],
-            "bold": True, "size": 12,
-        })
+        blocks.append(
+            {
+                "type": "centered_text",
+                "text": c["label_autor"],
+                "bold": True,
+                "size": 12,
+            }
+        )
     if c.get("autor_valor"):
-        blocks.append({
-            "type": "centered_text", "text": c["autor_valor"],
-            "size": 12, "space_after": 12,
-        })
+        blocks.append(
+            {
+                "type": "centered_text",
+                "text": c["autor_valor"],
+                "size": 12,
+                "space_after": 12,
+            }
+        )
     if c.get("label_asesor"):
-        blocks.append({
-            "type": "centered_text", "text": c["label_asesor"],
-            "bold": True, "size": 12, "space_before": 12,
-        })
+        blocks.append(
+            {
+                "type": "centered_text",
+                "text": c["label_asesor"],
+                "bold": True,
+                "size": 12,
+                "space_before": 12,
+            }
+        )
     if c.get("asesor_valor"):
-        blocks.append({
-            "type": "centered_text", "text": c["asesor_valor"],
-            "size": 12, "space_after": 12,
-        })
+        blocks.append(
+            {
+                "type": "centered_text",
+                "text": c["asesor_valor"],
+                "size": 12,
+                "space_after": 12,
+            }
+        )
 
     if c.get("label_linea"):
-        blocks.append({
-            "type": "centered_text", "text": c["label_linea"],
-            "size": 11, "italic": True, "space_after": 40,
-        })
+        blocks.append(
+            {
+                "type": "centered_text",
+                "text": c["label_linea"],
+                "size": 11,
+                "italic": True,
+                "space_after": 40,
+            }
+        )
 
     # Footer: lugar + año
     lugar = c.get("lugar", "")
@@ -379,10 +927,15 @@ def _normalize_caratula(data: dict) -> List[Block]:
     if not footer:
         footer = c.get("lugar_fecha") or f"{c.get('fecha', '')}\n{c.get('pais', '')}"
     if footer.strip():
-        blocks.append({
-            "type": "centered_text", "text": footer,
-            "bold": True, "size": 12, "space_before": 60,
-        })
+        blocks.append(
+            {
+                "type": "centered_text",
+                "text": footer,
+                "bold": True,
+                "size": 12,
+                "space_before": 60,
+            }
+        )
 
     blocks.append({"type": "page_break"})
     return blocks
@@ -391,6 +944,7 @@ def _normalize_caratula(data: dict) -> List[Block]:
 # ═══════════════════════════════════════════════════════════════
 # PÁGINA DE RESPETO (solo unac_proyecto)
 # ═══════════════════════════════════════════════════════════════
+
 
 def _normalize_pagina_respeto(data: dict) -> List[Block]:
     if "pagina_respeto" not in data:
@@ -401,10 +955,15 @@ def _normalize_pagina_respeto(data: dict) -> List[Block]:
 
     if isinstance(p, dict):
         if p.get("titulo"):
-            blocks.append({
-                "type": "centered_text", "text": p["titulo"],
-                "bold": True, "size": 14, "space_before": 200,
-            })
+            blocks.append(
+                {
+                    "type": "centered_text",
+                    "text": p["titulo"],
+                    "bold": True,
+                    "size": 14,
+                    "space_before": 200,
+                }
+            )
 
         if "notas" in p:
             for nota in p["notas"]:
@@ -421,25 +980,36 @@ def _normalize_pagina_respeto(data: dict) -> List[Block]:
 # INFORMACIÓN BÁSICA (solo unac_proyecto y unac_maestria)
 # ═══════════════════════════════════════════════════════════════
 
+
 def _normalize_informacion_basica(data: dict) -> List[Block]:
     info = data.get("informacion_basica", {})
     if not info:
         return []
 
+    is_unac_maestria = data.get("_meta", {}).get("id", "").startswith("unac-maestria")
+    if is_unac_maestria:
+        return [{"type": "info_basica_unac_maestria", "data": data, "info": info}]
+
     blocks: List[Block] = []
 
-    blocks.append({
-        "type": "paragraph_centered",
-        "text": info.get("titulo", "INFORMACIÓN BÁSICA"),
-        "bold": True, "size": 14,
-        "space_before": 12, "space_after": 12,
-    })
+    blocks.append(
+        {
+            "type": "paragraph_centered",
+            "text": info.get("titulo", "INFORMACIÓN BÁSICA"),
+            "bold": True,
+            "size": 14,
+            "space_before": 12,
+            "space_after": 12,
+        }
+    )
 
     if "elementos" in info:
-        blocks.append({
-            "type": "info_table",
-            "elementos": info["elementos"],
-        })
+        blocks.append(
+            {
+                "type": "info_table",
+                "elementos": info["elementos"],
+            }
+        )
 
     blocks.append({"type": "page_break"})
     return blocks
@@ -448,6 +1018,7 @@ def _normalize_informacion_basica(data: dict) -> List[Block]:
 # ═══════════════════════════════════════════════════════════════
 # PRELIMINARES
 # ═══════════════════════════════════════════════════════════════
+
 
 def _normalize_preliminares(data: dict) -> List[Block]:
     pre = data.get("preliminares", {})
@@ -459,32 +1030,50 @@ def _normalize_preliminares(data: dict) -> List[Block]:
     # Nueva sección
     blocks.append({"type": "section_break"})
 
+    optional_preliminary_keys = {"dedicatoria", "agradecimiento", "agradecimientos"}
+
     # Secciones de texto simples
     for key in ["dedicatoria", "agradecimiento", "agradecimientos", "resumen"]:
         if key not in pre:
             continue
         item = pre[key]
-        if isinstance(item, str):
-            blocks.append({
-                "type": "heading", "text": item,
-                "level": 1, "centered": True,
-            })
-        else:
-            blocks.append({
+        heading_text = item if isinstance(item, str) else item.get("titulo", key.upper())
+        content_blocks: List[Block] = []
+
+        if isinstance(item, dict):
+            if item.get("_ai_content"):
+                content_blocks = _normalize_ai_content(item["_ai_content"])
+            elif item.get("texto") and not _looks_like_template_placeholder_text(item["texto"]):
+                content_blocks = [{"type": "paragraph", "text": item["texto"]}]
+
+        if key in optional_preliminary_keys and not content_blocks:
+            continue
+
+        blocks.append(
+            {
                 "type": "heading",
-                "text": item.get("titulo", key.upper()),
-                "level": 1, "centered": True,
-            })
-            if item.get("texto"):
-                blocks.append({"type": "paragraph", "text": item["texto"]})
+                "text": heading_text,
+                "level": 1,
+                "centered": True,
+            }
+        )
+        blocks.extend(content_blocks)
         blocks.append({"type": "page_break"})
 
     rendered_abbreviations_from_indices = False
 
     # Índices
     if "indices" in pre:
-        rendered_abbreviations_from_indices = _indices_include_abbreviations(pre["indices"])
-        blocks.extend(_normalize_indices(pre["indices"], pre.get("abreviaturas")))
+        rendered_abbreviations_from_indices = _indices_include_abbreviations(
+            pre["indices"]
+        )
+        blocks.extend(
+            _normalize_indices(
+                pre["indices"],
+                pre.get("abreviaturas"),
+                document_source=data,
+            )
+        )
 
     # Abreviaturas fuera del bloque de indices
     if "abreviaturas" in pre and not rendered_abbreviations_from_indices:
@@ -494,7 +1083,13 @@ def _normalize_preliminares(data: dict) -> List[Block]:
             title = str(abbr.get("titulo", title) or title)
         elif isinstance(abbr, str) and abbr.strip():
             title = abbr.strip()
-        blocks.extend(_build_abbreviations_blocks(title, abbr))
+        blocks.extend(
+            _build_abbreviations_blocks(
+                title,
+                abbr,
+                document_source=data,
+            )
+        )
 
     # Tablas en preliminares (contenido extra)
     for item in pre.get("contenido", []):
@@ -504,18 +1099,29 @@ def _normalize_preliminares(data: dict) -> List[Block]:
     # Introducción
     if "introduccion" in pre:
         intro = pre["introduccion"]
-        blocks.append({
-            "type": "heading",
-            "text": intro.get("titulo", "INTRODUCCIÓN"),
-            "level": 1, "centered": True,
-        })
-        blocks.append({"type": "paragraph", "text": intro.get("texto", "")})
+        blocks.append(
+            {
+                "type": "heading",
+                "text": intro.get("titulo", "INTRODUCCIÓN"),
+                "level": 1,
+                "centered": True,
+            }
+        )
+        if intro.get("_ai_content"):
+            blocks.extend(_normalize_ai_content(intro["_ai_content"]))
+        elif intro.get("texto") and not _looks_like_template_placeholder_text(intro.get("texto", "")):
+            blocks.append({"type": "paragraph", "text": intro.get("texto", "")})
         blocks.append({"type": "page_break"})
 
     return blocks
 
 
-def _normalize_indices(idx, abbreviations_source: Any = None) -> List[Block]:
+def _normalize_indices(
+    idx,
+    abbreviations_source: Any = None,
+    *,
+    document_source: dict | None = None,
+) -> List[Block]:
     """Normaliza índices en ambos formatos (dict simple o list detallada)."""
     blocks: List[Block] = []
 
@@ -525,7 +1131,13 @@ def _normalize_indices(idx, abbreviations_source: Any = None) -> List[Block]:
                 continue
             if k == "abreviaturas":
                 heading_title = title if isinstance(title, str) else ""
-                blocks.extend(_build_abbreviations_blocks(heading_title, abbreviations_source))
+                blocks.extend(
+                    _build_abbreviations_blocks(
+                        heading_title,
+                        abbreviations_source,
+                        document_source=document_source,
+                    )
+                )
                 continue
 
             entry = _FIELD_MAP.get(k)
@@ -533,27 +1145,37 @@ def _normalize_indices(idx, abbreviations_source: Any = None) -> List[Block]:
                 field_code, exclude = entry
                 if field_code:
                     # Campo TOC de Word (contenido, tablas, figuras)
-                    blocks.append({
-                        "type": "toc_field",
-                        "field_code": field_code,
-                        "heading_text": title,
-                        "exclude_from_toc": exclude,
-                    })
+                    blocks.append(
+                        {
+                            "type": "toc_field",
+                            "field_code": field_code,
+                            "heading_text": title,
+                            "exclude_from_toc": exclude,
+                        }
+                    )
                 else:
                     # Sin campo TOC, pero con Heading 1 para aparecer en el indice
-                    blocks.append({
-                        "type": "heading", "text": title,
-                        "level": 1, "centered": True,
-                    })
+                    blocks.append(
+                        {
+                            "type": "heading",
+                            "text": title,
+                            "level": 1,
+                            "centered": True,
+                        }
+                    )
                     blocks.append({"type": "page_break"})
             else:
                 # Otra key custom
-                blocks.append({
-                    "type": "paragraph_centered",
-                    "text": title,
-                    "bold": True, "size": 14,
-                    "space_before": 12, "space_after": 12,
-                })
+                blocks.append(
+                    {
+                        "type": "paragraph_centered",
+                        "text": title,
+                        "bold": True,
+                        "size": 14,
+                        "space_before": 12,
+                        "space_after": 12,
+                    }
+                )
                 blocks.append({"type": "page_break"})
 
     elif isinstance(idx, list):
@@ -561,45 +1183,65 @@ def _normalize_indices(idx, abbreviations_source: Any = None) -> List[Block]:
             titulo = item.get("titulo", "")
 
             if "ABREVIATURAS" in str(titulo).upper():
-                source = item if item else abbreviations_source
+                source = abbreviations_source or item
                 heading_title = titulo if isinstance(titulo, str) else ""
-                blocks.extend(_build_abbreviations_blocks(heading_title, source))
+                blocks.extend(
+                    _build_abbreviations_blocks(
+                        heading_title,
+                        source,
+                        document_source=document_source,
+                    )
+                )
                 continue
 
             entry = _LIST_FIELD_MAP.get(titulo)
             if entry:
                 field_code, exclude = entry
                 if field_code:
-                    blocks.append({
-                        "type": "toc_field",
-                        "field_code": field_code,
-                        "heading_text": titulo,
-                        "exclude_from_toc": exclude,
-                    })
+                    blocks.append(
+                        {
+                            "type": "toc_field",
+                            "field_code": field_code,
+                            "heading_text": titulo,
+                            "exclude_from_toc": exclude,
+                        }
+                    )
                 else:
                     # Sin campo TOC, pero con Heading 1 para aparecer en el indice
-                    blocks.append({
-                        "type": "heading", "text": titulo,
-                        "level": 1, "centered": True,
-                    })
+                    blocks.append(
+                        {
+                            "type": "heading",
+                            "text": titulo,
+                            "level": 1,
+                            "centered": True,
+                        }
+                    )
                     if "items" in item:
-                        blocks.append({
-                            "type": "index_items",
-                            "items": item["items"],
-                        })
+                        blocks.append(
+                            {
+                                "type": "index_items",
+                                "items": item["items"],
+                            }
+                        )
                     blocks.append({"type": "page_break"})
             else:
-                blocks.append({
-                    "type": "paragraph_centered",
-                    "text": titulo,
-                    "bold": True, "size": 14,
-                    "space_before": 12, "space_after": 12,
-                })
+                blocks.append(
+                    {
+                        "type": "paragraph_centered",
+                        "text": titulo,
+                        "bold": True,
+                        "size": 14,
+                        "space_before": 12,
+                        "space_after": 12,
+                    }
+                )
                 if "items" in item:
-                    blocks.append({
-                        "type": "index_items",
-                        "items": item["items"],
-                    })
+                    blocks.append(
+                        {
+                            "type": "index_items",
+                            "items": item["items"],
+                        }
+                    )
                 blocks.append({"type": "page_break"})
 
     return blocks
@@ -608,6 +1250,7 @@ def _normalize_indices(idx, abbreviations_source: Any = None) -> List[Block]:
 # ═══════════════════════════════════════════════════════════════
 # CUERPO (capítulos)
 # ═══════════════════════════════════════════════════════════════
+
 
 def _normalize_cuerpo(data: dict) -> List[Block]:
     cuerpo = data.get("cuerpo", [])
@@ -623,26 +1266,42 @@ def _normalize_cuerpo(data: dict) -> List[Block]:
             blocks.append({"type": "page_break"})
 
         # Título del capítulo
-        blocks.append({
-            "type": "heading",
-            "text": cap.get("titulo", ""),
-            "level": 1, "centered": False,
-        })
+        blocks.append(
+            {
+                "type": "heading",
+                "text": cap.get("titulo", ""),
+                "level": 1,
+                "centered": False,
+            }
+        )
 
         # Nota del capítulo
         if "nota_capitulo" in cap:
             blocks.append({"type": "note", "text": cap["nota_capitulo"]})
 
         # Contenido del capítulo
+        chapter_has_ai = bool(cap.get("_ai_content")) or any(
+            isinstance(item, dict) and item.get("_ai_content")
+            for item in cap.get("contenido", [])
+        )
         for item in cap.get("contenido", []):
+            if (
+                chapter_has_ai
+                and isinstance(item, dict)
+                and item.get("tipo") in {"tabla", "figura"}
+                and not item.get("_ai_generated")
+            ):
+                continue
             blocks.extend(_normalize_content_item(item))
 
         # Ejemplos APA a nivel de capítulo
         if "ejemplos_apa" in cap:
-            blocks.append({
-                "type": "apa_examples",
-                "ejemplos": cap["ejemplos_apa"],
-            })
+            blocks.append(
+                {
+                    "type": "apa_examples",
+                    "ejemplos": cap["ejemplos_apa"],
+                }
+            )
 
     return blocks
 
@@ -652,7 +1311,9 @@ def _normalize_content_item(item) -> List[Block]:
 
     Soporta:
     - str → párrafo
-    - dict con tipo='tabla' → tabla canónica
+    - dict con tipo='parrafo' → párrafo (desde IA estructurada)
+    - dict con tipo='tabla' → tabla canónica (con landscape automático)
+    - dict con tipo='figura' → caption + imagen placeholder
     - dict con texto → subtítulo + content_block
     """
     blocks: List[Block] = []
@@ -665,29 +1326,99 @@ def _normalize_content_item(item) -> List[Block]:
     if not isinstance(item, dict):
         return blocks
 
+    # Párrafo estructurado desde IA (tipo == "parrafo")
+    if item.get("tipo") == "parrafo":
+        texto = item.get("texto", "")
+        if texto:
+            blocks.append({"type": "paragraph", "text": texto})
+        return blocks
+
+    # Figura sugerida por IA (tipo == "figura")
+    if item.get("tipo") == "figura":
+        caption = str(item.get("caption") or "").strip()
+        title = str(item.get("titulo") or "").strip() or _strip_figure_caption_prefix(caption)
+        ruta = item.get("ruta_placeholder") or item.get("ruta", "")
+        if ruta and ruta.lower() != "placeholder":
+            blocks.append(
+                {
+                    "type": "image",
+                    "titulo": title,
+                    "ruta": ruta,
+                    "fuente": item.get("fuente", "Elaboración propia"),
+                    "ancho_cm": item.get("ancho_cm"),
+                    "placeholder": True,
+                }
+            )
+        elif caption:
+            blocks.append({"type": "paragraph", "text": caption})
+        return blocks
+
     # Tabla canónica directa (tipo == "tabla" a nivel de contenido[])
+    # The table renderer (table.py) handles landscape internally via
+    # switch_to_landscape/switch_to_portrait, so we only need to resolve
+    # "auto" orientation here and pass the correct value.
     if item.get("tipo") == "tabla":
+        if _looks_like_placeholder_table_data(item) or _looks_like_template_example_title(item.get("titulo")):
+            return blocks
+        orientacion = (item.get("orientacion") or "auto").strip().lower()
+        if orientacion == "auto":
+            headers = item.get("encabezados") or item.get("columnas", [])
+            if isinstance(headers, list) and len(headers) > 5:
+                item["orientacion"] = "landscape"
+            else:
+                item["orientacion"] = "portrait"
+        elif orientacion in ("horizontal",):
+            item["orientacion"] = "landscape"
+        elif orientacion in ("vertical",):
+            item["orientacion"] = "portrait"
         blocks.append({"type": "table", **item})
         return blocks
 
     # Subtítulo
     if "texto" in item:
-        blocks.append({
-            "type": "black_heading",
-            "text": item["texto"],
-            "level": 2, "size": 12, "centered": False,
-        })
+        blocks.append(
+            {
+                "type": "black_heading",
+                "text": item["texto"],
+                "level": 2,
+                "size": 12,
+                "centered": False,
+            }
+        )
+
+    ai_content = item.get("_ai_content")
+    if ai_content:
+        blocks.extend(_normalize_ai_content(ai_content))
+        return blocks
 
     # Content block compartido (notas, párrafos, tablas, imágenes)
     blocks.extend(_normalize_content_block(item))
 
-    # Placeholder de matriz
-    if item.get("mostrar_matriz"):
-        blocks.append({
-            "type": "paragraph",
-            "text": "[Se insertará la Matriz de Consistencia aquí]",
-        })
+    return blocks
 
+
+def _normalize_ai_content(content: Any) -> List[Block]:
+    """Render AI-injected content as the source of truth for a node."""
+    if isinstance(content, str):
+        parts = [
+            part.strip()
+            for part in re.split(
+                r"\n\s*\n",
+                content.replace("\r\n", "\n").replace("\r", "\n"),
+            )
+            if part and part.strip()
+        ]
+        return [{"type": "paragraph", "text": part} for part in parts]
+
+    if isinstance(content, dict):
+        return _normalize_content_item(content)
+
+    if not isinstance(content, list):
+        return []
+
+    blocks: List[Block] = []
+    for item in content:
+        blocks.extend(_normalize_content_item(item))
     return blocks
 
 
@@ -713,39 +1444,54 @@ def _normalize_content_block(item: dict) -> List[Block]:
 
     # Tabla legacy (dict con headers/rows)
     if "tabla" in item and isinstance(item["tabla"], dict):
-        blocks.append({
-            "type": "legacy_table",
-            "tabla": item["tabla"],
-            "titulo": item.get("tabla_titulo"),
-            "nota": item.get("tabla_nota"),
-        })
+        table_title = item.get("tabla_titulo") or item.get("titulo")
+        if not _looks_like_template_example_title(table_title) and not _looks_like_placeholder_table_data(item["tabla"]):
+            blocks.append(
+                {
+                    "type": "legacy_table",
+                    "tabla": item["tabla"],
+                    "titulo": item.get("tabla_titulo"),
+                    "nota": item.get("tabla_nota"),
+                }
+            )
 
     # tablas_especiales (array de tablas legacy)
     if "tablas_especiales" in item:
         for te in item["tablas_especiales"]:
             if isinstance(te, dict):
-                blocks.append({
-                    "type": "legacy_table",
-                    "tabla": te,
-                    "titulo": te.get("titulo"),
-                })
+                if _looks_like_template_example_title(te.get("titulo")) or _looks_like_placeholder_table_data(te):
+                    continue
+                blocks.append(
+                    {
+                        "type": "legacy_table",
+                        "tabla": te,
+                        "titulo": te.get("titulo"),
+                    }
+                )
 
     # Tabla canónica (tabla_data)
     if "tabla_data" in item and isinstance(item["tabla_data"], dict):
-        blocks.append({"type": "table", **item["tabla_data"]})
+        if not _looks_like_placeholder_table_data(item["tabla_data"]):
+            blocks.append({"type": "table", **item["tabla_data"]})
 
     # Imágenes
     if "imagenes" in item:
         for img in item["imagenes"]:
             ruta = str(img.get("ruta", "") or "").strip()
-            if not ruta or ruta.lower() == "placeholder":
+            if (
+                not ruta
+                or ruta.lower() == "placeholder"
+                or _looks_like_template_example_image(img)
+            ):
                 continue
-            blocks.append({
-                "type": "image",
-                "titulo": img.get("titulo", ""),
-                "ruta": ruta,
-                "fuente": img.get("fuente", ""),
-            })
+            blocks.append(
+                {
+                    "type": "image",
+                    "titulo": img.get("titulo", ""),
+                    "ruta": ruta,
+                    "fuente": img.get("fuente", ""),
+                }
+            )
 
     return blocks
 
@@ -753,6 +1499,7 @@ def _normalize_content_block(item: dict) -> List[Block]:
 # ═══════════════════════════════════════════════════════════════
 # FINALES (referencias + anexos)
 # ═══════════════════════════════════════════════════════════════
+
 
 def _normalize_finales(data: dict) -> List[Block]:
     fin = data.get("finales", {})
@@ -780,20 +1527,32 @@ def _normalize_referencias(fin: dict) -> List[Block]:
     if "referencias" not in fin:
         return []
 
-    blocks: List[Block] = []
+    blocks: List[Block] = [{"type": "page_break"}]
     ref = fin["referencias"]
 
     if isinstance(ref, str):
-        blocks.append({
-            "type": "heading", "text": ref,
-            "level": 1, "centered": False,
-        })
+        blocks.append(
+            {
+                "type": "heading",
+                "text": ref,
+                "level": 1,
+                "centered": False,
+            }
+        )
     else:
-        blocks.append({
-            "type": "heading",
-            "text": ref.get("titulo", "REFERENCIAS BIBLIOGRÁFICAS"),
-            "level": 1, "centered": False,
-        })
+        blocks.append(
+            {
+                "type": "heading",
+                "text": ref.get("titulo", "REFERENCIAS BIBLIOGRÁFICAS"),
+                "level": 1,
+                "centered": False,
+            }
+        )
+        ai_content = ref.get("_ai_content")
+        if ai_content:
+            blocks.extend(_normalize_ai_content(ai_content))
+            blocks.append({"type": "page_break"})
+            return blocks
         if "nota" in ref:
             blocks.append({"type": "note", "text": ref["nota"]})
         ejemplos = ref.get("ejemplos") or ref.get("ejemplos_apa", [])
@@ -836,50 +1595,74 @@ def _normalize_anexos(data: dict, fin: dict) -> List[Block]:
         blocks.append({"type": "section_switch", "orientation": "landscape"})
 
     if isinstance(anx, str):
-        blocks.append({
-            "type": "heading", "text": anx,
-            "level": 1, "centered": False,
-        })
+        blocks.append(
+            {
+                "type": "heading",
+                "text": anx,
+                "level": 1,
+                "centered": False,
+            }
+        )
     else:
-        blocks.append({
-            "type": "heading",
-            "text": anx.get("titulo_seccion", "ANEXOS"),
-            "level": 1, "centered": False,
-        })
-        if anx.get("nota"):
-            blocks.append({"type": "note", "text": anx["nota"]})
+        blocks.append(
+            {
+                "type": "heading",
+                "text": anx.get("titulo_seccion", "ANEXOS"),
+                "level": 1,
+                "centered": False,
+            }
+        )
 
-        for item in lista:
-            # Tabla canónica directa
-            if isinstance(item, dict) and item.get("tipo") == "tabla":
-                blocks.append({"type": "table", **item})
-                continue
+        for position, item in enumerate(lista, start=1):
             # String simple
             if isinstance(item, str):
                 blocks.append({"type": "paragraph", "text": item})
                 continue
 
-            titulo_anexo = item.get("titulo", "")
+            if not isinstance(item, dict):
+                continue
+
+            titulo_anexo = _resolve_annex_heading_text(item, position)
             if titulo_anexo:
-                blocks.append({
-                    "type": "paragraph_centered",
-                    "text": titulo_anexo,
-                    "bold": True, "size": 13,
-                    "space_before": 12, "space_after": 12,
-                })
+                blocks.append(
+                    {
+                        "type": "paragraph_centered",
+                        "text": titulo_anexo,
+                        "bold": True,
+                        "size": 13,
+                        "space_before": 12,
+                        "space_after": 12,
+                    }
+                )
+
+            # Tabla canónica directa
+            if item.get("tipo") == "tabla":
+                table_block = dict(item)
+                table_block.pop("titulo", None)
+                blocks.extend(_normalize_annex_blocks([{"type": "table", **table_block}]))
+                continue
+
+            ai_content = item.get("_ai_content")
+            if ai_content:
+                if "matriz" in titulo_anexo.lower():
+                    rendered_matriz = True
+                blocks.extend(_normalize_annex_content(ai_content))
+                continue
 
             is_matriz = "matriz" in titulo_anexo.lower()
             if is_matriz and "matriz_consistencia" in data:
-                blocks.append({
-                    "type": "matriz",
-                    "data": data["matriz_consistencia"],
-                    "landscape": False,
-                })
+                blocks.append(
+                    {
+                        "type": "matriz",
+                        "data": data["matriz_consistencia"],
+                        "landscape": False,
+                    }
+                )
                 rendered_matriz = True
                 continue
 
             # Content block normal del anexo
-            blocks.extend(_normalize_content_block(item))
+            blocks.extend(_normalize_annex_blocks(_normalize_content_block(item)))
 
     # Restore portrait
     if first_is_matriz:
@@ -888,21 +1671,31 @@ def _normalize_anexos(data: dict, fin: dict) -> List[Block]:
     # Fallback: matriz como último anexo si no estaba en la lista
     if "matriz_consistencia" in data and not rendered_matriz:
         blocks.append({"type": "section_switch", "orientation": "landscape"})
-        blocks.append({
-            "type": "heading", "text": "ANEXOS",
-            "level": 1, "centered": False,
-        })
-        blocks.append({
-            "type": "paragraph_centered",
-            "text": "Anexo 1: Matriz de Consistencia",
-            "bold": True, "size": 13,
-            "space_before": 12, "space_after": 12,
-        })
-        blocks.append({
-            "type": "matriz",
-            "data": data["matriz_consistencia"],
-            "landscape": False,
-        })
+        blocks.append(
+            {
+                "type": "heading",
+                "text": "ANEXOS",
+                "level": 1,
+                "centered": False,
+            }
+        )
+        blocks.append(
+            {
+                "type": "paragraph_centered",
+                "text": "Anexo 1: Matriz de Consistencia",
+                "bold": True,
+                "size": 13,
+                "space_before": 12,
+                "space_after": 12,
+            }
+        )
+        blocks.append(
+            {
+                "type": "matriz",
+                "data": data["matriz_consistencia"],
+                "landscape": False,
+            }
+        )
         blocks.append({"type": "section_switch", "orientation": "portrait"})
 
     return blocks

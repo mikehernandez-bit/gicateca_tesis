@@ -1,4 +1,5 @@
 """Renderer: note — caja azul de instrucciones/validación."""
+
 from __future__ import annotations
 
 from docx.document import Document

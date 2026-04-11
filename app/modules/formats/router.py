@@ -23,6 +23,7 @@ Puntos de extension:
 Donde tocar si falla:
 - Revisar generacion en service y conversion PDF en _convert_docx_to_pdf.
 """
+
 import hashlib
 import json
 import os
@@ -32,7 +33,7 @@ from email.utils import formatdate, parsedate_to_datetime
 from pathlib import Path
 
 import logging
-from fastapi import APIRouter, Request, HTTPException, BackgroundTasks, Response
+from fastapi import APIRouter, Request, HTTPException, BackgroundTasks
 from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
 
 from app.core.loaders import find_format_index, load_format_by_id
@@ -46,7 +47,12 @@ from app.modules.formats import service
 router = APIRouter(prefix="/formatos", tags=["formatos"])
 
 _PDF_CACHE_MAX_AGE = int(os.getenv("PDF_CACHE_MAX_AGE", "3600"))
-_PDF_PREWARM_ON_STARTUP = os.getenv("PDF_PREWARM_ON_STARTUP", "false").lower() in ("1", "true", "yes", "on")
+_PDF_PREWARM_ON_STARTUP = os.getenv("PDF_PREWARM_ON_STARTUP", "false").lower() in (
+    "1",
+    "true",
+    "yes",
+    "on",
+)
 _PDF_CONVERSION_TIMEOUT = float(os.getenv("PDF_CONVERSION_TIMEOUT", "120"))
 
 logger = logging.getLogger(__name__)
@@ -118,7 +124,7 @@ def _replace_cached_file(src: Path, dest: Path) -> None:
 def _build_etag(format_id: str, source_mtime: float) -> str:
     """Construye ETag estable basado en fuente."""
     raw = f"{format_id}:{int(source_mtime)}".encode("utf-8")
-    return f"\"{hashlib.md5(raw).hexdigest()}\""
+    return f'"{hashlib.md5(raw).hexdigest()}"'
 
 
 def _http_date(timestamp: float) -> str:
@@ -295,7 +301,9 @@ def _get_source_info(format_id: str):
         provider = get_provider(item.uni)
         generator = provider.get_generator_command(item.categoria)
         script_path = _resolve_generator_path(generator)
-        script_mtime = script_path.stat().st_mtime if script_path and script_path.exists() else 0.0
+        script_mtime = (
+            script_path.stat().st_mtime if script_path and script_path.exists() else 0.0
+        )
     except Exception:
         script_path = None
         script_mtime = 0.0
@@ -319,7 +327,9 @@ def _get_source_info(format_id: str):
 
 def _get_source_mtime(format_id: str) -> float:
     """Obtiene mtime total de fuentes para invalidar cache PDF."""
-    _item, _json_path, _json_mtime, _script_path, _script_mtime, source_mtime = _get_source_info(format_id)
+    _item, _json_path, _json_mtime, _script_path, _script_mtime, source_mtime = (
+        _get_source_info(format_id)
+    )
     return source_mtime
 
 
@@ -330,7 +340,7 @@ async def get_format_detail(format_id: str, request: Request):
         formato = service.get_formato(format_id)
     except ValueError:
         raise HTTPException(status_code=404, detail="Formato no encontrado")
-    
+
     return templates.TemplateResponse(
         "pages/detail.html",
         {
@@ -356,7 +366,7 @@ async def get_format_versions(format_id: str, request: Request):
     versions = [
         {"version": current_version, "date": "2026-02-16", "changes": "Versión actual"},
     ]
-    
+
     return templates.TemplateResponse(
         "pages/versions.html",
         {
@@ -376,7 +386,7 @@ async def generate_format_document(format_id: str, background_tasks: BackgroundT
         raise HTTPException(status_code=400, detail=str(exc))
     except RuntimeError as exc:
         raise HTTPException(status_code=500, detail=str(exc))
-    
+
     background_tasks.add_task(cleanup_temp_file, output_path)
     return FileResponse(
         path=str(output_path),
@@ -389,9 +399,11 @@ async def generate_format_document(format_id: str, background_tasks: BackgroundT
 async def get_format_pdf(format_id: str, request: Request):
     """Genera el DOCX, lo convierte a PDF y lo devuelve."""
     try:
-        item, json_path, json_mtime, script_path, script_mtime, source_mtime = _get_source_info(format_id)
+        item, json_path, json_mtime, script_path, script_mtime, source_mtime = (
+            _get_source_info(format_id)
+        )
         pdf_path, docx_path, docx_sha256 = _ensure_pdf_cached(format_id, source_mtime)
-        etag = f"\"{docx_sha256[:16]}\"" if docx_sha256 else None
+        etag = f'"{docx_sha256[:16]}"' if docx_sha256 else None
         if item and json_path:
             _write_manifest(
                 format_id=format_id,
@@ -413,7 +425,9 @@ async def get_format_pdf(format_id: str, request: Request):
             )
         except Exception:
             pass
-        headers = _build_cache_headers(format_id, source_mtime, etag=etag, no_store=True)
+        headers = _build_cache_headers(
+            format_id, source_mtime, etag=etag, no_store=True
+        )
         return FileResponse(
             path=str(pdf_path),
             media_type="application/pdf",
@@ -453,7 +467,7 @@ async def get_format_cover_model(format_id: str):
     """
     from app.core.view_models import build_cover_view_model
     from app.core.settings import get_default_uni_code
-    
+
     try:
         data = load_format_by_id(format_id)
     except FileNotFoundError:
@@ -461,20 +475,17 @@ async def get_format_cover_model(format_id: str):
     except Exception as e:
         logger.error("Error cargando formato %s: %s", format_id, e)
         raise HTTPException(status_code=500, detail=str(e))
-    
+
     # Determinar uni_code desde _meta.university (con fallback a _meta.uni)
     meta = data.get("_meta") or {}
-    uni_code = (
-        meta.get("university") or meta.get("uni") or ""
-    ).strip().lower()
-    
+    uni_code = (meta.get("university") or meta.get("uni") or "").strip().lower()
+
     if not uni_code:
         uni_code = get_default_uni_code()
         logger.warning(
-            "Formato %s sin _meta.uni, usando default: %s", 
-            format_id, uni_code
+            "Formato %s sin _meta.uni, usando default: %s", format_id, uni_code
         )
-    
+
     # Obtener provider
     try:
         provider = get_provider(uni_code)
@@ -482,19 +493,15 @@ async def get_format_cover_model(format_id: str):
         # uni_code no registrado, usar default
         default_uni = get_default_uni_code()
         logger.warning(
-            "Universidad %s no registrada, usando fallback: %s",
-            uni_code, default_uni
+            "Universidad %s no registrada, usando fallback: %s", uni_code, default_uni
         )
         try:
             provider = get_provider(default_uni)
         except KeyError:
             raise HTTPException(
-                status_code=400,
-                detail=f"Universidad no registrada: {uni_code}"
+                status_code=400, detail=f"Universidad no registrada: {uni_code}"
             )
-    
+
     # Construir view-model
     view_model = build_cover_view_model(data, provider)
     return JSONResponse(content=view_model)
-
-

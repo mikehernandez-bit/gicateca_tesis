@@ -23,7 +23,11 @@ Donde tocar si falla:
 - Revisar mapeo de get_provider y manejo de KeyError.
 """
 
-from app.core.registry import discover_providers, get_provider as _get_provider, list_universities
+from app.core.registry import (
+    discover_providers,
+    get_provider as _get_provider,
+    list_universities,
+)
 
 __all__ = ["discover_providers", "get_provider", "list_universities"]
 

@@ -21,6 +21,7 @@ Puntos de extension:
 Donde tocar si falla:
 - Revisar cambios en app.core.registry.
 """
+
 from app.core.registry import discover_providers, get_provider, list_universities
 
 __all__ = ["discover_providers", "get_provider", "list_universities"]

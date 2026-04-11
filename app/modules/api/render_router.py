@@ -14,21 +14,23 @@ No hace:
 Dependencias:
 - app.modules.formats.service, app.modules.generation.preprocessor, app.core.loaders.
 """
+
 from __future__ import annotations
 
 import json
 import tempfile
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 from fastapi import APIRouter, BackgroundTasks, HTTPException
 from fastapi.responses import FileResponse
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field
 
 from app.modules.formats import service as formats_service
 from app.modules.formats.router import _ensure_pdf_cached, _get_source_mtime
 from app.core.loaders import find_format_index
 from app.core.document_generator import cleanup_temp_file
+from app.modules.api.ai_content_contract import AIResult, serialize_ai_sections
 from app.modules.generation.preprocessor import (
     exclude_instruction_keys,
     merge_values,
@@ -40,31 +42,19 @@ from app.modules.generation.preprocessor import (
 router = APIRouter(prefix="/api/v1/render", tags=["render"])
 
 
-# Request/Response Models
-class AISection(BaseModel):
-    """A section of AI-generated content."""
-    sectionId: Optional[str] = Field(default=None, description="Stable section ID from sectionIndex")
-    path: Optional[str] = Field(default=None, description="Section path like 'Capitulo I/Introduccion'")
-    content: str = Field(..., description="AI-generated content for this section")
-
-    @model_validator(mode="after")
-    def validate_locator(self) -> "AISection":
-        if not (self.sectionId or self.path):
-            raise ValueError("AISection requires at least one locator: path or sectionId")
-        return self
-
-
-class AIResult(BaseModel):
-    """AI-generated content result."""
-    sections: List[AISection] = Field(default_factory=list)
-
-
 class RenderRequest(BaseModel):
     """Request to render a document using real generators."""
+
     formatId: str = Field(..., min_length=1, description="Format ID to render")
-    values: Dict[str, Any] = Field(default_factory=dict, description="User values for cover page")
-    mode: str = Field(default="simulation", description="Render mode: 'simulation' or 'final'")
-    aiResult: Optional[AIResult] = Field(default=None, description="AI-generated content")
+    values: Dict[str, Any] = Field(
+        default_factory=dict, description="User values for cover page"
+    )
+    mode: str = Field(
+        default="simulation", description="Render mode: 'simulation' or 'final'"
+    )
+    aiResult: Optional[AIResult] = Field(
+        default=None, description="AI-generated content"
+    )
 
 
 def _validate_publishable(format_id: str) -> None:
@@ -109,14 +99,7 @@ def _generate_simulation_docx(
     # 3) Apply AI content
     ai_sections = []
     if ai_result and ai_result.sections:
-        ai_sections = [
-            {
-                "sectionId": s.sectionId,
-                "path": s.path,
-                "content": s.content,
-            }
-            for s in ai_result.sections
-        ]
+        ai_sections = serialize_ai_sections(ai_result.sections)
     sanitized = apply_ai_content(sanitized, ai_sections)
 
     # 4) Write processed JSON to temp file
@@ -210,7 +193,6 @@ def render_pdf(request: RenderRequest, background_tasks: BackgroundTasks):
             if not docx_path.exists():
                 raise RuntimeError("DOCX generation returned path but file is missing")
 
-
             # Convert to PDF using same Word COM pipeline
             from app.core.pdf_converter import convert_docx_to_pdf
 
@@ -238,7 +220,9 @@ def render_pdf(request: RenderRequest, background_tasks: BackgroundTasks):
         else:
             # Final mode: use cached PDF pipeline
             source_mtime = _get_source_mtime(request.formatId)
-            pdf_path, docx_path, docx_sha256 = _ensure_pdf_cached(request.formatId, source_mtime)
+            pdf_path, docx_path, docx_sha256 = _ensure_pdf_cached(
+                request.formatId, source_mtime
+            )
 
             item = find_format_index(request.formatId)
             filename = f"{request.formatId.replace('-', '_').upper()}.pdf"

@@ -30,6 +30,7 @@ from app.core.templates import templates
 
 router = APIRouter()
 
+
 @router.get("/admin", response_class=HTMLResponse)
 def admin(request: Request):
     """Renderiza la vista principal de admin."""

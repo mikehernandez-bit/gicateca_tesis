@@ -1,4 +1,5 @@
 """Renderers: heading + black_heading."""
+
 from __future__ import annotations
 
 from docx.document import Document

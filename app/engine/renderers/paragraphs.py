@@ -1,4 +1,5 @@
 """Renderers: paragraph + paragraph_centered."""
+
 from __future__ import annotations
 
 from docx.document import Document

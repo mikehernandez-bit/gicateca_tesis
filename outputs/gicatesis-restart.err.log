@@ -1,0 +1,40 @@
+INFO:     Will watch for changes in these directories: ['C:\\Users\\jhoan\\Documents\\gicateca_tesis']
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [89720] using WatchFiles
+INFO:     Started server process [69384]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'app\modules\generation\preprocessor.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [69384]
+Reiniciando Word COM (reason=shutdown)
+WARNING:  WatchFiles detected changes in 'tests\test_generation_preprocessor.py', 'tests\test_engine_normalizer.py', 'app\engine\normalizer.py'. Reloading...
+C:\Users\jhoan\Documents\gicateca_tesis\.venv\Lib\site-packages\uvicorn\_subprocess.py:84: RuntimeWarning: coroutine 'Server.serve' was never awaited
+  pass
+RuntimeWarning: Enable tracemalloc to get the object allocation traceback
+INFO:     Started server process [95032]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'app\modules\generation\preprocessor.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [95032]
+WARNING:  WatchFiles detected changes in 'tests\test_generation_preprocessor.py'. Reloading...
+Exception ignored while calling deallocator <function BaseEventLoop.__del__ at 0x0000020AE2D28510>:
+Traceback (most recent call last):
+  File "C:\Users\jhoan\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\base_events.py", line 760, in __del__
+    self.close()
+  File "C:\Users\jhoan\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\selector_events.py", line 104, in close
+    self._close_self_pipe()
+  File "C:\Users\jhoan\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\selector_events.py", line 111, in _close_self_pipe
+    self._remove_reader(self._ssock.fileno())
+AttributeError: '_WindowsSelectorEventLoop' object has no attribute '_ssock'
+C:\Users\jhoan\Documents\gicateca_tesis\.venv\Lib\site-packages\uvicorn\_subprocess.py:84: RuntimeWarning: coroutine 'Server.serve' was never awaited
+  pass
+RuntimeWarning: Enable tracemalloc to get the object allocation traceback
+INFO:     Started server process [92328]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.

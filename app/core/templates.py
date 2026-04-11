@@ -33,6 +33,7 @@ templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 def _get_favicon_url() -> str:
     """Construye la URL del favicon basada en la universidad por defecto."""
     from app.core.settings import get_default_uni_code
+
     code = get_default_uni_code().upper()
     return f"/static/assets/Logo{code}.png"
 

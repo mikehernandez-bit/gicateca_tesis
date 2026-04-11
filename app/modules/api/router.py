@@ -16,13 +16,19 @@ Dependencias:
 Puntos de extensión:
 - Agregar endpoints de assets si se necesita.
 """
+
 from typing import Optional
 
 from fastapi import APIRouter, Header, Query, Response
 from fastapi.responses import JSONResponse
 
 from app.modules.api import service
-from app.modules.api.dtos import CatalogValidationResponse, CatalogVersionResponse, FormatDetail, FormatSummary
+from app.modules.api.dtos import (
+    CatalogValidationResponse,
+    CatalogVersionResponse,
+    FormatDetail,
+    FormatSummary,
+)
 
 router = APIRouter(prefix="/api/v1", tags=["formats-api"])
 
@@ -47,11 +53,14 @@ def _make_etag(value: str) -> str:
 # GET /api/v1/formats - Lista de formatos
 # -----------------------------------------------------------------------------
 
+
 @router.get("/formats", response_model=list[FormatSummary])
 async def list_formats(
     university: Optional[str] = Query(None, description="Filtrar por universidad"),
     category: Optional[str] = Query(None, description="Filtrar por categoría"),
-    documentType: Optional[str] = Query(None, description="Filtrar por tipo de documento"),
+    documentType: Optional[str] = Query(
+        None, description="Filtrar por tipo de documento"
+    ),
     if_none_match: Optional[str] = Header(None, alias="If-None-Match"),
 ) -> Response:
     """
@@ -95,6 +104,7 @@ async def list_formats(
 # GET /api/v1/formats/version - Versión del catálogo
 # -----------------------------------------------------------------------------
 
+
 @router.get("/formats/version", response_model=CatalogVersionResponse)
 async def get_catalog_version() -> JSONResponse:
     """
@@ -116,6 +126,7 @@ async def get_catalog_version() -> JSONResponse:
 # GET /api/v1/formats/validate - Diagnóstico del catálogo
 # -----------------------------------------------------------------------------
 
+
 @router.get("/formats/validate", response_model=CatalogValidationResponse)
 async def validate_catalog() -> CatalogValidationResponse:
     """
@@ -135,6 +146,7 @@ async def validate_catalog() -> CatalogValidationResponse:
 # -----------------------------------------------------------------------------
 # GET /api/v1/formats/{format_id} - Detalle de formato
 # -----------------------------------------------------------------------------
+
 
 @router.get("/formats/{format_id}", response_model=FormatDetail)
 async def get_format_detail(
@@ -177,10 +189,10 @@ async def get_format_detail(
     )
 
 
-
 # -----------------------------------------------------------------------------
 # GET /api/v1/assets/{asset_path:path} - Servir assets
 # -----------------------------------------------------------------------------
+
 
 @router.get("/assets/{asset_path:path}")
 async def get_asset(asset_path: str) -> Response:

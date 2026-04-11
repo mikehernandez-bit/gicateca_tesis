@@ -1,4 +1,5 @@
 """Renderer: image — figuras con caption SEQ-numbered y fuente."""
+
 from __future__ import annotations
 
 import logging
@@ -42,6 +43,7 @@ def render_image(doc: Document, block: Block) -> None:
     """
     ruta = block.get("ruta", "")
     titulo = _clean_figure_title(block.get("titulo", ""))
+    omit_caption = bool(block.get("omit_caption"))
 
     # Omit placeholders or missing files: never inject fake "example" figures.
     if not ruta or ruta.lower() == "placeholder":
@@ -52,7 +54,7 @@ def render_image(doc: Document, block: Block) -> None:
 
     try:
         # Caption with SEQ field
-        if titulo:
+        if titulo and not omit_caption:
             pc = doc.add_paragraph()
             pc.alignment = WD_ALIGN_PARAGRAPH.CENTER
             pc.paragraph_format.space_after = Pt(4)

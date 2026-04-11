@@ -1,4 +1,5 @@
 """Renderer: logo — logotipo universitario centrado."""
+
 from __future__ import annotations
 
 import logging

@@ -68,7 +68,9 @@ async def generate_document(request: Request, background_tasks: BackgroundTasks)
         return JSONResponse({"error": "Datos invalidos"}, status_code=400)
 
     try:
-        output_path, filename = service.generate_document(payload.format, payload.sub_type, payload.uni or "unac")
+        output_path, filename = service.generate_document(
+            payload.format, payload.sub_type, payload.uni or "unac"
+        )
     except ValueError as exc:
         return JSONResponse({"error": str(exc)}, status_code=400)
     except RuntimeError as exc:

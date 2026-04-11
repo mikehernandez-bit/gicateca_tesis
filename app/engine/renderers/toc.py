@@ -2,6 +2,7 @@
 
 Agrupados porque ambos generan índices/listas de contenido del documento.
 """
+
 from __future__ import annotations
 
 from docx.document import Document
@@ -10,7 +11,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Cm, Pt
 
 from app.engine.registry import register
-from app.engine.primitives import add_toc_field, add_heading_formal
+from app.engine.primitives import add_toc_field
 from app.engine.types import Block
 
 
@@ -45,7 +46,9 @@ def render_index_items(doc: Document, block: Block) -> None:
     for item in block.get("items", []):
         p = doc.add_paragraph()
         p.paragraph_format.tab_stops.add_tab_stop(
-            Cm(15.0), WD_TAB_ALIGNMENT.RIGHT, WD_TAB_LEADER.DOTS,
+            Cm(15.0),
+            WD_TAB_ALIGNMENT.RIGHT,
+            WD_TAB_LEADER.DOTS,
         )
         run = p.add_run(item.get("texto", ""))
         if item.get("bold"):
@@ -71,9 +74,13 @@ def render_abbreviations_table(doc: Document, block: Block) -> None:
     rows = block.get("rows", []) or []
 
     if not rows:
-        note = doc.add_paragraph("(Completar abreviaturas)")
+        note = doc.add_paragraph("No se identificaron abreviaturas relevantes en el documento.")
         note.alignment = WD_ALIGN_PARAGRAPH.LEFT
-        run = note.runs[0] if note.runs else note.add_run("(Completar abreviaturas)")
+        run = (
+            note.runs[0]
+            if note.runs
+            else note.add_run("No se identificaron abreviaturas relevantes en el documento.")
+        )
         run.italic = True
         run.font.name = "Arial"
         run.font.size = Pt(10)
@@ -82,7 +89,7 @@ def render_abbreviations_table(doc: Document, block: Block) -> None:
     table = doc.add_table(rows=1 + len(rows), cols=2)
     table.style = "Table Grid"
     table.autofit = False
-    table.columns[0].width = Cm(4.0)   # ~25%
+    table.columns[0].width = Cm(4.0)  # ~25%
     table.columns[1].width = Cm(12.0)  # ~75%
 
     _set_abbr_cell_text(table.cell(0, 0), "SIGLA", bold=True)

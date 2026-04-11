@@ -244,13 +244,40 @@ class TestNormalizePreliminares:
         pars = _blocks_of_type(blocks, "paragraph")
         assert any(b["text"] == "A mi familia" for b in pars)
 
-    def test_dedicatoria_as_string(self):
-        """Dedicatoria como string genera solo heading."""
+    def test_optional_preliminary_as_string_is_omitted(self):
+        """Dedicatoria opcional sin contenido no debe dejar heading vacio."""
         data = _minimal_json()
         data["preliminares"] = {"dedicatoria": "DEDICATORIA"}
         blocks = normalize(data)
         hdgs = _blocks_of_type(blocks, "heading")
-        assert any(b["text"] == "DEDICATORIA" for b in hdgs)
+        assert not any(b["text"] == "DEDICATORIA" for b in hdgs)
+
+    def test_preliminary_ai_content_overrides_placeholder_text(self):
+        data = _minimal_json()
+        data["preliminares"] = {
+            "dedicatoria": {
+                "titulo": "DEDICATORIA",
+                "texto": "[Escriba aqui su dedicatoria...]",
+                "_ai_content": "Dedico este trabajo a mi familia por su apoyo constante.",
+            }
+        }
+        blocks = normalize(data)
+        pars = _blocks_of_type(blocks, "paragraph")
+        texts = [b["text"] for b in pars]
+        assert any("Dedico este trabajo" in t for t in texts)
+        assert not any("[Escriba aqui" in t for t in texts)
+
+    def test_optional_preliminary_placeholder_is_omitted(self):
+        data = _minimal_json()
+        data["preliminares"] = {
+            "dedicatoria": {
+                "titulo": "DEDICATORIA",
+                "texto": "[Escriba aqui su dedicatoria...]",
+            }
+        }
+        blocks = normalize(data)
+        headings = [b["text"] for b in _blocks_of_type(blocks, "heading")]
+        assert "DEDICATORIA" not in headings
 
     def test_indices_as_dict(self):
         """Indices como dict genera toc_field blocks."""
@@ -283,6 +310,72 @@ class TestNormalizePreliminares:
         abbr = _blocks_of_type(blocks, "abbreviations_table")
         assert len(abbr) == 1
         assert abbr[0]["rows"][0]["sigla"] == "IA"
+
+    def test_indices_list_prefers_ai_abbreviations_over_base_examples(self):
+        data = _minimal_json()
+        data["preliminares"] = {
+            "indices": [
+                {
+                    "titulo": "ÍNDICE DE ABREVIATURAS",
+                    "items": [{"texto": "OMS: Organizacion Mundial de la Salud"}],
+                }
+            ],
+            "abreviaturas": {
+                "titulo": "INDICE DE ABREVIATURAS",
+                "_ai_content": "IA: Inteligencia Artificial\nERP: Planificacion de Recursos Empresariales",
+            },
+        }
+        blocks = normalize(data)
+        abbr = _blocks_of_type(blocks, "abbreviations_table")
+        assert len(abbr) == 1
+        rows = abbr[0]["rows"]
+        assert rows[0]["sigla"] == "IA"
+        assert all(row["sigla"] != "OMS" for row in rows)
+
+    def test_abbreviaturas_without_rows_use_clean_fallback_text(self):
+        data = _minimal_json()
+        data["preliminares"] = {
+            "abreviaturas": {"titulo": "INDICE DE ABREVIATURAS", "_ai_content": ""},
+        }
+        blocks = normalize(data)
+        pars = _blocks_of_type(blocks, "paragraph")
+        assert any(
+            b["text"] == "No se identificaron abreviaturas relevantes en el presente documento."
+            for b in pars
+        )
+
+    def test_abbreviaturas_are_derived_from_generated_body_content(self):
+        data = _minimal_json()
+        data["preliminares"] = {
+            "indices": {
+                "contenido": "INDICE",
+                "abreviaturas": "INDICE DE ABREVIATURAS",
+            }
+        }
+        data["cuerpo"] = [
+            {
+                "titulo": "II. MARCO TEORICO",
+                "contenido": [
+                    {
+                        "texto": "2.1 Bases teoricas",
+                        "_ai_content": (
+                            "La Inteligencia Artificial (IA) se integra con soluciones de IoT para el monitoreo continuo. "
+                            "Ademas, el analisis estadistico se procesa en SPSS y el seguimiento operativo utiliza KPI tecnicos."
+                        ),
+                    }
+                ],
+            }
+        ]
+
+        blocks = normalize(data)
+        abbr = _blocks_of_type(blocks, "abbreviations_table")
+
+        assert len(abbr) == 1
+        rows = abbr[0]["rows"]
+        assert any(row["sigla"] == "IA" and "Inteligencia Artificial" in row["meaning"] for row in rows)
+        assert any(row["sigla"] == "IoT" and "Internet de las Cosas" in row["meaning"] for row in rows)
+        assert any(row["sigla"] == "SPSS" and "Statistical Package" in row["meaning"] for row in rows)
+        assert any(row["sigla"] == "KPI" and "Key Performance Indicator" in row["meaning"] for row in rows)
 
     def test_introduccion(self):
         """Introducción en preliminares genera heading + párrafo."""
@@ -386,6 +479,17 @@ class TestNormalizeCuerpo:
         imgs = _blocks_of_type(blocks, "image")
         assert len(imgs) == 0
 
+    def test_content_with_template_example_image_is_skipped(self):
+        """Las figuras de ejemplo del formato base nunca deben renderizarse."""
+        data = _minimal_json()
+        data["cuerpo"][0]["contenido"] = [{
+            "texto": "1.1 Sec",
+            "imagenes": [{"titulo": "Arbol de problemas", "ruta": "figura_ejemplo.png", "fuente": "Propia"}],
+        }]
+        blocks = normalize(data)
+        imgs = _blocks_of_type(blocks, "image")
+        assert len(imgs) == 0
+
     def test_content_with_legacy_table(self):
         """Item con tabla legacy (headers/rows) genera block legacy_table."""
         data = _minimal_json()
@@ -399,6 +503,20 @@ class TestNormalizeCuerpo:
         assert len(lt) == 1
         assert lt[0]["titulo"] == "Tabla legacy"
         assert lt[0]["tabla"]["headers"] == ["X", "Y"]
+
+    def test_placeholder_legacy_table_is_skipped(self):
+        """Tablas legacy con celdas placeholder no deben renderizarse."""
+        data = _minimal_json()
+        data["cuerpo"][0]["contenido"] = [{
+            "texto": "6.1 Discusion",
+            "tabla": {
+                "headers": ["Autor/Estudio", "Variable", "Resultado del autor"],
+                "rows": [["[Autor 1]", "[Variable]", "[Resultado]"]],
+            },
+            "tabla_titulo": "Tabla 13. Comparacion de resultados con antecedentes",
+        }]
+        blocks = normalize(data)
+        assert _blocks_of_type(blocks, "legacy_table") == []
 
     def test_content_with_tablas_especiales(self):
         """tablas_especiales genera blocks legacy_table."""
@@ -414,6 +532,56 @@ class TestNormalizeCuerpo:
         assert len(lt) == 1
         assert lt[0]["titulo"] == "TE1"
 
+    def test_subsection_ai_content_replaces_base_image_and_keeps_single_caption_source(self):
+        """Cuando hay _ai_content, debe quedar solo la figura indexable final."""
+        data = _minimal_json()
+        data["cuerpo"][0]["contenido"] = [{
+            "texto": "1.1 Sec",
+            "imagenes": [{"titulo": "Arbol de problemas", "ruta": "figura_ejemplo.png", "fuente": "Base"}],
+            "_ai_content": [
+                {
+                    "tipo": "figura",
+                    "titulo": "Modelo real",
+                    "caption": "Figura 1. Modelo real.",
+                    "ruta_placeholder": "assets/placeholder_figura.png",
+                    "fuente": "Elaboracion propia",
+                }
+            ],
+        }]
+        blocks = normalize(data)
+        imgs = _blocks_of_type(blocks, "image")
+        pars = _blocks_of_type(blocks, "paragraph")
+
+        assert len(imgs) == 1
+        assert imgs[0]["titulo"] == "Modelo real"
+        assert imgs[0]["ruta"] == "assets/placeholder_figura.png"
+        assert all("Figura 1. Modelo real." not in b["text"] for b in pars)
+        assert all(b["ruta"] != "figura_ejemplo.png" for b in imgs)
+
+    def test_subsection_ai_content_replaces_base_example_table(self):
+        """Una tabla generada por IA debe reemplazar la tabla ejemplo del formato."""
+        data = _minimal_json()
+        data["cuerpo"][0]["contenido"] = [{
+            "texto": "1.1 Sec",
+            "tabla": {"headers": ["Base"], "rows": [["Ejemplo"]]},
+            "tabla_titulo": "Tabla 3.1. Matriz de categorizacion (ejemplo)",
+            "_ai_content": [
+                {
+                    "tipo": "tabla",
+                    "titulo": "Tabla final",
+                    "encabezados": ["Categoria", "Codigo"],
+                    "filas": [["Gestion", "A1"]],
+                }
+            ],
+        }]
+        blocks = normalize(data)
+        tables = _blocks_of_type(blocks, "table")
+        legacy_tables = _blocks_of_type(blocks, "legacy_table")
+
+        assert len(tables) == 1
+        assert tables[0]["titulo"] == "Tabla final"
+        assert len(legacy_tables) == 0
+
     def test_content_string_item(self):
         """String en contenido genera paragraph."""
         data = _minimal_json()
@@ -422,13 +590,13 @@ class TestNormalizeCuerpo:
         pars = _blocks_of_type(blocks, "paragraph")
         assert any(b["text"] == "Plain text here" for b in pars)
 
-    def test_mostrar_matriz_placeholder(self):
-        """mostrar_matriz:true genera paragraph placeholder."""
+    def test_mostrar_matriz_does_not_render_placeholder(self):
+        """mostrar_matriz:true no debe dejar texto placeholder visible."""
         data = _minimal_json()
         data["cuerpo"][0]["contenido"] = [{"texto": "Sec", "mostrar_matriz": True}]
         blocks = normalize(data)
         pars = _blocks_of_type(blocks, "paragraph")
-        assert any("Matriz" in b["text"] for b in pars)
+        assert not any("Matriz de Consistencia" in b["text"] for b in pars)
 
     def test_ejemplos_apa_chapter(self):
         """ejemplos_apa a nivel de capítulo genera apa_examples."""
@@ -443,6 +611,40 @@ class TestNormalizeCuerpo:
 # ─────────────────────────────────────────────────────────────
 # FINALES
 # ─────────────────────────────────────────────────────────────
+
+def test_chapter_ai_table_skips_template_direct_table():
+    """Si el capitulo ya trae tabla IA, la tabla canonica base no debe coexistir."""
+    data = _minimal_json()
+    data["cuerpo"][0]["_ai_content"] = [
+        {
+            "tipo": "tabla",
+            "titulo": "Cronograma final",
+            "encabezados": ["Actividad", "Mes 1"],
+            "filas": [["Real", "X"]],
+        }
+    ]
+    data["cuerpo"][0]["contenido"] = [
+        {
+            "tipo": "tabla",
+            "titulo": "Cronograma final",
+            "encabezados": ["Actividad", "Mes 1"],
+            "filas": [["Real", "X"]],
+            "_ai_generated": True,
+        },
+        {
+            "tipo": "tabla",
+            "titulo": "Cronograma de Actividades",
+            "encabezados": ["Actividad", "Mes 1"],
+            "filas": [["Base", "X"]],
+        },
+    ]
+
+    blocks = normalize(data)
+    tables = _blocks_of_type(blocks, "table")
+
+    assert len(tables) == 1
+    assert tables[0]["titulo"] == "Cronograma final"
+
 
 class TestNormalizeFinales:
     def test_referencias_as_string(self):
@@ -470,6 +672,59 @@ class TestNormalizeFinales:
         assert any(b["text"] == "Cite correctamente" for b in notes)
         apa = _blocks_of_type(blocks, "apa_examples")
         assert len(apa) == 1
+
+    def test_referencias_start_on_new_page(self):
+        """Referencias debe iniciar con page_break antes del heading."""
+        data = _minimal_json()
+        data["cuerpo"] = [
+            {
+                "titulo": "I. CAPITULO",
+                "contenido": [{"texto": "1.1 Seccion", "_ai_content": "Texto base."}],
+            }
+        ]
+        data["finales"] = {
+            "referencias": {
+                "titulo": "REFERENCIAS BIBLIOGRAFICAS",
+                "_ai_content": "Referencia uno.\n\nReferencia dos.",
+            }
+        }
+
+        blocks = normalize(data)
+        ref_idx = next(
+            i
+            for i, block in enumerate(blocks)
+            if block["type"] == "heading"
+            and block["text"] == "REFERENCIAS BIBLIOGRAFICAS"
+        )
+
+        assert ref_idx > 0
+        assert blocks[ref_idx - 1]["type"] == "page_break"
+
+    def test_referencias_ai_content_replaces_examples(self):
+        """Si referencias tiene _ai_content, no deben sobrevivir ejemplos base."""
+        data = _minimal_json()
+        data["finales"] = {
+            "referencias": {
+                "titulo": "REFERENCIAS BIBLIOGRAFICAS",
+                "nota": "Cite correctamente",
+                "ejemplos_apa": ["Ejemplo base"],
+                "_ai_content": (
+                    "Referencias propuestas simuladas para validacion.\n\n"
+                    "Morales, J. (2024). Texto uno.\n\n"
+                    "Rojas, M. (2023). Texto dos."
+                ),
+            }
+        }
+        blocks = normalize(data)
+        paragraphs = _blocks_of_type(blocks, "paragraph")
+        notes = _blocks_of_type(blocks, "note")
+        apa = _blocks_of_type(blocks, "apa_examples")
+
+        assert any("Referencias propuestas simuladas" in block["text"] for block in paragraphs)
+        assert any("Morales, J." in block["text"] for block in paragraphs)
+        assert any("Rojas, M." in block["text"] for block in paragraphs)
+        assert len(notes) == 0
+        assert len(apa) == 0
 
     def test_anexos_with_matriz_landscape(self):
         """Anexo con matriz genera section_switch landscape → heading → matriz → portrait."""
@@ -499,6 +754,267 @@ class TestNormalizeFinales:
         mat = _blocks_of_type(blocks, "matriz")
         assert len(mat) == 1
         assert mat[0]["landscape"] is False
+
+    def test_anexo_ai_content_replaces_base_fallback_content(self):
+        """Los anexos con _ai_content no deben mezclar matriz fallback ni tablas base."""
+        data = _minimal_json()
+        data["finales"] = {
+            "anexos": {
+                "titulo_seccion": "ANEXOS",
+                "lista": [
+                    {
+                        "titulo": "Anexo 1: Matriz de consistencia",
+                        "tabla": {"headers": ["Base"], "rows": [["Ejemplo"]]},
+                        "tabla_titulo": "Tabla A1. Matriz de consistencia (ejemplo)",
+                        "_ai_content": [
+                            {
+                                "tipo": "tabla",
+                                "titulo": "Matriz final",
+                                "encabezados": ["Problema", "Objetivo"],
+                                "filas": [["P1", "O1"]],
+                            }
+                        ],
+                    }
+                ],
+            }
+        }
+        data["matriz_consistencia"] = {
+            "problemas": {"general": "P?", "especificos": []},
+            "objetivos": {"general": "O", "especificos": []},
+            "hipotesis": {"general": "H", "especificos": []},
+            "variables": {},
+            "metodologia": {"tipo": "Aplicada"},
+        }
+
+        blocks = normalize(data)
+        tables = _blocks_of_type(blocks, "table")
+        matrices = _blocks_of_type(blocks, "matriz")
+        legacy_tables = _blocks_of_type(blocks, "legacy_table")
+
+        assert len(tables) == 1
+        assert not tables[0].get("titulo")
+        assert len(matrices) == 0
+        assert len(legacy_tables) == 0
+
+    def test_anexo_strips_intro_filler_and_table_title(self):
+        """El anexo debe ir directo al contenido y sin caption de tabla principal."""
+        data = _minimal_json()
+        data["finales"] = {
+            "anexos": {
+                "titulo_seccion": "ANEXOS",
+                "lista": [
+                    {
+                        "titulo": "Anexo 1: Matriz de consistencia final",
+                        "_ai_content": [
+                            {
+                                "tipo": "parrafo",
+                                "texto": "A continuacion se muestra la matriz de consistencia final.",
+                            },
+                            {
+                                "tipo": "tabla",
+                                "titulo": "Tabla 14. Matriz de consistencia final",
+                                "encabezados": ["Problema", "Objetivo"],
+                                "filas": [["P1", "O1"]],
+                            },
+                        ],
+                    }
+                ],
+            }
+        }
+
+        blocks = normalize(data)
+        centered = _blocks_of_type(blocks, "paragraph_centered")
+        paragraphs = _blocks_of_type(blocks, "paragraph")
+        tables = _blocks_of_type(blocks, "table")
+
+        assert any("Anexo 1: Matriz de consistencia final" == b["text"] for b in centered)
+        assert all(
+            "A continuacion se muestra" not in b["text"] for b in paragraphs if "text" in b
+        )
+        assert len(tables) == 1
+        assert not tables[0].get("titulo")
+
+    def test_anexo_direct_table_uses_annex_heading_not_table_title(self):
+        """Una tabla directa en anexos debe presentarse bajo heading de anexo."""
+        data = _minimal_json()
+        data["finales"] = {
+            "anexos": {
+                "titulo_seccion": "ANEXOS",
+                "lista": [
+                    {
+                        "tipo": "tabla",
+                        "titulo": "Tabla 15. Cronograma de validacion",
+                        "encabezados": ["Actividad", "Mes 1"],
+                        "filas": [["Revision", "X"]],
+                    }
+                ],
+            }
+        }
+
+        blocks = normalize(data)
+        centered = _blocks_of_type(blocks, "paragraph_centered")
+        tables = _blocks_of_type(blocks, "table")
+
+        assert any("Anexo 1: Cronograma de validacion" == b["text"] for b in centered)
+        assert len(tables) == 1
+        assert not tables[0].get("titulo")
+
+    def test_anexos_ignore_section_note_and_strip_reported_filler_phrases(self):
+        """ANEXOS no debe renderizar nota de seccion ni frases de relleno reportadas."""
+        data = _minimal_json()
+        data["finales"] = {
+            "anexos": {
+                "titulo_seccion": "ANEXOS",
+                "nota": "A continuación, se presentan los anexos que complementan la investigación.",
+                "lista": [
+                    {
+                        "titulo": "Anexo 1: Instrumento de recolección de datos",
+                        "_ai_content": [
+                            {"tipo": "parrafo", "texto": "El primer anexo incluye el cuestionario aplicado."},
+                            {"tipo": "parrafo", "texto": "Asimismo, se adjunta la ficha de validación."},
+                            {"tipo": "parrafo", "texto": "Pregunta 1. ¿Con qué frecuencia ocurre la falla?"},
+                        ],
+                    }
+                ],
+            }
+        }
+
+        blocks = normalize(data)
+        notes = _blocks_of_type(blocks, "note")
+        paragraphs = _blocks_of_type(blocks, "paragraph")
+
+        assert len(notes) == 0
+        assert all(
+            "A continuación, se presentan los anexos" not in b["text"]
+            and "El primer anexo incluye" not in b["text"]
+            and "Asimismo" not in b["text"]
+            for b in paragraphs
+            if "text" in b
+        )
+        assert any(
+            "Pregunta 1. ¿Con qué frecuencia ocurre la falla?" == b["text"]
+            for b in paragraphs
+        )
+
+    def test_anexos_strip_garbled_continuacion_filler(self):
+        """Debe limpiar también relleno degradado tipo 'continuaci?n'."""
+        data = _minimal_json()
+        data["finales"] = {
+            "anexos": {
+                "titulo_seccion": "ANEXOS",
+                "lista": [
+                    {
+                        "titulo": "Anexo 1: Matriz de consistencia",
+                        "_ai_content": [
+                            {"tipo": "parrafo", "texto": "A continuaci?n se muestra la matriz de consistencia final."},
+                            {
+                                "tipo": "tabla",
+                                "titulo": "Tabla 14. Matriz de consistencia final",
+                                "encabezados": ["Problema", "Objetivo"],
+                                "filas": [["P1", "O1"]],
+                            },
+                        ],
+                    }
+                ],
+            }
+        }
+
+        blocks = normalize(data)
+        paragraphs = _blocks_of_type(blocks, "paragraph")
+        assert all("A continuaci?n se muestra" not in b["text"] for b in paragraphs if "text" in b)
+
+    def test_anexo_with_structured_table_drops_explanatory_narrative_before_and_after(self):
+        """Si el anexo contiene tabla, no debe conservar narrativa explicativa alrededor."""
+        data = _minimal_json()
+        data["finales"] = {
+            "anexos": {
+                "titulo_seccion": "ANEXOS",
+                "lista": [
+                    {
+                        "titulo": "Anexo 1: Matriz de consistencia",
+                        "_ai_content": [
+                            {"tipo": "parrafo", "texto": "Esta sección contiene los documentos complementarios."},
+                            {"tipo": "parrafo", "texto": "En primer lugar, se presenta la matriz de consistencia final."},
+                            {
+                                "tipo": "tabla",
+                                "titulo": "Tabla 14. Matriz de consistencia final",
+                                "encabezados": ["Problema", "Objetivo"],
+                                "filas": [["P1", "O1"]],
+                            },
+                            {"tipo": "parrafo", "texto": "Adicionalmente, se incluye una explicación metodológica del anexo."},
+                            {"tipo": "parrafo", "texto": "Los anexos también contienen observaciones complementarias."},
+                        ],
+                    }
+                ],
+            }
+        }
+
+        blocks = normalize(data)
+        paragraphs = _blocks_of_type(blocks, "paragraph")
+        tables = _blocks_of_type(blocks, "table")
+
+        assert len(tables) == 1
+        assert not tables[0].get("titulo")
+        assert all(
+            marker not in b["text"]
+            for b in paragraphs
+            if "text" in b
+            for marker in (
+                "Esta sección contiene",
+                "En primer lugar",
+                "Adicionalmente",
+                "Los anexos también contienen",
+            )
+        )
+
+    def test_anexo_text_only_keeps_useful_entries_and_drops_filler(self):
+        """En anexos solo texto, se debe conservar contenido útil como preguntas o evidencias."""
+        data = _minimal_json()
+        data["finales"] = {
+            "anexos": {
+                "titulo_seccion": "ANEXOS",
+                "lista": [
+                    {
+                        "titulo": "Anexo 2: Instrumento de recolección de datos",
+                        "_ai_content": [
+                            {"tipo": "parrafo", "texto": "Asimismo, se adjunta la ficha de validación."},
+                            {"tipo": "parrafo", "texto": "Pregunta 1. ¿Con qué frecuencia ocurre la falla?"},
+                            {"tipo": "parrafo", "texto": "Pregunta 2. ¿Qué causa identifica con mayor impacto?"},
+                        ],
+                    }
+                ],
+            }
+        }
+
+        blocks = normalize(data)
+        paragraphs = _blocks_of_type(blocks, "paragraph")
+
+        assert all("Asimismo" not in b["text"] for b in paragraphs if "text" in b)
+        assert any("Pregunta 1. ¿Con qué frecuencia ocurre la falla?" == b["text"] for b in paragraphs)
+        assert any("Pregunta 2. ¿Qué causa identifica con mayor impacto?" == b["text"] for b in paragraphs)
+
+    def test_anexo_figure_style_title_becomes_annex_heading(self):
+        """Figura A1 no debe sobrevivir como heading principal del anexo."""
+        data = _minimal_json()
+        data["finales"] = {
+            "anexos": {
+                "titulo_seccion": "ANEXOS",
+                "lista": [
+                    {
+                        "titulo": "Figura A1. Registro fotográfico",
+                        "_ai_content": [{"tipo": "parrafo", "texto": "Evidencia 1: Vista frontal del equipo."}],
+                    }
+                ],
+            }
+        }
+
+        blocks = normalize(data)
+        centered = _blocks_of_type(blocks, "paragraph_centered")
+        paragraphs = _blocks_of_type(blocks, "paragraph")
+
+        assert any("Anexo 1: Registro fotográfico" == b["text"] for b in centered)
+        assert all("Figura A1" not in b["text"] for b in centered if "text" in b)
+        assert any("Evidencia 1: Vista frontal del equipo." == b["text"] for b in paragraphs)
 
     def test_anexos_fallback_matriz(self):
         """Si hay matriz_consistencia pero no está en la lista → fallback."""

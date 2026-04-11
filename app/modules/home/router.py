@@ -29,6 +29,7 @@ from app.core.university_registry import get_provider
 
 router = APIRouter()
 
+
 @router.get("/", response_class=HTMLResponse)
 def home(request: Request):
     """Renderiza la pagina de inicio."""

@@ -17,6 +17,7 @@ Este archivo conserva únicamente:
     - generate_document_unified — orquesta el pipeline
     - __main__                  — CLI para subprocess
 """
+
 import json
 import sys
 from pathlib import Path
@@ -44,6 +45,7 @@ from app.engine.registry import render_blocks
 # JSON LOADER
 # ─────────────────────────────────────────────────────────────
 
+
 def load_json(path_str: str):
     path = Path(path_str)
     if not path.exists():
@@ -55,6 +57,7 @@ def load_json(path_str: str):
 # ─────────────────────────────────────────────────────────────
 # PIPELINE PRINCIPAL
 # ─────────────────────────────────────────────────────────────
+
 
 def generate_document_unified(json_path: str, output_path: str):
     """Genera un DOCX completo a partir de un JSON canónico v2.
@@ -93,4 +96,3 @@ if __name__ == "__main__":
             sys.exit(1)
     else:
         print("Usage: python universal_generator.py <input_json> <output_docx>")
-

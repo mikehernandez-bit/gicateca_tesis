@@ -707,7 +707,7 @@ class TestTableEdgeCases:
     """Casos límite en tablas."""
 
     def test_table_no_rows(self):
-        """Tabla con solo encabezados, sin filas de datos."""
+        """Tabla sin filas de datos se omite para no dejar placeholders vacios."""
         data = {
             "caratula": _minimal_caratula(),
             "cuerpo": [{
@@ -725,8 +725,7 @@ class TestTableEdgeCases:
             }],
         }
         doc = _pipeline(data)
-        # Debe generar la tabla con solo header row
-        assert len(doc.tables) >= 1
+        assert len(doc.tables) == 0
 
     def test_table_no_headers(self):
         """Tabla sin encabezados (edge case) → debe ser ignorada."""

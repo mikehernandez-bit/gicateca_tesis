@@ -22,6 +22,7 @@ Dependencias:
 Donde tocar si falla:
 - Ajustar _convert_with_retry, timeouts o el reinicio de Word.
 """
+
 from __future__ import annotations
 
 import atexit
@@ -29,9 +30,7 @@ import logging
 import queue
 import subprocess
 import threading
-import time
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Optional
 
 import pythoncom
@@ -74,7 +73,12 @@ class PdfConversionManager:
 
     def convert(self, docx_path: str, pdf_path: str, timeout: float = 120.0) -> None:
         """Encola y espera la conversion. Lanza excepcion si falla."""
-        job = _Job(docx_path=docx_path, pdf_path=pdf_path, timeout=timeout, done=threading.Event())
+        job = _Job(
+            docx_path=docx_path,
+            pdf_path=pdf_path,
+            timeout=timeout,
+            done=threading.Event(),
+        )
         self._queue.put(job)
 
         if not job.done.wait(timeout=timeout):
@@ -215,4 +219,3 @@ def get_pdf_converter() -> PdfConversionManager:
 def convert_docx_to_pdf(docx_path: str, pdf_path: str, timeout: float = 120.0) -> None:
     """API publico: convierte docx a pdf usando el manager."""
     return get_pdf_converter().convert(docx_path, pdf_path, timeout=timeout)
-

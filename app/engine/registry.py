@@ -26,6 +26,7 @@ Donde tocar si falla:
 - Verificar que el tipo del block coincide con un renderer registrado.
 - Verificar que renderers/__init__.py importa todos los módulos.
 """
+
 from __future__ import annotations
 
 import logging
@@ -104,9 +105,7 @@ def render_blocks(doc: Document, blocks: List[Block]) -> None:
             render_block(doc, block)
         except Exception:
             block_type = block.get("type", "???") if isinstance(block, dict) else "???"
-            logger.exception(
-                "Error renderizando block #%d (tipo='%s')", i, block_type
-            )
+            logger.exception("Error renderizando block #%d (tipo='%s')", i, block_type)
 
 
 def list_registered() -> List[str]:

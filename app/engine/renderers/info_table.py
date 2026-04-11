@@ -1,4 +1,5 @@
 """Renderer: info_table — tabla de información básica (label/valor)."""
+
 from __future__ import annotations
 
 from docx.document import Document

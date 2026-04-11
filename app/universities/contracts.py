@@ -22,6 +22,7 @@ Puntos de extension:
 Donde tocar si falla:
 - Revisar cumplimiento del contrato en provider.py de cada universidad.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -56,15 +57,16 @@ class UniversityProvider(Protocol):
 class SimpleUniversityProvider:
     """
     Implementacion simple del contrato UniversityProvider.
-    
+
     Fase 2: Incluye default_logo_url y defaults para view-models de carátula.
     """
+
     code: str
     display_name: str
     data_dir: Path
     generator_map: Dict[str, GeneratorCommand]
     name: Optional[str] = None
-    
+
     # Fase 2: Nuevos campos para view-models
     default_logo_url: str = "/static/assets/LogoGeneric.png"
     defaults: Dict[str, str] = field(default_factory=dict)
@@ -94,7 +96,7 @@ class SimpleUniversityProvider:
         """Carga formatos legacy desde formatos.json si existe."""
         path = self.data_dir / "formatos.json"
         return json.loads(path.read_text(encoding="utf-8")) if path.exists() else []
-    
+
     def get_default(self, key: str, fallback: str = "") -> str:
         """Obtiene un valor de defaults con fallback."""
         return self.defaults.get(key, fallback)

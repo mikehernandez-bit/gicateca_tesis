@@ -22,6 +22,7 @@ Puntos de extension:
 Donde tocar si falla:
 - Revisar calculo de parents si cambia la estructura del repo.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
