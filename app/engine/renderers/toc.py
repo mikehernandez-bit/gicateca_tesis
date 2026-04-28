@@ -5,8 +5,8 @@ Agrupados porque ambos generan índices/listas de contenido del documento.
 
 from __future__ import annotations
 
-from docx.document import Document
 from docx.enum.text import WD_TAB_ALIGNMENT, WD_TAB_LEADER
+from docx.document import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Cm, Pt
 
@@ -56,21 +56,31 @@ def render_index_items(doc: Document, block: Block) -> None:
         p.add_run(f"\t{item.get('pag', '')}")
 
 
-def _set_abbr_cell_text(cell, text: str, *, bold: bool = False) -> None:
-    cell.text = ""
-    paragraph = cell.paragraphs[0]
+def _add_abbreviation_line(doc: Document, sigla: str, meaning: str) -> None:
+    paragraph = doc.add_paragraph()
     paragraph.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    paragraph.paragraph_format.space_before = Pt(1)
-    paragraph.paragraph_format.space_after = Pt(1)
-    run = paragraph.add_run(text)
-    run.bold = bold
-    run.font.name = "Arial"
-    run.font.size = Pt(10)
+    paragraph.paragraph_format.space_before = Pt(0)
+    paragraph.paragraph_format.space_after = Pt(2)
+    paragraph.paragraph_format.tab_stops.add_tab_stop(Cm(4.0), WD_TAB_ALIGNMENT.LEFT, WD_TAB_LEADER.SPACES)
+    paragraph.paragraph_format.tab_stops.add_tab_stop(Cm(4.5), WD_TAB_ALIGNMENT.LEFT, WD_TAB_LEADER.SPACES)
+
+    run_sigla = paragraph.add_run(sigla)
+    run_sigla.bold = True
+    run_sigla.font.name = "Arial"
+    run_sigla.font.size = Pt(10)
+
+    run_colon = paragraph.add_run("\t:\t")
+    run_colon.font.name = "Arial"
+    run_colon.font.size = Pt(10)
+
+    run_meaning = paragraph.add_run(meaning)
+    run_meaning.font.name = "Arial"
+    run_meaning.font.size = Pt(10)
 
 
 @register("abbreviations_table")
 def render_abbreviations_table(doc: Document, block: Block) -> None:
-    """Renderiza abreviaturas como tabla de 2 columnas (SIGLA | SIGNIFICADO)."""
+    """Renderiza abreviaturas como lista alineada, sin grid visible."""
     rows = block.get("rows", []) or []
 
     if not rows:
@@ -86,17 +96,9 @@ def render_abbreviations_table(doc: Document, block: Block) -> None:
         run.font.size = Pt(10)
         return
 
-    table = doc.add_table(rows=1 + len(rows), cols=2)
-    table.style = "Table Grid"
-    table.autofit = False
-    table.columns[0].width = Cm(4.0)  # ~25%
-    table.columns[1].width = Cm(12.0)  # ~75%
-
-    _set_abbr_cell_text(table.cell(0, 0), "SIGLA", bold=True)
-    _set_abbr_cell_text(table.cell(0, 1), "SIGNIFICADO", bold=True)
-
-    for index, row in enumerate(rows, start=1):
+    for row in rows:
         sigla = str(row.get("sigla", "")).strip()
         meaning = str(row.get("meaning", "")).strip()
-        _set_abbr_cell_text(table.cell(index, 0), sigla)
-        _set_abbr_cell_text(table.cell(index, 1), meaning)
+        if not sigla or not meaning:
+            continue
+        _add_abbreviation_line(doc, sigla, meaning)

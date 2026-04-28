@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from docx.document import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.shared import Pt
 
 from app.engine.registry import register
 from app.engine.types import Block
@@ -16,7 +17,24 @@ def render_paragraph(doc: Document, block: Block) -> None:
     Block keys:
         text (str): Texto del párrafo.
     """
-    doc.add_paragraph(block.get("text", ""))
+    p = doc.add_paragraph()
+    p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+    p.paragraph_format.line_spacing = 1.5
+    run = p.add_run(block.get("text", ""))
+    run.font.name = "Arial"
+    run.font.size = Pt(12)
+
+
+@register("paragraph_bold")
+def render_paragraph_bold(doc: Document, block: Block) -> None:
+    """Renderiza una etiqueta o subtitulo interno sin meterlo al TOC."""
+    p = doc.add_paragraph()
+    p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    p.paragraph_format.line_spacing = 1.5
+    run = p.add_run(block.get("text", ""))
+    run.bold = True
+    run.font.name = "Arial"
+    run.font.size = Pt(block.get("size", 12))
 
 
 @register("paragraph_centered")
@@ -30,8 +48,6 @@ def render_paragraph_centered(doc: Document, block: Block) -> None:
         space_before (int): Espacio antes en pt. Default 0.
         space_after (int): Espacio después en pt. Default 0.
     """
-    from docx.shared import Pt
-
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
@@ -45,6 +61,5 @@ def render_paragraph_centered(doc: Document, block: Block) -> None:
     run = p.add_run(block.get("text", ""))
     if block.get("bold"):
         run.bold = True
-    if block.get("size"):
-        run.font.size = Pt(block["size"])
+    run.font.size = Pt(block.get("size", 12))
     run.font.name = "Arial"

@@ -84,11 +84,11 @@ def _render_many(blocks: list) -> Document:
 
 class TestAllRegistered:
     EXPECTED_TYPES = {
-        "abbreviations_table", "apa_examples", "black_heading", "centered_text", "heading",
-        "image", "index_items", "info_table", "legacy_table", "logo",
-        "matriz", "note", "page_break", "page_footer", "paragraph",
-        "paragraph_centered", "section_break", "section_switch",
-        "table", "toc_field",
+        "abbreviations_table", "apa_examples", "black_heading", "caratula_unac_maestria",
+        "centered_text", "heading", "image", "index_items", "info_basica_unac_maestria",
+        "info_table", "legacy_table", "logo", "matriz", "note",
+        "page_break", "page_footer", "paragraph", "paragraph_bold", "paragraph_centered",
+        "section_break", "section_switch", "table", "toc_field",
     }
 
     def test_all_20_registered(self):
@@ -96,7 +96,7 @@ class TestAllRegistered:
         assert registered == self.EXPECTED_TYPES
 
     def test_count(self):
-        assert len(list_registered()) == 20
+        assert len(list_registered()) == 23
 
 
 # ─────────────────────────────────────────────────────────────
@@ -136,7 +136,6 @@ class TestLogo:
             "type": "logo",
             "data": {"configuracion": {"ruta_logo": "nonexistent.png"}},
         })
-        texts = [p.text for p in doc.paragraphs]
         # Should have either a picture or the [LOGO] fallback
         assert len(doc.paragraphs) >= 1
 
@@ -199,6 +198,12 @@ class TestParagraphs:
     def test_paragraph(self):
         doc = _render({"type": "paragraph", "text": "Some text here"})
         assert any(p.text == "Some text here" for p in doc.paragraphs)
+
+    def test_paragraph_uses_arial_12(self):
+        doc = _render({"type": "paragraph", "text": "Some text here"})
+        paragraph = [p for p in doc.paragraphs if p.text == "Some text here"][0]
+        assert paragraph.runs[0].font.name == "Arial"
+        assert int(paragraph.runs[0].font.size.pt) == 12
 
     def test_paragraph_centered(self):
         doc = _render({"type": "paragraph_centered", "text": "Centered"})
@@ -487,6 +492,51 @@ class TestImage:
         })
         assert len(doc.paragraphs) == 0
 
+    def test_image_caption_uses_chapter_aware_label_and_note(self):
+        doc = _render_many([
+            {"type": "heading", "text": "I. PLANTEAMIENTO DEL PROBLEMA", "level": 1},
+            {
+                "type": "image",
+                "titulo": "Diagrama de Pareto de modos de falla en flota CAT 24M",
+                "ruta": "assets/placeholder_figura.png",
+                "nota": "Escala: 1 (Desfavorable) a 10 (Favorable).",
+            },
+        ])
+        texts = [p.text.strip() for p in doc.paragraphs if p.text.strip()]
+        assert any(text.startswith("Figura 1.1 Diagrama de Pareto de modos de falla en flota CAT 24M") for text in texts)
+        assert any(text.startswith("Nota. Escala: 1 (Desfavorable) a 10 (Favorable).") for text in texts)
+
+    def test_image_placeholder_renders_text_source_and_note(self):
+        doc = _render_many([
+            {"type": "heading", "text": "I. PLANTEAMIENTO DEL PROBLEMA", "level": 1},
+            {
+                "type": "image",
+                "titulo": "Diagrama de Pareto de modos de falla en flota CAT 24M",
+                "ruta": "assets/placeholder_figura.png",
+                "placeholder_text": "Figura pendiente de elaboración",
+                "fuente": "Elaboración propia.",
+                "nota": "Construir el Pareto con sistemas, frecuencias y curva acumulada.",
+            },
+        ])
+        texts = [p.text.strip() for p in doc.paragraphs if p.text.strip()]
+        assert "Figura pendiente de elaboración" in texts
+        assert "Fuente: Elaboración propia." in texts
+        assert "Nota. Construir el Pareto con sistemas, frecuencias y curva acumulada." in texts
+
+
+def test_table_caption_uses_chapter_aware_label():
+    doc = _render_many([
+        {"type": "heading", "text": "III. HIPÓTESIS Y VARIABLES", "level": 1},
+        {
+            "type": "table",
+            "titulo": "Tabla 3.1 Operacionalización de variable independiente",
+            "encabezados": ["VARIABLE", "DIMENSIÓN"],
+            "filas": [["RCM", "Taxonomía"]],
+        },
+    ])
+    texts = [p.text.strip() for p in doc.paragraphs if p.text.strip()]
+    assert any(text.startswith("Tabla 3.1 Operacionalización de variable independiente") for text in texts)
+
 
 # ─────────────────────────────────────────────────────────────
 # TOC_FIELD
@@ -554,7 +604,7 @@ class TestIndexItems:
 
 
 class TestAbbreviationsTable:
-    def test_renders_table_with_two_columns(self):
+    def test_renders_aligned_list_without_visible_table(self):
         doc = _render({
             "type": "abbreviations_table",
             "rows": [
@@ -562,11 +612,10 @@ class TestAbbreviationsTable:
                 {"sigla": "ERP", "meaning": "Planificacion de Recursos Empresariales"},
             ],
         })
-        assert len(doc.tables) == 1
-        table = doc.tables[0]
-        assert len(table.columns) == 2
-        assert table.cell(0, 0).text == "SIGLA"
-        assert table.cell(0, 1).text == "SIGNIFICADO"
+        assert len(doc.tables) == 0
+        texts = [p.text for p in doc.paragraphs if p.text.strip()]
+        assert "IA\t:\tInteligencia Artificial" in texts
+        assert "ERP\t:\tPlanificacion de Recursos Empresariales" in texts
 
     def test_empty_rows_show_discreet_note(self):
         doc = _render({"type": "abbreviations_table", "rows": []})

@@ -139,7 +139,7 @@ def resolve_logo_path(data: dict) -> Optional[str]:
 
 
 def configure_styles(
-    doc: Document, font_name: str = "Arial", font_size: int = 11
+    doc: Document, font_name: str = "Arial", font_size: int = 12
 ) -> None:
     """Configura el estilo Normal del documento."""
     style = doc.styles["Normal"]
@@ -387,7 +387,13 @@ def add_toc_field(
     doc.add_page_break()
 
 
-def add_seq_field(paragraph, seq_name: str) -> None:
+def add_seq_field(
+    paragraph,
+    seq_name: str,
+    *,
+    reset_to: int | None = None,
+    display_value: int | None = None,
+) -> None:
     """Inserta un campo SEQ para auto-numeración (tablas, figuras).
 
     Permite que Word construya índices de tablas/figuras automáticamente.
@@ -397,7 +403,8 @@ def add_seq_field(paragraph, seq_name: str) -> None:
     fld_begin.set(qn("w:fldCharType"), "begin")
     instr = OxmlElement("w:instrText")
     instr.set(qn("xml:space"), "preserve")
-    instr.text = f" SEQ {seq_name} \\* ARABIC "
+    reset_clause = f" \\r {int(reset_to)}" if reset_to is not None else ""
+    instr.text = f" SEQ {seq_name}{reset_clause} \\* ARABIC "
     fld_separate = OxmlElement("w:fldChar")
     fld_separate.set(qn("w:fldCharType"), "separate")
     fld_end = OxmlElement("w:fldChar")
@@ -406,9 +413,9 @@ def add_seq_field(paragraph, seq_name: str) -> None:
     run._r.append(instr)
     run._r.append(fld_separate)
     # Placeholder number
-    num_run = paragraph.add_run("#")
+    num_run = paragraph.add_run(str(display_value if display_value is not None else "#"))
     num_run.font.size = Pt(10)
-    num_run.italic = True
+    num_run.font.name = "Arial"
     end_run = paragraph.add_run()
     end_run._r.append(fld_end)
 

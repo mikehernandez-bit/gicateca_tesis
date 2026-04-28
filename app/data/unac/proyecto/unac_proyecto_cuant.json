@@ -18,17 +18,22 @@
   },
   "caratula": {
     "universidad": "UNIVERSIDAD NACIONAL DEL CALLAO",
-    "facultad": "FACULTAD DE [NOMBRE DE LA FACULTAD]",
-    "escuela": "",
+    "facultad": "ESCUELA DE POSGRADO",
+    "escuela": "UNIDAD DE POSGRADO DE LA FACULTAD DE INGENIERÍA MECÁNICA Y DE ENERGÍA",
     "tipo_documento": "PROYECTO DE INVESTIGACIÓN",
-    "titulo_placeholder": "“TÍTULO DEL PROYECTO”",
-    "frase_grado": "[Nota: Contiene: Las variables, unidad de análisis, ámbito de estudio. Máximo 15 palabras sin considerar artículos conectores.]",
-    "grado_objetivo": "",
-    "label_autor": "AUTOR(ES)\n\n[NOMBRES Y APELLIDOS]\n[NOMBRES Y APELLIDOS]",
-    "label_asesor": "ASESOR\n[GRADO Y NOMBRES]",
-    "label_linea": "LÍNEA DE INVESTIGACIÓN:\n[Unidad de Investigación]",
-    "lugar": "Callao, [AÑO]",
-    "anio": "PERÚ"
+    "titulo_placeholder": "\"[TÍTULO DE LA TESIS]\"",
+    "frase_grado": "PARA OPTAR EL GRADO ACADÉMICO DE MAESTRO EN GERENCIA DE MANTENIMIENTO",
+    "label_autor": "AUTORES:",
+    "autores": [
+      "[Apellidos y nombres]"
+    ],
+    "label_asesor": "ASESOR:",
+    "asesor": "[Apellidos y nombres]",
+    "label_linea": "LÍNEA DE INVESTIGACIÓN:",
+    "linea_investigacion": "[Nombre de la línea]",
+    "lugar": "Callao, 2026",
+    "anio": "2026",
+    "pais": "PERÚ"
   },
   "preliminares": {
     "indices": [
@@ -196,7 +201,7 @@
           "instruccion_detallada": "Sustenta adecuadamente el por qué se realiza el trabajo de investigación de acuerdo con la naturaleza del problema explicando cuáles son las contribuciones científicas o sociales y los beneficiarios de su trabajo. Definir los tipos de justificación (teórica, práctica, metodológica, etc) citando adecuadamente y el sustento respectivo explicando las razones por las cuales la investigación posee dicha justificación. Se redacta en tiempo futuro."
         },
         {
-          "texto": "1.5 Delimitantes de la investigación",
+            "texto": "1.5 Delimitaciones de la investigación",
           "nota": "Delimitante Teórica, Temporal y Espacial.",
           "instruccion_detallada": "Delimitante Teórica: Especifica las teorías que soportan su investigación.\nDelimitante Temporal: Especifica en qué momento (tiempo) se realiza la investigación.\nDelimitante Espacial: Especifica en qué lugar se realiza la investigación."
         }
@@ -870,51 +875,30 @@
   "pagina_respeto": {},
   "informacion_basica": {
     "titulo": "INFORMACIÓN BÁSICA",
-    "elementos": [
+    "facultad": "Facultad de Ingeniería Mecánica y de Energía",
+    "unidad_investigacion": "Unidad de Posgrado de la Facultad de Ingeniería Mecánica y de Energía",
+    "titulo_investigacion": "[Título de tesis]",
+    "autores": [
       {
-        "label": "FACULTAD:",
-        "valor": "Facultad de Ingeniería Mecánica y de Energía"
-      },
-      {
-        "label": "UNIDAD DE INVESTIGACIÓN:",
-        "valor": "Unidad de Posgrado..."
-      },
-      {
-        "label": "TÍTULO:",
-        "valor": "Implementación xxx"
-      },
-      {
-        "label": "AUTOR(ES):",
-        "valor": "Nombres y Apellidos / DNI: XXX / ORCID: YYYY"
-      },
-      {
-        "label": "ASESOR:",
-        "valor": "Dr. Abel Tapia Díaz / DNI: ... / ORCID: ..."
-      },
-      {
-        "label": "LUGAR DE EJECUCIÓN:",
-        "valor": ""
-      },
-      {
-        "label": "UNIDAD DE ANÁLISIS:",
-        "valor": ""
-      },
-      {
-        "label": "TIPO:",
-        "valor": ""
-      },
-      {
-        "label": "ENFOQUE:",
-        "valor": ""
-      },
-      {
-        "label": "DISEÑO DE INVESTIGACIÓN:",
-        "valor": ""
-      },
-      {
-        "label": "TEMA OCDE:",
-        "valor": ""
+        "nombre": "Bach. [Apellidos y nombres]",
+        "dni": "[00000000]",
+        "orcid": "[0000-0000-0000-0000]"
       }
+    ],
+    "asesor": {
+      "nombre": "Dr. [Apellidos y nombres]",
+      "dni": "[00000000]",
+      "orcid": "[0000-0000-0000-0000]"
+    },
+    "lugar_ejecucion": "[Lugar de ejecución]",
+    "unidad_analisis": "[Unidad de análisis]",
+    "tipo": "[TIPO]",
+    "enfoque": "[ENFOQUE]",
+    "diseno_investigacion": "[DISEÑO DE INVESTIGACIÓN]",
+    "tema_ocde": [
+      "[LÍNEA OCDE 1]",
+      "[LÍNEA OCDE 2]",
+      "[LÍNEA OCDE 3]"
     ]
   }
 }
