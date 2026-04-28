@@ -139,6 +139,8 @@ def _apply_cover_fallbacks(data: Dict[str, Any], values: Dict[str, Any]) -> None
     caratula = data.get("caratula")
     if not isinstance(caratula, dict):
         return
+    document_id = str((data.get("_meta") or {}).get("id") or "").strip().lower()
+    is_unac_project = document_id.startswith("unac-proyecto")
 
     # 1. Autor(es)
     autores = []
@@ -186,8 +188,10 @@ def _apply_cover_fallbacks(data: Dict[str, Any], values: Dict[str, Any]) -> None
         "asesor_valor": ["asesor_valor", "asesor", "advisor"],
     }
     for cover_key, candidates in fallback_map.items():
-        if cover_key in caratula and not _looks_like_placeholder(str(caratula[cover_key])):
-            continue # Already filled by user directly or by new logic
+        if cover_key in caratula and not _looks_like_placeholder(
+            str(caratula[cover_key])
+        ):
+            continue  # Already filled by user directly or by new logic
         picked = _pick_first_nonempty(values, candidates)
         if picked:
             caratula[cover_key] = picked
@@ -212,33 +216,49 @@ def _apply_cover_fallbacks(data: Dict[str, Any], values: Dict[str, Any]) -> None
             # ALSO INJECT AT ROOT LEVEL FOR FLEXIBILITY
             data[dest] = val
 
+    if is_unac_project:
+        fixed_project_cover = {
+            "universidad": "UNIVERSIDAD NACIONAL DEL CALLAO",
+            "facultad": "ESCUELA DE POSGRADO",
+            "escuela": "UNIDAD DE POSGRADO DE LA FACULTAD DE INGENIERÍA MECÁNICA Y DE ENERGÍA",
+            "tipo_documento": "PROYECTO DE INVESTIGACIÓN",
+            "frase_grado": "PARA OPTAR EL GRADO ACADÉMICO DE MAESTRO EN GERENCIA DE MANTENIMIENTO",
+            "pais": "PERÚ",
+        }
+        caratula.update(fixed_project_cover)
+        data.update(fixed_project_cover)
 
-def _apply_unac_maestria_smart_replacements(data: Dict[str, Any], values: Dict[str, Any]) -> None:
+
+def _apply_unac_maestria_smart_replacements(
+    data: Dict[str, Any], values: Dict[str, Any]
+) -> None:
     """
     Last-mile hardcoded placeholder replacement for UNAC Master's thesis.
     Targets exact strings seen in institutional templates.
     """
     v = values or {}
-    
+
     # 1. Define replacements map
     # Key: Placeholder string to find
     # Value: Variable name in 'values' to replace with
     replacements = {
         # Carátula
         "[TÍTULO DE LA TESIS]": v.get("titulo"),
-        "\"[TÍTULO DE LA TESIS]\"": v.get("titulo"),
-        # NOTA: Se elimina "[Apellidos y nombres]" global porque causaba que el asesor 
-        # reemplazara al autor si este último faltaba. El renderizado estructural ya 
+        '"[TÍTULO DE LA TESIS]"': v.get("titulo"),
+        # NOTA: Se elimina "[Apellidos y nombres]" global porque causaba que el asesor
+        # reemplazara al autor si este último faltaba. El renderizado estructural ya
         # maneja los nombres en sus lugares correctos.
         "[Nombre de la línea]": v.get("linea_investigacion"),
-        "[AÑO]": v.get("anio"),
-        
         # Información Básica
         "[Nombre de Facultad]": v.get("facultad"),
         "[Nombre Unidad de Investigación]": v.get("unidad_investigacion"),
         "[Título de tesis]": v.get("titulo"),
-        "Bach. [Apellidos y nombres]": f"Bach. {v.get('autor1_nombres')}" if v.get("autor1_nombres") else None,
-        "Dr. [Apellidos y nombres]": f"Dr. {v.get('asesor_nombres')}" if v.get("asesor_nombres") else None,
+        "Bach. [Apellidos y nombres]": f"Bach. {v.get('autor1_nombres')}"
+        if v.get("autor1_nombres")
+        else None,
+        "Dr. [Apellidos y nombres]": f"Dr. {v.get('asesor_nombres')}"
+        if v.get("asesor_nombres")
+        else None,
         "[Lugar de ejecución]": v.get("lugar_ejecucion"),
         "[Unidad de análisis]": v.get("unidad_analisis"),
         "[TIPO]": v.get("tipo"),
@@ -247,22 +267,23 @@ def _apply_unac_maestria_smart_replacements(data: Dict[str, Any], values: Dict[s
         "[LÍNEA OCDE 1]": v.get("tema_ocde_1"),
         "[LÍNEA OCDE 2]": v.get("tema_ocde_2"),
         "[LÍNEA OCDE 3]": v.get("tema_ocde_3"),
-
         # Matriz de Consistencia y otros apartados técnicos
-        "¿[Problema general de la investigación]?": f"¿{v.get('problema_general')}?" if v.get("problema_general") else None,
+        "¿[Problema general de la investigación]?": f"¿{v.get('problema_general')}?"
+        if v.get("problema_general")
+        else None,
         "[Objetivo general de la investigación]": v.get("objetivo_general"),
         "[Hipótesis general de la investigación]": v.get("hipotesis_general"),
         "[Variable independiente]": v.get("vi"),
         "[Variable dependiente]": v.get("vd"),
         "[Línea de investigación]": v.get("linea_investigacion"),
-        "[Población y muestra]": f"{v.get('poblacion', '')} / {v.get('muestra', '')}".strip() if v.get("poblacion") or v.get("muestra") else None,
-
+        "[Población y muestra]": f"{v.get('poblacion', '')} / {v.get('muestra', '')}".strip()
+        if v.get("poblacion") or v.get("muestra")
+        else None,
         # Carátula - Reemplazos genéricos post-enfocados
         # Se aplican al final para no interferir con los prefijados (Bach./Dr.)
         "[Apellidos y nombres]": v.get("autor1_nombres") or v.get("asesor_nombres"),
         "[Nombre de la facultad]": v.get("facultad"),
         "[AÑO]": v.get("anio"),
-
         # Hoja de Jurado y Actas
         "[ASESOR]": v.get("asesor_nombres"),
         "[dd de mes de aaaa]": v.get("fecha_sustentacion"),
@@ -285,7 +306,10 @@ def _apply_unac_maestria_smart_replacements(data: Dict[str, Any], values: Dict[s
     for key in list(data.keys()):
         data[key] = _recursive_replace(data[key])
 
-def _apply_informacion_basica_values(data: Dict[str, Any], values: Dict[str, Any]) -> None:
+
+def _apply_informacion_basica_values(
+    data: Dict[str, Any], values: Dict[str, Any]
+) -> None:
     informacion_basica = data.get("informacion_basica")
     if not isinstance(informacion_basica, dict):
         return
@@ -297,11 +321,13 @@ def _apply_informacion_basica_values(data: Dict[str, Any], values: Dict[str, Any
         if not nombre:
             continue
         prefix_label = "Bach. " if prefix.startswith("autor") else "Dr. "
-        autores_info.append({
-            "nombre": f"{prefix_label}{nombre}",
-            "dni": str(values.get(f"{prefix}_dni", "") or "[DNI]").strip(),
-            "orcid": str(values.get(f"{prefix}_orcid", "") or "[ORCID]").strip(),
-        })
+        autores_info.append(
+            {
+                "nombre": f"{prefix_label}{nombre}",
+                "dni": str(values.get(f"{prefix}_dni", "") or "[DNI]").strip(),
+                "orcid": str(values.get(f"{prefix}_orcid", "") or "[ORCID]").strip(),
+            }
+        )
     if autores_info:
         informacion_basica["autores"] = autores_info
 
@@ -428,10 +454,26 @@ def merge_values(
 
     merged = _replace_placeholders(data)
     if isinstance(merged, dict):
+        if values:
+            merged["values"] = deepcopy(values)
+            for key in (
+                "matriz_consistencia",
+                "operacionalizacion_vi",
+                "operacionalizacion_vd",
+                "operacionalizacion_variable_independiente",
+                "operacionalizacion_variable_dependiente",
+            ):
+                if key in values and values[key] not in (None, "", [], {}):
+                    merged[key] = deepcopy(values[key])
+
         # DIAGNOSTIC: Log the keys in values
-        logger.info(f"PREPROCESSOR: Received values keys: {list((values or {}).keys())}")
+        logger.info(
+            f"PREPROCESSOR: Received values keys: {list((values or {}).keys())}"
+        )
         if values and "autor1_nombres" in values:
-             logger.info(f"PREPROCESSOR: autor1_nombres found: {values.get('autor1_nombres')}")
+            logger.info(
+                f"PREPROCESSOR: autor1_nombres found: {values.get('autor1_nombres')}"
+            )
 
         _apply_cover_fallbacks(merged, values or {})
         _apply_informacion_basica_values(merged, values or {})
@@ -449,14 +491,14 @@ def _inject_ai_into_informacion_basica(data: Dict[str, Any], content: Any) -> No
     info = data.get("informacion_basica")
     if not isinstance(info, dict):
         return
-    
+
     # Store it in a hidden/internal key that the renderer can pick up
     info["_ai_content"] = content
-    
+
     # Also attempt to replace common placeholders if content is text
     if isinstance(content, str) and content.strip():
         # This is a fallback: if the AI generated a block of text for the basic info,
-        # we might want to show it somewhere. 
+        # we might want to show it somewhere.
         # For now, we just ensure it's available for the renderer.
         pass
 
@@ -600,6 +642,7 @@ def apply_ai_content(
 
         Handles both plain strings and structured content lists.
         """
+
         def _tag_ai_generated_blocks(value: Any) -> Any:
             if not isinstance(value, list):
                 return value
@@ -657,6 +700,7 @@ def apply_ai_content(
 
     def _inject_chapter_content(capitulo: Dict[str, Any], content: Any) -> None:
         """Inject content into a chapter. Handles both str and list."""
+
         def _tag_ai_generated_blocks(value: Any) -> Any:
             if not isinstance(value, list):
                 return value
@@ -698,9 +742,13 @@ def apply_ai_content(
         contenido.insert(0, {"parrafos": [content]})
 
     result = deepcopy(data)
+    meta = result.get("_meta") if isinstance(result.get("_meta"), dict) else {}
+    document_id = str(meta.get("id") or "").strip().lower()
+    skip_chapter_level_ai = document_id.startswith("unac-proyecto")
 
     preliminares = result.get("preliminares")
     if isinstance(preliminares, dict):
+
         def _preliminary_title(item: Any, default_title: str) -> str:
             if isinstance(item, dict):
                 return str(item.get("titulo", default_title) or default_title).strip()
@@ -785,7 +833,7 @@ def apply_ai_content(
                 capitulo_titulo,
                 f"CUERPO/{capitulo_titulo}",
             )
-            if capitulo_content:
+            if capitulo_content and not skip_chapter_level_ai:
                 _inject_chapter_content(capitulo, capitulo_content)
                 capitulo["_ai_content"] = capitulo_content
 
@@ -830,7 +878,9 @@ def apply_ai_content(
                 if safe_references:
                     referencias["_ai_content"] = safe_references
         elif isinstance(referencias, str):
-            referencias_titulo = str(referencias or "REFERENCIAS BIBLIOGRAFICAS").strip()
+            referencias_titulo = str(
+                referencias or "REFERENCIAS BIBLIOGRAFICAS"
+            ).strip()
             referencias_content = _consume_content(
                 referencias_titulo,
                 f"FINALES/{referencias_titulo}",

@@ -61,6 +61,73 @@ def _blocks_of_type(blocks, block_type):
     return [b for b in blocks if b["type"] == block_type]
 
 
+def _project_structured_json():
+    data = _minimal_json()
+    data["_meta"]["id"] = "unac-proyecto-cuant"
+    data["cuerpo"] = [
+        {
+            "titulo": "I. PLANTEAMIENTO DEL PROBLEMA",
+            "contenido": [
+                {"texto": "1.2 Formulación del problema", "_ai_content": "texto IA"},
+                {"texto": "1.3 Objetivos", "_ai_content": "texto IA"},
+            ],
+        },
+        {
+            "titulo": "III. HIPÓTESIS Y VARIABLES",
+            "contenido": [
+                {"texto": "3.1 Hipótesis", "_ai_content": "texto IA"},
+                {"texto": "3.2 Operacionalización de variable", "_ai_content": "texto IA"},
+            ],
+        },
+    ]
+    data["matriz_consistencia"] = {
+        "problema_general": "¿De qué manera el plan RCM mejora la disponibilidad?",
+        "problemas_especificos": [
+            "¿De qué manera el plan RCM mejora la confiabilidad?",
+            "¿De qué manera el plan RCM mejora la mantenibilidad?",
+        ],
+        "objetivo_general": "Determinar cómo el plan RCM mejora la disponibilidad.",
+        "objetivos_especificos": [
+            "Determinar cómo el plan RCM mejora la confiabilidad.",
+            "Determinar cómo el plan RCM mejora la mantenibilidad.",
+        ],
+        "hipotesis_general": "El plan RCM mejora la disponibilidad.",
+        "hipotesis_especificas": [
+            "El plan RCM mejora la confiabilidad.",
+            "El plan RCM mejora la mantenibilidad.",
+        ],
+        "variable_independiente": "Mantenimiento centrado en confiabilidad",
+        "variable_dependiente": "Disponibilidad inherente",
+    }
+    data["operacionalizacion_vi"] = {
+        "variable": "Mantenimiento centrado en confiabilidad",
+        "definicion_conceptual": "Definición conceptual VI",
+        "definicion_operacional": "Definición operacional VI",
+        "filas": [
+            {
+                "dimension": "Taxonomía de equipos",
+                "indicador": "Nivel de jerarquía taxonómica",
+                "indice": "Ordinal",
+                "tecnica_instrumentos": "Fichas de análisis de datos",
+            }
+        ],
+    }
+    data["operacionalizacion_vd"] = {
+        "variable": "Disponibilidad inherente",
+        "definicion_conceptual": "Definición conceptual VD",
+        "definicion_operacional": "Definición operacional VD",
+        "filas": [
+            {
+                "dimension": "Confiabilidad",
+                "indicador": "MTBF",
+                "indice": "MTBF = tiempo total / número de fallas",
+                "metodo_tecnica": "Análisis de datos",
+            }
+        ],
+    }
+    return data
+
+
 # ─────────────────────────────────────────────────────────────
 # NORMALIZACIÓN MÍNIMA
 # ─────────────────────────────────────────────────────────────
@@ -88,6 +155,74 @@ class TestNormalizeMinimal:
         blocks = normalize({})
         assert len(blocks) >= 1
         assert blocks[-1]["type"] == "page_footer"
+
+
+class TestUnacProyectoStructuredSections:
+    def test_problem_objective_and_hypothesis_labels_are_deterministic(self):
+        blocks = normalize(_project_structured_json())
+        bold_texts = [block["text"] for block in _blocks_of_type(blocks, "paragraph_bold")]
+
+        assert "Problema general" in bold_texts
+        assert "Problemas específicos" in bold_texts
+        assert "Objetivo general" in bold_texts
+        assert "Objetivos específicos" in bold_texts
+        assert "Hipótesis general" in bold_texts
+        assert "Hipótesis específicas" in bold_texts
+
+    def test_nested_matrix_shape_is_supported(self):
+        data = _project_structured_json()
+        data["matriz_consistencia"] = {
+            "problemas": {
+                "general": "¿De qué manera el plan RCM mejora la disponibilidad?",
+                "especificos": ["¿De qué manera el plan RCM mejora la confiabilidad?"],
+            },
+            "objetivos": {
+                "general": "Determinar cómo el plan RCM mejora la disponibilidad.",
+                "especificos": ["Determinar cómo el plan RCM mejora la confiabilidad."],
+            },
+            "hipotesis": {
+                "general": "El plan RCM mejora la disponibilidad.",
+                "especificos": ["El plan RCM mejora la confiabilidad."],
+            },
+        }
+
+        blocks = normalize(data)
+        paragraph_texts = [block["text"] for block in _blocks_of_type(blocks, "paragraph")]
+
+        assert "¿De qué manera el plan RCM mejora la disponibilidad?" in paragraph_texts
+        assert "Determinar cómo el plan RCM mejora la disponibilidad." in paragraph_texts
+        assert "El plan RCM mejora la disponibilidad." in paragraph_texts
+
+    def test_operationalization_tables_are_built_from_structured_values(self):
+        blocks = normalize(_project_structured_json())
+        tables = _blocks_of_type(blocks, "table")
+        titles = [table.get("titulo") for table in tables]
+
+        assert "Tabla 3.1 Operacionalización de variable independiente" in titles
+        assert "Tabla 3.2 Operacionalización de variable dependiente" in titles
+
+        vi_table = next(table for table in tables if table.get("titulo", "").startswith("Tabla 3.1"))
+        vd_table = next(table for table in tables if table.get("titulo", "").startswith("Tabla 3.2"))
+        assert vi_table["encabezados"][-1] == "TÉCNICA E INSTRUMENTOS"
+        assert vd_table["encabezados"][-1] == "MÉTODO Y TÉCNICA"
+        assert vi_table["filas"][0][3] == "Taxonomía de equipos"
+        assert vd_table["filas"][0][4] == "MTBF"
+
+    def test_project_skips_legacy_standalone_operationalization_table(self):
+        data = _project_structured_json()
+        data["cuerpo"][1]["contenido"].append(
+            {
+                "tipo": "tabla",
+                "titulo": "Operacionalización de Variables",
+                "encabezados": ["Variable", "Dimensión"],
+                "filas": [["Plantilla", "No debe renderizarse"]],
+            }
+        )
+
+        blocks = normalize(data)
+        tables = _blocks_of_type(blocks, "table")
+
+        assert len([table for table in tables if table.get("titulo") == "Operacionalización de Variables"]) == 0
 
 
 # ─────────────────────────────────────────────────────────────
@@ -743,7 +878,6 @@ class TestNormalizeFinales:
             "metodologia": {"tipo": "Aplicada"},
         }
         blocks = normalize(data)
-        types = _types(blocks)
 
         # Verificar secuencia: section_switch(landscape) → heading → black_heading → matriz → section_switch(portrait)
         ss = _blocks_of_type(blocks, "section_switch")
@@ -1103,11 +1237,12 @@ class TestNormalizeRealJsons:
         assert blocks[-1]["type"] == "page_footer"
 
     def test_has_caratula_blocks(self, real_json):
-        """Todos los JSONs reales generan centered_text (de carátula)."""
+        """Todos los JSONs reales generan la carátula, sea legacy o especializada."""
         data, _ = real_json
         blocks = normalize(data)
         ct = _blocks_of_type(blocks, "centered_text")
-        assert len(ct) >= 2  # al menos universidad y facultad
+        special_cover = _blocks_of_type(blocks, "caratula_unac_maestria")
+        assert len(ct) >= 2 or len(special_cover) == 1
 
     def test_has_heading_blocks(self, real_json):
         """Todos los JSONs reales generan headings (capítulos)."""

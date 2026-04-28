@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from docx.document import Document
 
+from app.engine.render_state import register_heading
 from app.engine.registry import register
 from app.engine.primitives import add_heading_formal, add_black_heading
 from app.engine.types import Block
@@ -28,6 +29,10 @@ def render_heading(doc: Document, block: Block) -> None:
         space_after=block.get("space_after", 12),
         centered=block.get("centered", False),
     )
+    register_heading(
+        str(block.get("text") or ""),
+        level=int(block.get("level", 1) or 1),
+    )
 
 
 @register("black_heading")
@@ -46,4 +51,8 @@ def render_black_heading(doc: Document, block: Block) -> None:
         level=block.get("level", 2),
         size=block.get("size", 13),
         centered=block.get("centered", True),
+    )
+    register_heading(
+        str(block.get("text") or ""),
+        level=int(block.get("level", 2) or 2),
     )

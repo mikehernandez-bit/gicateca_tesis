@@ -34,6 +34,7 @@ from typing import Callable, Dict, List
 
 from docx.document import Document
 
+from app.engine.render_state import reset_render_state
 from app.engine.types import Block, BlockRenderer
 
 logger = logging.getLogger(__name__)
@@ -100,6 +101,7 @@ def render_blocks(doc: Document, blocks: List[Block]) -> None:
     Cada block se despacha individualmente a su renderer.
     Si un renderer falla, logea el error y continúa con el siguiente.
     """
+    reset_render_state()
     for i, block in enumerate(blocks):
         try:
             render_block(doc, block)

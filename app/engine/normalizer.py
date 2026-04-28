@@ -744,7 +744,10 @@ def _normalize_caratula(data: dict) -> List[Block]:
         return []
 
     is_unac_maestria = data.get("_meta", {}).get("id", "").startswith("unac-maestria")
-    if is_unac_maestria:
+    is_unac_proyecto = data.get("_meta", {}).get("id", "").startswith("unac-proyecto")
+    # Proyecto de Tesis UNAC debe compartir exactamente la misma maqueta
+    # de carátula que Maestría.
+    if is_unac_maestria or is_unac_proyecto:
         return [{"type": "caratula_unac_maestria", "data": data, "caratula": c}]
 
     blocks: List[Block] = []
@@ -987,7 +990,10 @@ def _normalize_informacion_basica(data: dict) -> List[Block]:
         return []
 
     is_unac_maestria = data.get("_meta", {}).get("id", "").startswith("unac-maestria")
-    if is_unac_maestria:
+    is_unac_proyecto = data.get("_meta", {}).get("id", "").startswith("unac-proyecto")
+    # Proyecto de Tesis UNAC debe compartir exactamente la misma maqueta
+    # de información básica que Maestría.
+    if is_unac_maestria or is_unac_proyecto:
         return [{"type": "info_basica_unac_maestria", "data": data, "info": info}]
 
     blocks: List[Block] = []
@@ -1252,6 +1258,308 @@ def _normalize_indices(
 # ═══════════════════════════════════════════════════════════════
 
 
+def _as_dict(value: Any) -> dict:
+    return value if isinstance(value, dict) else {}
+
+
+def _clean_text(value: Any) -> str:
+    if value is None or isinstance(value, (dict, list)):
+        return ""
+    return str(value).strip()
+
+
+def _clean_list(value: Any) -> list[str]:
+    if isinstance(value, list):
+        return [text for item in value if (text := _clean_text(item))]
+    if isinstance(value, str):
+        return [line.strip(" -•\t") for line in value.splitlines() if line.strip(" -•\t")]
+    return []
+
+
+def _is_unac_project_document(data: dict | None) -> bool:
+    if not isinstance(data, dict):
+        return False
+    return str(data.get("_meta", {}).get("id", "") or "").startswith("unac-proyecto")
+
+
+def _document_values(data: dict | None) -> dict:
+    if not isinstance(data, dict):
+        return {}
+    return _as_dict(data.get("values"))
+
+
+def _matrix_data(data: dict | None) -> dict:
+    if not isinstance(data, dict):
+        return {}
+    values = _document_values(data)
+    return _as_dict(data.get("matriz_consistencia") or values.get("matriz_consistencia"))
+
+
+def _matrix_value(data: dict, flat_key: str, group: str = "", nested_key: str = "") -> str:
+    matriz = _matrix_data(data)
+    values = _document_values(data)
+    if flat := _clean_text(matriz.get(flat_key)):
+        return flat
+    if flat_value := _clean_text(values.get(flat_key)):
+        return flat_value
+    if group and nested_key:
+        nested = _as_dict(matriz.get(group))
+        if nested_value := _clean_text(nested.get(nested_key)):
+            return nested_value
+    return ""
+
+
+def _matrix_list(data: dict, flat_key: str, group: str = "", nested_key: str = "") -> list[str]:
+    matriz = _matrix_data(data)
+    values = _document_values(data)
+    values_list = _clean_list(values.get(flat_key))
+    direct = _clean_list(matriz.get(flat_key))
+    if direct:
+        return direct
+    if values_list:
+        return values_list
+    if group and nested_key:
+        nested = _as_dict(matriz.get(group))
+        return _clean_list(nested.get(nested_key))
+    return []
+
+
+def _matrix_variable_name(data: dict, kind: str) -> str:
+    matriz = _matrix_data(data)
+    values = _document_values(data)
+    flat_key = f"variable_{kind}"
+    if text := _clean_text(matriz.get(flat_key) or values.get(flat_key)):
+        return text
+    if kind == "independiente" and (text := _clean_text(values.get("vi"))):
+        return text
+    if kind == "dependiente" and (text := _clean_text(values.get("vd"))):
+        return text
+    variables = _as_dict(matriz.get("variables"))
+    variable = _as_dict(variables.get(kind))
+    return _clean_text(variable.get("nombre"))
+
+
+def _matrix_dimensions(data: dict, kind: str) -> list[str]:
+    matriz = _matrix_data(data)
+    values = _document_values(data)
+    flat_key = f"dimensiones_variable_{kind}"
+    direct = _clean_list(matriz.get(flat_key)) or _clean_list(values.get(flat_key))
+    if direct:
+        return direct
+    variables = _as_dict(matriz.get("variables"))
+    variable = _as_dict(variables.get(kind))
+    return _clean_list(variable.get("dimensiones"))
+
+
+def _operationalization_data(data: dict, kind: str) -> dict:
+    values = _document_values(data)
+    aliases = (
+        ("operacionalizacion_vi", "operacionalizacion_variable_independiente")
+        if kind == "independiente"
+        else ("operacionalizacion_vd", "operacionalizacion_variable_dependiente")
+    )
+    for key in aliases:
+        found = _as_dict(data.get(key) or values.get(key))
+        if found:
+            return found
+    return {}
+
+
+def _operationalization_rows(data: dict, kind: str) -> list[dict]:
+    raw = _operationalization_data(data, kind).get("filas")
+    if not isinstance(raw, list):
+        raw = _operationalization_data(data, kind).get("rows")
+    rows = [row for row in raw if isinstance(row, dict)] if isinstance(raw, list) else []
+    if rows:
+        return rows
+    return [{"dimension": dimension} for dimension in _matrix_dimensions(data, kind)]
+
+
+def _has_project_matrix_content(data: dict, *keys: str) -> bool:
+    if not _is_unac_project_document(data):
+        return False
+    nested_aliases = {
+        "problema_general": ("problemas", "general"),
+        "problemas_especificos": ("problemas", "especificos"),
+        "objetivo_general": ("objetivos", "general"),
+        "objetivos_especificos": ("objetivos", "especificos"),
+        "hipotesis_general": ("hipotesis", "general"),
+        "hipotesis_especificas": ("hipotesis", "especificos"),
+    }
+    for key in keys:
+        group, nested_key = nested_aliases.get(key, ("", ""))
+        if _matrix_value(data, key, group, nested_key) or _matrix_list(data, key, group, nested_key):
+            return True
+    return False
+
+
+def _make_bullet_paragraphs(items: list[str]) -> list[Block]:
+    return [{"type": "paragraph", "text": f"• {item}"} for item in items if item]
+
+
+def _normalize_problem_formulation(data: dict) -> list[Block]:
+    if not _has_project_matrix_content(data, "problema_general", "problemas_especificos"):
+        return []
+    blocks: list[Block] = []
+    general = _matrix_value(data, "problema_general", "problemas", "general")
+    specific = _matrix_list(data, "problemas_especificos", "problemas", "especificos")
+    if general:
+        blocks.append({"type": "paragraph_bold", "text": "Problema general"})
+        blocks.append({"type": "paragraph", "text": general})
+    if specific:
+        blocks.append({"type": "paragraph_bold", "text": "Problemas específicos"})
+        blocks.extend(_make_bullet_paragraphs(specific))
+    return blocks
+
+
+def _normalize_objectives(data: dict) -> list[Block]:
+    if not _has_project_matrix_content(data, "objetivo_general", "objetivos_especificos"):
+        return []
+    blocks: list[Block] = []
+    general = _matrix_value(data, "objetivo_general", "objetivos", "general")
+    specific = _matrix_list(data, "objetivos_especificos", "objetivos", "especificos")
+    if general:
+        blocks.append({"type": "paragraph_bold", "text": "Objetivo general"})
+        blocks.append({"type": "paragraph", "text": general})
+    if specific:
+        blocks.append({"type": "paragraph_bold", "text": "Objetivos específicos"})
+        blocks.extend(_make_bullet_paragraphs(specific))
+    return blocks
+
+
+def _normalize_hypotheses(data: dict) -> list[Block]:
+    if not _has_project_matrix_content(data, "hipotesis_general", "hipotesis_especificas"):
+        return []
+    blocks: list[Block] = []
+    general = _matrix_value(data, "hipotesis_general", "hipotesis", "general")
+    specific = _matrix_list(data, "hipotesis_especificas", "hipotesis", "especificos")
+    if general:
+        blocks.append({"type": "paragraph_bold", "text": "Hipótesis general"})
+        blocks.append({"type": "paragraph", "text": general})
+    if specific:
+        blocks.append({"type": "paragraph_bold", "text": "Hipótesis específicas"})
+        blocks.extend(_make_bullet_paragraphs(specific))
+    return blocks
+
+
+def _technique_cell(row: dict, *, dependent: bool) -> str:
+    tecnica = _clean_text(row.get("tecnica") or row.get("metodo_tecnica") or row.get("metodoTecnica"))
+    instrumento = _clean_text(
+        row.get("instrumento")
+        or row.get("tecnica_instrumentos")
+        or row.get("tecnicaInstrumentos")
+    )
+    if tecnica and instrumento and tecnica != instrumento:
+        return f"Técnica:\n{tecnica}\n\nInstrumento:\n{instrumento}"
+    if dependent and tecnica:
+        return f"Método/Técnica:\n{tecnica}"
+    if tecnica:
+        return f"Técnica:\n{tecnica}"
+    if instrumento:
+        return f"Instrumento:\n{instrumento}"
+    return ""
+
+
+def _operationalization_table(data: dict, *, kind: str) -> Block | None:
+    op = _operationalization_data(data, kind)
+    fallback_variable = _matrix_variable_name(data, kind)
+    variable = _clean_text(op.get("variable")) or fallback_variable
+    definition = _clean_text(op.get("definicion_conceptual") or op.get("definicionConceptual"))
+    operational = _clean_text(op.get("definicion_operacional") or op.get("definicionOperacional"))
+    rows = _operationalization_rows(data, kind)
+    if not variable and not definition and not operational and not rows:
+        return None
+
+    is_dependent = kind == "dependiente"
+    headers = [
+        "VARIABLE" if is_dependent else "VARIABLES",
+        "DEFINICIÓN CONCEPTUAL",
+        "DEFINICIÓN OPERACIONAL",
+        "DIMENSIONES",
+        "INDICADORES",
+        "ÍNDICE",
+        "MÉTODO Y TÉCNICA" if is_dependent else "TÉCNICA E INSTRUMENTOS",
+    ]
+    label = "Variable Dependiente" if is_dependent else "Variable Independiente"
+    table_rows: list[list[str]] = []
+    for index, row in enumerate(rows or [{}]):
+        table_rows.append(
+            [
+                f"{label}:\n{variable}" if index == 0 else "",
+                definition if index == 0 else "",
+                operational if index == 0 else "",
+                _clean_text(row.get("dimension")),
+                _clean_text(row.get("indicador")),
+                _clean_text(row.get("indice")),
+                _technique_cell(row, dependent=is_dependent),
+            ]
+        )
+
+    row_count = max(1, len(table_rows))
+    title = (
+        "Tabla 3.2 Operacionalización de variable dependiente"
+        if is_dependent
+        else "Tabla 3.1 Operacionalización de variable independiente"
+    )
+    return {
+        "type": "table",
+        "titulo": title,
+        "orientacion": "landscape",
+        "encabezados": headers,
+        "filas": table_rows,
+        "celdas_fusionadas": [
+            {"fila": 0, "col": 0, "filas_span": row_count},
+            {"fila": 0, "col": 1, "filas_span": row_count},
+            {"fila": 0, "col": 2, "filas_span": row_count},
+        ],
+        "estilo": {
+            "encabezado_color": "D9D9D9",
+            "fuente_size": 8,
+        },
+    }
+
+
+def _normalize_operationalization_section(data: dict) -> list[Block]:
+    if not _is_unac_project_document(data):
+        return []
+    tables = [
+        table
+        for table in (
+            _operationalization_table(data, kind="independiente"),
+            _operationalization_table(data, kind="dependiente"),
+        )
+        if table
+    ]
+    if not tables:
+        return []
+    blocks: list[Block] = [
+        {
+            "type": "paragraph",
+            "text": (
+                "La operacionalización organiza las variables del estudio en definiciones, "
+                "dimensiones, indicadores, índices y técnicas o instrumentos de medición."
+            ),
+        }
+    ]
+    blocks.extend(tables)
+    return blocks
+
+
+def _normalize_project_structured_section(data: dict | None, item: dict) -> list[Block]:
+    if not _is_unac_project_document(data):
+        return []
+    title = _norm_upper(item.get("texto", ""))
+    if "FORMULACION DEL PROBLEMA" in title:
+        return _normalize_problem_formulation(data or {})
+    if "OBJETIVOS" in title and "FORMULACION" not in title:
+        return _normalize_objectives(data or {})
+    if "HIPOTESIS" in title and "VARIABLES" not in title:
+        return _normalize_hypotheses(data or {})
+    if "OPERACIONALIZACION" in title:
+        return _normalize_operationalization_section(data or {})
+    return []
+
+
 def _normalize_cuerpo(data: dict) -> List[Block]:
     cuerpo = data.get("cuerpo", [])
     if not cuerpo:
@@ -1292,7 +1600,7 @@ def _normalize_cuerpo(data: dict) -> List[Block]:
                 and not item.get("_ai_generated")
             ):
                 continue
-            blocks.extend(_normalize_content_item(item))
+            blocks.extend(_normalize_content_item(item, data))
 
         # Ejemplos APA a nivel de capítulo
         if "ejemplos_apa" in cap:
@@ -1306,7 +1614,7 @@ def _normalize_cuerpo(data: dict) -> List[Block]:
     return blocks
 
 
-def _normalize_content_item(item) -> List[Block]:
+def _normalize_content_item(item, document_data: dict | None = None) -> List[Block]:
     """Normaliza un item de contenido (dentro de cuerpo o anexos).
 
     Soporta:
@@ -1347,6 +1655,8 @@ def _normalize_content_item(item) -> List[Block]:
                     "fuente": item.get("fuente", "Elaboración propia"),
                     "ancho_cm": item.get("ancho_cm"),
                     "placeholder": True,
+                    "nota": item.get("nota") or item.get("note"),
+                    "placeholder_text": item.get("placeholder_text") or item.get("texto_placeholder"),
                 }
             )
         elif caption:
@@ -1358,6 +1668,8 @@ def _normalize_content_item(item) -> List[Block]:
     # switch_to_landscape/switch_to_portrait, so we only need to resolve
     # "auto" orientation here and pass the correct value.
     if item.get("tipo") == "tabla":
+        if _is_unac_project_document(document_data) and "OPERACIONALIZACION" in _norm_upper(item.get("titulo", "")):
+            return blocks
         if _looks_like_placeholder_table_data(item) or _looks_like_template_example_title(item.get("titulo")):
             return blocks
         orientacion = (item.get("orientacion") or "auto").strip().lower()
@@ -1385,6 +1697,11 @@ def _normalize_content_item(item) -> List[Block]:
                 "centered": False,
             }
         )
+
+    special_blocks = _normalize_project_structured_section(document_data, item)
+    if special_blocks:
+        blocks.extend(special_blocks)
+        return blocks
 
     ai_content = item.get("_ai_content")
     if ai_content:
@@ -1490,6 +1807,8 @@ def _normalize_content_block(item: dict) -> List[Block]:
                     "titulo": img.get("titulo", ""),
                     "ruta": ruta,
                     "fuente": img.get("fuente", ""),
+                    "nota": img.get("nota") or img.get("note"),
+                    "placeholder_text": img.get("placeholder_text") or img.get("texto_placeholder"),
                 }
             )
 

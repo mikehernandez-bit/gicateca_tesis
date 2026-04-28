@@ -22,6 +22,46 @@ def test_merge_values_sets_cover_title_when_placeholder_is_literal() -> None:
     assert merged["caratula"]["titulo"] == "Implementacion de IA en procesos logisticos"
 
 
+def test_merge_values_forces_unac_project_cover_institutional_labels() -> None:
+    data = {
+        "_meta": {"id": "unac-proyecto-cuant"},
+        "caratula": {
+            "facultad": "Facultad de Ingeniería Mecánica y de Energía",
+            "escuela": "Unidad de Posgrado",
+            "tipo_documento": "PROYECTO DE INVESTIGACIÓN",
+        },
+    }
+    values = {
+        "tipo_documento": "Tesis de Maestría",
+        "frase_grado": "PARA OPTAR EL GRADO ACADÉMICO DE MAESTRO EN GERENCIA DE MANTENIMIENTO",
+    }
+
+    merged = merge_values(data, values)
+
+    assert merged["caratula"]["facultad"] == "ESCUELA DE POSGRADO"
+    assert (
+        merged["caratula"]["escuela"]
+        == "UNIDAD DE POSGRADO DE LA FACULTAD DE INGENIERÍA MECÁNICA Y DE ENERGÍA"
+    )
+    assert merged["caratula"]["tipo_documento"] == "PROYECTO DE INVESTIGACIÓN"
+    assert merged["tipo_documento"] == "PROYECTO DE INVESTIGACIÓN"
+
+
+def test_merge_values_exposes_structured_project_tables_at_root() -> None:
+    values = {
+        "matriz_consistencia": {"problema_general": "P"},
+        "operacionalizacion_vi": {"variable": "VI", "filas": [{"dimension": "D1"}]},
+        "operacionalizacion_vd": {"variable": "VD", "filas": [{"dimension": "D2"}]},
+    }
+
+    merged = merge_values({"caratula": {}}, values)
+
+    assert merged["values"]["matriz_consistencia"]["problema_general"] == "P"
+    assert merged["matriz_consistencia"]["problema_general"] == "P"
+    assert merged["operacionalizacion_vi"]["filas"][0]["dimension"] == "D1"
+    assert merged["operacionalizacion_vd"]["filas"][0]["dimension"] == "D2"
+
+
 def test_sanitize_ai_text_removes_markdown_and_placeholder_lines() -> None:
     raw = (
         "# Encabezado markdown\n"
@@ -74,19 +114,35 @@ def test_apply_ai_content_injects_sanitized_text_in_target_section() -> None:
 def test_apply_ai_content_injects_preliminares_sections_beyond_introduccion() -> None:
     data = {
         "preliminares": {
-            "dedicatoria": {"titulo": "DEDICATORIA", "texto": "[Escriba aqui su dedicatoria...]"},
-            "agradecimientos": {"titulo": "AGRADECIMIENTO", "texto": "[Escriba aqui su agradecimiento...]"},
+            "dedicatoria": {
+                "titulo": "DEDICATORIA",
+                "texto": "[Escriba aqui su dedicatoria...]",
+            },
+            "agradecimientos": {
+                "titulo": "AGRADECIMIENTO",
+                "texto": "[Escriba aqui su agradecimiento...]",
+            },
         }
     }
     ai_sections = [
-        {"path": "DEDICATORIA", "content": "Dedico este trabajo a mi familia por su apoyo constante."},
-        {"path": "AGRADECIMIENTO", "content": "Agradezco a mi asesor y a la universidad por el acompanamiento brindado."},
+        {
+            "path": "DEDICATORIA",
+            "content": "Dedico este trabajo a mi familia por su apoyo constante.",
+        },
+        {
+            "path": "AGRADECIMIENTO",
+            "content": "Agradezco a mi asesor y a la universidad por el acompanamiento brindado.",
+        },
     ]
 
     result = apply_ai_content(data, ai_sections)
 
-    assert result["preliminares"]["dedicatoria"]["_ai_content"].startswith("Dedico este trabajo")
-    assert result["preliminares"]["agradecimientos"]["_ai_content"].startswith("Agradezco a mi asesor")
+    assert result["preliminares"]["dedicatoria"]["_ai_content"].startswith(
+        "Dedico este trabajo"
+    )
+    assert result["preliminares"]["agradecimientos"]["_ai_content"].startswith(
+        "Agradezco a mi asesor"
+    )
 
 
 def test_apply_ai_content_injects_abbreviations_preliminary() -> None:
@@ -104,7 +160,9 @@ def test_apply_ai_content_injects_abbreviations_preliminary() -> None:
 
     result = apply_ai_content(data, ai_sections)
 
-    assert result["preliminares"]["abreviaturas"]["_ai_content"].startswith("IA: Inteligencia Artificial")
+    assert result["preliminares"]["abreviaturas"]["_ai_content"].startswith(
+        "IA: Inteligencia Artificial"
+    )
 
 
 def test_apply_ai_content_keeps_index_items_unchanged_when_titles_overlap() -> None:
@@ -211,6 +269,38 @@ def test_apply_ai_content_tags_structured_chapter_blocks_as_ai_generated() -> No
     assert "_ai_generated" not in contenido[1]
 
 
+def test_apply_ai_content_skips_unac_project_chapter_level_text() -> None:
+    data = {
+        "_meta": {"id": "unac-proyecto-cuant"},
+        "cuerpo": [
+            {
+                "titulo": "III. HIPOTESIS Y VARIABLES",
+                "contenido": [
+                    {"texto": "3.1 Hipotesis"},
+                ],
+            }
+        ],
+    }
+    ai_sections = [
+        {
+            "path": "III. HIPOTESIS Y VARIABLES",
+            "content": "Este texto del capitulo padre no debe mezclarse con 3.1.",
+        },
+        {
+            "path": "III. HIPOTESIS Y VARIABLES/3.1 Hipotesis",
+            "content": "Hipotesis general validada.",
+        },
+    ]
+
+    result = apply_ai_content(data, ai_sections)
+    chapter = result["cuerpo"][0]
+    child = chapter["contenido"][0]
+
+    assert "_ai_content" not in chapter
+    assert "Este texto del capitulo padre" not in str(child)
+    assert child["_ai_content"] == "Hipotesis general validada."
+
+
 def test_apply_ai_content_injects_final_references_section() -> None:
     data = {
         "finales": {
@@ -275,7 +365,9 @@ def test_apply_ai_content_matches_annex_by_prefix_when_title_changes() -> None:
     assert anexo["_ai_content"][1]["titulo"] == "Matriz de consistencia final"
 
 
-def test_apply_ai_content_matches_annex_by_position_when_base_title_is_not_annex() -> None:
+def test_apply_ai_content_matches_annex_by_position_when_base_title_is_not_annex() -> (
+    None
+):
     data = {
         "finales": {
             "anexos": {
@@ -314,4 +406,7 @@ def test_apply_ai_content_matches_annex_by_position_when_base_title_is_not_annex
     assert foto["titulo"] == "Anexo 1: Registro fotográfico"
     assert foto["_ai_content"][0]["texto"] == "Evidencia 1. Vista frontal del equipo."
     assert tabla["titulo"] == "Anexo 2: Tabla de resultados complementarios"
-    assert tabla["_ai_content"][0]["titulo"] == "Tabla 15. Tabla de resultados complementarios"
+    assert (
+        tabla["_ai_content"][0]["titulo"]
+        == "Tabla 15. Tabla de resultados complementarios"
+    )

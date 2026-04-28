@@ -19,6 +19,7 @@ from docx.document import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Cm, Pt
 
+from app.engine.render_state import next_table_number
 from app.engine.registry import register
 from app.engine.primitives import (
     DEFAULT_HEADER_COLOR,
@@ -88,15 +89,23 @@ def _render_tabla_impl(doc: Document, tabla_data: dict) -> None:
         clean_title = (
             re.sub(r"^Tabla\s*[\d.]+\s*[:.]*\s*", "", titulo).strip() or titulo
         )
+        chapter_number, table_number, is_first_in_chapter = next_table_number()
         p = doc.add_paragraph()
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
         p.paragraph_format.space_after = Pt(6)
-        run_label = p.add_run("Tabla ")
+        prefix = f"Tabla {chapter_number}." if chapter_number is not None else "Tabla "
+        run_label = p.add_run(prefix)
         run_label.bold = True
         run_label.font.size = Pt(11)
         run_label.font.name = "Arial"
-        add_seq_field(p, "Tabla")
-        run_title = p.add_run(f". {clean_title}")
+        add_seq_field(
+            p,
+            "Tabla",
+            reset_to=1 if is_first_in_chapter else None,
+            display_value=table_number,
+        )
+        separator = " " if chapter_number is not None else ". "
+        run_title = p.add_run(f"{separator}{clean_title}")
         run_title.bold = True
         run_title.font.size = Pt(11)
         run_title.font.name = "Arial"
