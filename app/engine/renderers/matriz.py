@@ -1,4 +1,4 @@
-"""Renderer: matriz — Matriz de Consistencia como tabla landscape."""
+"""Renderer: matriz - Matriz de Consistencia como tabla academica."""
 
 from __future__ import annotations
 
@@ -9,92 +9,179 @@ from app.engine.renderers.table import _render_tabla_impl
 from app.engine.types import Block
 
 
+def _clean_text(value) -> str:
+    if isinstance(value, list):
+        return "\n".join(str(item) for item in value if str(item).strip())
+    if isinstance(value, dict):
+        lines = []
+        for key, item in value.items():
+            if item in (None, "", []):
+                continue
+            lines.append(f"{str(key).replace('_', ' ').capitalize()}: {item}")
+        return "\n".join(lines)
+    return str(value or "")
+
+
+def _build_variables_block(var: dict) -> str:
+    if not isinstance(var, dict):
+        return _clean_text(var)
+    lines: list[str] = []
+    indep = var.get("independiente", {}) if isinstance(var.get("independiente"), dict) else {}
+    dep = var.get("dependiente", {}) if isinstance(var.get("dependiente"), dict) else {}
+
+    if indep:
+        lines.append("VARIABLE INDEPENDIENTE")
+        if indep.get("nombre"):
+            lines.append(str(indep.get("nombre")))
+        dims = indep.get("dimensiones", [])
+        if dims:
+            lines.append("")
+            lines.append("Dimensiones")
+            lines.extend(str(d) for d in dims if str(d).strip())
+
+    if dep:
+        if lines:
+            lines.append("")
+        lines.append("VARIABLE DEPENDIENTE")
+        if dep.get("nombre"):
+            lines.append(str(dep.get("nombre")))
+        dims = dep.get("dimensiones", [])
+        if dims:
+            lines.append("")
+            lines.append("Dimensiones")
+            lines.extend(str(d) for d in dims if str(d).strip())
+
+    return "\n".join(lines).strip()
+
+
+def _build_metodologia_block(met: dict) -> str:
+    if not isinstance(met, dict):
+        return _clean_text(met)
+
+    ordered_keys = [
+        "tipo",
+        "nivel",
+        "enfoque",
+        "diseno",
+        "diseño",
+        "poblacion",
+        "población",
+        "muestra",
+        "tecnicas",
+        "técnicas",
+        "instrumentos",
+        "procesamiento_datos",
+        "procesamiento",
+    ]
+
+    lines: list[str] = []
+    used: set[str] = set()
+
+    for key in ordered_keys:
+        if key not in met or key in used:
+            continue
+        used.add(key)
+        value = met.get(key)
+        if value in (None, "", []):
+            continue
+        label = key.replace("_", " ").capitalize() + ":"
+        lines.append(label)
+        lines.append(_clean_text(value))
+        lines.append("")
+
+    for key, value in met.items():
+        if key in used or value in (None, "", []):
+            continue
+        label = str(key).replace("_", " ").capitalize() + ":"
+        lines.append(label)
+        lines.append(_clean_text(value))
+        lines.append("")
+
+    return "\n".join(lines).strip()
+
+
 @register("matriz")
 def render_matriz(doc: Document, block: Block) -> None:
-    """Renderiza la Matriz de Consistencia como tabla.
-
-    Construye la tabla a partir de la estructura de matriz_consistencia
-    y delega el rendering a _render_tabla_impl.
-
-    Cuando landscape=False, el caller (section_switch) ya cambió la orientación,
-    así que la tabla se renderiza como "portrait" (sin switch propio).
-
-    Block keys:
-        data (dict): Datos de matriz_consistencia con keys:
-            problemas, objetivos, hipotesis, variables, metodologia.
-        landscape (bool): Si True, la tabla maneja su propio landscape switch.
-    """
+    """Renderiza la Matriz de Consistencia con 5 columnas y fusiones."""
     matriz_data = block.get("data", {})
     if not matriz_data:
         return
 
     landscape = block.get("landscape", True)
-
-    # Helper
-    def clean_text(val):
-        if isinstance(val, list):
-            return "\n".join(f"- {x}" for x in val)
-        return str(val)
-
     prob = matriz_data.get("problemas", {})
     obj = matriz_data.get("objetivos", {})
     hip = matriz_data.get("hipotesis", {})
     var = matriz_data.get("variables", {})
     met = matriz_data.get("metodologia", {})
+    titulo_investigacion = (
+        matriz_data.get("titulo_investigacion")
+        or matriz_data.get("titulo")
+        or matriz_data.get("research_title")
+        or "MATRIZ DE CONSISTENCIA"
+    )
 
-    # Variables text
-    txt_var = ""
-    if "independiente" in var:
-        txt_var += f"V. Indep: {var['independiente'].get('nombre', '')}"
-        dims = var["independiente"].get("dimensiones", [])
-        if dims:
-            txt_var += "\nDim: " + ", ".join(dims)
-    if "dependiente" in var:
-        txt_var += f"\n\nV. Dep: {var['dependiente'].get('nombre', '')}"
-        dims = var["dependiente"].get("dimensiones", [])
-        if dims:
-            txt_var += "\nDim: " + ", ".join(dims)
+    problemas_especificos = prob.get("especificos", []) if isinstance(prob, dict) else []
+    objetivos_especificos = obj.get("especificos", []) if isinstance(obj, dict) else []
+    hipotesis_especificas = hip.get("especificos", []) if isinstance(hip, dict) else []
 
-    # Metodologia text
-    txt_met = "\n".join(f"{k.capitalize()}: {v}" for k, v in met.items())
+    problema_esp_1 = problemas_especificos[0] if isinstance(problemas_especificos, list) and len(problemas_especificos) > 0 else ""
+    problema_esp_2 = problemas_especificos[1] if isinstance(problemas_especificos, list) and len(problemas_especificos) > 1 else ""
+    objetivo_esp_1 = objetivos_especificos[0] if isinstance(objetivos_especificos, list) and len(objetivos_especificos) > 0 else ""
+    objetivo_esp_2 = objetivos_especificos[1] if isinstance(objetivos_especificos, list) and len(objetivos_especificos) > 1 else ""
+    hipotesis_esp_1 = hipotesis_especificas[0] if isinstance(hipotesis_especificas, list) and len(hipotesis_especificas) > 0 else ""
+    hipotesis_esp_2 = hipotesis_especificas[1] if isinstance(hipotesis_especificas, list) and len(hipotesis_especificas) > 1 else ""
 
     filas = [
-        [
-            "General:\n" + clean_text(prob.get("general", "")),
-            "General:\n" + clean_text(obj.get("general", "")),
-            "General:\n" + clean_text(hip.get("general", "")),
-            txt_var,
-            txt_met,
-        ],
-        [
-            "Específicos:\n" + clean_text(prob.get("especificos", [])),
-            "Específicos:\n" + clean_text(obj.get("especificos", [])),
-            "Específicos:\n" + clean_text(hip.get("especificos", [])),
-            "",
-            "",
-        ],
+        ["PROBLEMA", "OBJETIVOS", "HIPOTESIS", "VARIABLES", "METODOLOGIA"],
+        ["PROBLEMA GENERAL", "OBJETIVO GENERAL", "HIPOTESIS GENERAL", "", ""],
+        [_clean_text(prob.get("general", "")), _clean_text(obj.get("general", "")), _clean_text(hip.get("general", "")), "", ""],
+        ["PROBLEMAS ESPECIFICOS", "OBJETIVOS ESPECIFICOS", "HIPOTESIS ESPECIFICAS", "", ""],
+        [_clean_text(problema_esp_1), _clean_text(objetivo_esp_1), _clean_text(hipotesis_esp_1), "", ""],
+        [_clean_text(problema_esp_2), _clean_text(objetivo_esp_2), _clean_text(hipotesis_esp_2), "", ""],
     ]
 
     tabla_data = {
         "tipo": "tabla",
         "orientacion": "landscape" if landscape else "portrait",
-        "encabezados": [
-            "PROBLEMAS",
-            "OBJETIVOS",
-            "HIPÓTESIS",
-            "VARIABLES",
-            "METODOLOGÍA",
-        ],
+        "encabezados": [str(titulo_investigacion), "", "", "", ""],
         "filas": filas,
-        "celdas_fusionadas": [
-            {"fila": 0, "col": 3, "filas_span": 2},
-            {"fila": 0, "col": 4, "filas_span": 2},
+        "filas_fase": [0, 1, 3],
+        "celdas_combinadas": [
+            {
+                "fila": -1,
+                "col_inicio": 0,
+                "col_fin": 4,
+                "texto": str(titulo_investigacion),
+                "bold": True,
+                "alignment": "center",
+            },
+            {
+                "fila": 1,
+                "fila_fin": 5,
+                "col_inicio": 3,
+                "col_fin": 3,
+                "texto": _build_variables_block(var),
+                "bold": False,
+                "alignment": "left",
+            },
+            {
+                "fila": 1,
+                "fila_fin": 5,
+                "col_inicio": 4,
+                "col_fin": 4,
+                "texto": _build_metodologia_block(met),
+                "bold": False,
+                "alignment": "left",
+            },
         ],
         "estilo": {
             "encabezado_color": "D9D9D9",
-            "fuente_size": 9,
+            "fuente_size": 7.5,
+            "ancho_columnas": [5.2, 5.2, 5.2, 4.4, 4.7],
+            "titulo_exacto": False,
+            "bordes": True,
+            "celda_margen_twips": 70,
         },
     }
 
-    # Render sin título SEQ — el heading del anexo ya fue emitido por el normalizer
     _render_tabla_impl(doc, tabla_data)

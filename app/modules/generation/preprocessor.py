@@ -101,6 +101,51 @@ def _is_index_path(path: str) -> bool:
     return any(part.startswith("INDICE") for part in parts)
 
 
+def _collect_selected_paths(
+    selected_sections: List[Dict[str, Any]] | List[str] | None,
+) -> Set[str]:
+    if not isinstance(selected_sections, list):
+        return set()
+
+    selected_paths: Set[str] = set()
+    for item in selected_sections:
+        if isinstance(item, str):
+            normalized = _normalize_path(item)
+            if normalized:
+                selected_paths.add(normalized)
+            continue
+        if not isinstance(item, dict):
+            continue
+        for key in ("section_path", "sectionPath", "path", "section_id", "sectionId", "id"):
+            normalized = _normalize_path(str(item.get(key) or ""))
+            if normalized:
+                selected_paths.add(normalized)
+    return selected_paths
+
+
+def _path_selected(path: str, selected_paths: Set[str]) -> bool:
+    if not selected_paths:
+        return True
+    normalized = _normalize_path(path)
+    if not normalized:
+        return False
+    for selected in selected_paths:
+        if normalized == selected:
+            return True
+        if normalized.startswith(f"{selected}/"):
+            return True
+        if selected.startswith(f"{normalized}/"):
+            return True
+    return False
+
+
+def _selected_token_present(selected_paths: Set[str], token: str) -> bool:
+    normalized_token = _normalize_path(token)
+    if not normalized_token:
+        return False
+    return any(normalized_token in selected for selected in selected_paths)
+
+
 def _looks_like_placeholder(value: str) -> bool:
     if not value or not value.strip():
         return True
@@ -506,6 +551,7 @@ def _inject_ai_into_informacion_basica(data: Dict[str, Any], content: Any) -> No
 def apply_ai_content(
     data: Dict[str, Any],
     ai_sections: List[Dict[str, Any]],
+    selected_sections: List[Dict[str, Any]] | List[str] | None = None,
 ) -> Dict[str, Any]:
     """
     Apply AI content to the document structure.
@@ -742,12 +788,38 @@ def apply_ai_content(
         contenido.insert(0, {"parrafos": [content]})
 
     result = deepcopy(data)
-    meta = result.get("_meta") if isinstance(result.get("_meta"), dict) else {}
-    document_id = str(meta.get("id") or "").strip().lower()
-    skip_chapter_level_ai = document_id.startswith("unac-proyecto")
+    selected_paths = _collect_selected_paths(selected_sections)
+    document_id = str(
+        (
+            result.get("_meta", {})
+            if isinstance(result.get("_meta"), dict)
+            else {}
+        ).get("id", "")
+        or ""
+    ).strip().lower()
+    is_unac_project = document_id.startswith("unac-proyecto")
 
     preliminares = result.get("preliminares")
     if isinstance(preliminares, dict):
+
+        def _preliminary_selected(default_title: str, *extra_titles: str) -> bool:
+            if not selected_paths:
+                return True
+            candidate_titles = [default_title, *extra_titles]
+            for candidate in candidate_titles:
+                normalized_candidate = str(candidate or "").strip()
+                if not normalized_candidate:
+                    continue
+                if _path_selected(normalized_candidate, selected_paths):
+                    return True
+                if _path_selected(
+                    f"PRELIMINARES/{normalized_candidate}",
+                    selected_paths,
+                ):
+                    return True
+                if _selected_token_present(selected_paths, normalized_candidate):
+                    return True
+            return False
 
         def _preliminary_title(item: Any, default_title: str) -> str:
             if isinstance(item, dict):
@@ -795,6 +867,12 @@ def apply_ai_content(
         ):
             _inject_text_preliminary(prelim_key, default_title)
 
+        if "introduccion" in preliminares and not _preliminary_selected(
+            "INTRODUCCION",
+            "INTRODUCCIÓN",
+        ):
+            preliminares.pop("introduccion", None)
+
         abbreviations = preliminares.get("abreviaturas")
         abbreviations_title = _preliminary_title(
             abbreviations,
@@ -819,8 +897,106 @@ def apply_ai_content(
                         "_ai_content": safe_abbreviations,
                     }
 
+    def _extract_table_blocks(content: Any) -> List[Dict[str, Any]]:
+        tables: List[Dict[str, Any]] = []
+        if isinstance(content, dict):
+            block_type = str(content.get("tipo") or "").strip().lower()
+            if block_type == "tabla":
+                tables.append(dict(content))
+            return tables
+        if not isinstance(content, list):
+            return tables
+        for block in content:
+            if not isinstance(block, dict):
+                continue
+            if str(block.get("tipo") or "").strip().lower() == "tabla":
+                tables.append(dict(block))
+        return tables
+
+    def _consume_child_table_blocks(chapter_title: str) -> List[Dict[str, Any]]:
+        chapter_key = _normalize_path(chapter_title)
+        if not chapter_key:
+            return []
+        prefix = f"{chapter_key}/"
+        candidate_keys = sorted([key for key in content_map if key.startswith(prefix)])
+        for key in candidate_keys:
+            tables = _extract_table_blocks(content_map.get(key))
+            if tables:
+                content_map.pop(key, None)
+                return tables
+        return []
+
+    def _merge_ai_table_into_template_table(
+        template_table: Dict[str, Any],
+        ai_table: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        merged = deepcopy(template_table)
+        dynamic_keys = (
+            "encabezados",
+            "filas",
+            "anio",
+            "meses",
+            "simbolo_marca",
+            "filas_fase",
+            "filas_categoria",
+            "fila_total",
+            "celdas_combinadas",
+            "celdas_fusionadas",
+            "nota_pie",
+            "fuente",
+            "nota",
+            "nota_color",
+        )
+        for key in dynamic_keys:
+            if key in ai_table and ai_table.get(key) not in (None, ""):
+                merged[key] = deepcopy(ai_table.get(key))
+
+        for identity_key in ("tipo", "id", "titulo", "orientacion", "subtipo"):
+            if merged.get(identity_key) in (None, "") and ai_table.get(identity_key) not in (None, ""):
+                merged[identity_key] = deepcopy(ai_table.get(identity_key))
+
+        if "estilo" not in merged and isinstance(ai_table.get("estilo"), dict):
+            merged["estilo"] = deepcopy(ai_table.get("estilo"))
+        if "estilos" not in merged and isinstance(ai_table.get("estilos"), dict):
+            merged["estilos"] = deepcopy(ai_table.get("estilos"))
+
+        merged["_ai_generated"] = True
+        return merged
+
+    def _apply_ai_table_over_static_template(
+        capitulo: Dict[str, Any],
+        ai_tables: List[Dict[str, Any]],
+    ) -> bool:
+        if not ai_tables:
+            return False
+        contenido = capitulo.get("contenido")
+        if not isinstance(contenido, list):
+            return False
+
+        ai_table = next(
+            (
+                table
+                for table in ai_tables
+                if isinstance(table, dict)
+                and str(table.get("tipo", "")).strip().lower() == "tabla"
+            ),
+            None,
+        )
+        if not isinstance(ai_table, dict):
+            return False
+
+        for index, item in enumerate(contenido):
+            if not isinstance(item, dict):
+                continue
+            if str(item.get("tipo", "")).strip().lower() != "tabla":
+                continue
+            contenido[index] = _merge_ai_table_into_template_table(item, ai_table)
+            return True
+        return False
+
     cuerpo = result.get("cuerpo")
     if isinstance(cuerpo, list):
+        filtered_chapters: List[Dict[str, Any]] = []
         for capitulo in cuerpo:
             if not isinstance(capitulo, dict):
                 continue
@@ -828,18 +1004,94 @@ def apply_ai_content(
             capitulo_titulo = str(capitulo.get("titulo", "") or "").strip()
             if not capitulo_titulo:
                 continue
+            if selected_paths and not _path_selected(capitulo_titulo, selected_paths):
+                continue
+
+            normalized_capitulo_titulo = _normalize_path(capitulo_titulo).lower()
+            is_schedule_or_budget_chapter = any(
+                token in normalized_capitulo_titulo
+                for token in ("cronograma", "presupuesto")
+            )
+            chapter_has_static_table = isinstance(capitulo.get("contenido"), list) and any(
+                isinstance(child, dict) and str(child.get("tipo", "")).strip().lower() == "tabla"
+                for child in capitulo.get("contenido", [])
+            )
 
             capitulo_content = _consume_content(
                 capitulo_titulo,
                 f"CUERPO/{capitulo_titulo}",
             )
+            chapter_has_child_sections = isinstance(capitulo.get("contenido"), list) and any(
+                isinstance(child, dict) and str(child.get("texto", "") or "").strip()
+                for child in capitulo.get("contenido", [])
+            )
+            skip_chapter_level_ai = is_unac_project and chapter_has_child_sections
+            if (
+                is_schedule_or_budget_chapter
+                and chapter_has_static_table
+                and isinstance(capitulo_content, str)
+            ):
+                # Keep chapter title immediately followed by the existing table.
+                # Ignore chapter-level narrative text for schedule/budget.
+                capitulo_content = ""
+            schedule_or_budget_tables: List[Dict[str, Any]] = []
+            if is_schedule_or_budget_chapter and chapter_has_static_table:
+                schedule_or_budget_tables = _extract_table_blocks(capitulo_content)
+                if not schedule_or_budget_tables:
+                    schedule_or_budget_tables = _consume_child_table_blocks(capitulo_titulo)
+                if schedule_or_budget_tables:
+                    if _apply_ai_table_over_static_template(
+                        capitulo,
+                        schedule_or_budget_tables,
+                    ):
+                        capitulo["_ai_content"] = deepcopy(schedule_or_budget_tables)
+                    else:
+                        tagged_tables: List[Dict[str, Any]] = []
+                        for table_block in schedule_or_budget_tables:
+                            tagged = dict(table_block)
+                            tagged["_ai_generated"] = True
+                            tagged_tables.append(tagged)
+                        capitulo["contenido"] = tagged_tables
+                        capitulo["_ai_content"] = tagged_tables
+                    filtered_chapters.append(capitulo)
+                    continue
+            if (
+                selected_paths
+                and is_unac_project
+                and is_schedule_or_budget_chapter
+                and chapter_has_static_table
+            ):
+                # If no AI replacement table arrives, keep the canonical table
+                # already defined by the institutional template.
+                capitulo.pop("_ai_content", None)
+                filtered_chapters.append(capitulo)
+                continue
             if capitulo_content and not skip_chapter_level_ai:
                 _inject_chapter_content(capitulo, capitulo_content)
                 capitulo["_ai_content"] = capitulo_content
 
             contenido_items = capitulo.get("contenido")
             if not isinstance(contenido_items, list):
+                filtered_chapters.append(capitulo)
                 continue
+
+            if selected_paths:
+                pruned_items: List[Any] = []
+                for item in contenido_items:
+                    if not isinstance(item, dict):
+                        pruned_items.append(item)
+                        continue
+                    item_titulo_candidate = str(item.get("texto", "") or "").strip()
+                    if not item_titulo_candidate:
+                        pruned_items.append(item)
+                        continue
+                    if _path_selected(
+                        f"{capitulo_titulo}/{item_titulo_candidate}",
+                        selected_paths,
+                    ):
+                        pruned_items.append(item)
+                capitulo["contenido"] = pruned_items
+                contenido_items = pruned_items
 
             for item in contenido_items:
                 if not isinstance(item, dict):
@@ -858,9 +1110,16 @@ def apply_ai_content(
                     item, item_content, allow_text_override=False
                 )
                 item["_ai_content"] = item_content
+            filtered_chapters.append(capitulo)
+        result["cuerpo"] = filtered_chapters
 
     finales = result.get("finales")
     if isinstance(finales, dict):
+        if selected_paths and not _selected_token_present(selected_paths, "REFERENCIAS"):
+            finales.pop("referencias", None)
+        if selected_paths and not _selected_token_present(selected_paths, "ANEXOS"):
+            finales.pop("anexos", None)
+
         referencias = finales.get("referencias")
         if isinstance(referencias, dict):
             referencias_titulo = str(

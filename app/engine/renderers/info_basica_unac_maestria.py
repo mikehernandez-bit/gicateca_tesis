@@ -192,4 +192,6 @@ def render_info_basica_unac_maestria(doc: Document, block: Block) -> None:
             r_o.font.name = "Arial"
             r_o.font.size = Pt(12)
 
-    doc.add_page_break()
+    # La paginacion de esta seccion debe controlarse en el normalizer.
+    # Si este renderer agrega un salto propio, al combinarse con el
+    # section_break de preliminares produce una hoja en blanco.
