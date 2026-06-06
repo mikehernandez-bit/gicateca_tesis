@@ -7,7 +7,7 @@ import re
 
 from docx.document import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.shared import Cm, Pt
+from docx.shared import Cm, Pt, RGBColor
 
 from app.engine.render_state import next_figure_number
 from app.engine.registry import register
@@ -28,6 +28,19 @@ def _clean_figure_title(titulo: str) -> str:
     return titulo.strip()
 
 
+def _rgb_from_hex(value: str) -> RGBColor | None:
+    text = str(value or "").strip().lstrip("#")
+    if len(text) != 6:
+        return None
+    try:
+        red = int(text[0:2], 16)
+        green = int(text[2:4], 16)
+        blue = int(text[4:6], 16)
+    except ValueError:
+        return None
+    return RGBColor(red, green, blue)
+
+
 @register("image")
 def render_image(doc: Document, block: Block) -> None:
     """Renderiza una imagen con caption numerada y fuente opcional.
@@ -46,6 +59,7 @@ def render_image(doc: Document, block: Block) -> None:
     titulo = _clean_figure_title(block.get("titulo", ""))
     omit_caption = bool(block.get("omit_caption"))
     nota = str(block.get("nota") or block.get("note") or "").strip()
+    nota_color = _rgb_from_hex(str(block.get("nota_color") or block.get("note_color") or "").strip())
     placeholder_text = str(
         block.get("placeholder_text") or block.get("texto_placeholder") or ""
     ).strip()
@@ -75,6 +89,9 @@ def render_image(doc: Document, block: Block) -> None:
                 "Figura",
                 reset_to=1 if is_first_in_chapter else None,
                 display_value=figure_number,
+                font_name="Arial",
+                font_size_pt=10,
+                bold=False,
             )
             rt = pc.add_run(f" {titulo}")
             rt.font.name = "Arial"
@@ -104,13 +121,19 @@ def render_image(doc: Document, block: Block) -> None:
         if nota:
             pn = doc.add_paragraph()
             pn.alignment = WD_ALIGN_PARAGRAPH.LEFT
-            rn = pn.add_run("Nota.")
-            rn.italic = True
-            rn.font.name = "Arial"
-            rn.font.size = Pt(10)
-            rt = pn.add_run(f" {nota}")
-            rt.italic = True
-            rt.font.name = "Arial"
-            rt.font.size = Pt(10)
+            if nota_color is not None:
+                rn = pn.add_run(nota)
+                rn.font.color.rgb = nota_color
+                rn.font.name = "Arial"
+                rn.font.size = Pt(10)
+            else:
+                rn = pn.add_run("Nota.")
+                rn.italic = True
+                rn.font.name = "Arial"
+                rn.font.size = Pt(10)
+                rt = pn.add_run(f" {nota}")
+                rt.italic = True
+                rt.font.name = "Arial"
+                rt.font.size = Pt(10)
     except Exception as e:
         logger.warning("Image %s: %s", ruta, e)

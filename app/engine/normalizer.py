@@ -67,6 +67,7 @@ _ABBR_IN_TEXT_RE = re.compile(r"([A-Za-z][^()\n]{3,120}?)\s*\(([A-Za-z][A-Za-z0-
 _ABBR_REVERSED_IN_TEXT_RE = re.compile(r"\b([A-Za-z][A-Za-z0-9./-]{1,19})\s*\(([^()]{3,120})\)")
 _ABBR_MEANING_TOKEN_RE = re.compile(r"[A-Za-zÃÃ‰ÃÃ“ÃšÃœÃ‘Ã¡Ã©Ã­Ã³ÃºÃ¼Ã±]+")
 _ABBR_REFERENCE_RE = re.compile(r"\b(?:19|20)\d{2}\b")
+_AI_LEVEL3_HEADING_RE = re.compile(r"^\s*(\d+\.\d+\.\d+\.?)\s+(.+?)\s*$")
 _ABBR_AUTHOR_LIKE_RE = re.compile(
     r"^[A-ZÃÃ‰ÃÃ“ÃšÃ‘][a-zÃ¡Ã©Ã­Ã³ÃºÃ±]+(?:\s+[A-ZÃÃ‰ÃÃ“ÃšÃ‘][a-zÃ¡Ã©Ã­Ã³ÃºÃ±]+){0,3}(?:\s+et al\.?)?(?:,\s*(?:19|20)\d{2})?$",
     re.IGNORECASE,
@@ -730,7 +731,52 @@ def normalize(data: dict) -> List[Block]:
     blocks.extend(_normalize_finales(data))
     blocks.append({"type": "page_footer"})
 
-    return blocks
+    return _apply_consecutive_landscape_table_policy(blocks)
+
+
+def _is_landscape_table_block(block: Any) -> bool:
+    if not isinstance(block, dict):
+        return False
+    if str(block.get("type") or "").strip().lower() != "table":
+        return False
+    orientation = str(block.get("orientacion") or "").strip().lower()
+    return orientation == "landscape"
+
+
+def _apply_consecutive_landscape_table_policy(blocks: List[Block]) -> List[Block]:
+    """Avoid redundant portrait restores between consecutive landscape tables.
+
+    When two or more landscape canonical tables are consecutive, only the last
+    one should restore portrait orientation. This prevents blank pages produced
+    by back-to-back section switches (landscape -> portrait -> landscape).
+    """
+    if not blocks:
+        return blocks
+
+    normalized: List[Block] = []
+    index = 0
+    total = len(blocks)
+
+    while index < total:
+        current = blocks[index]
+        if not _is_landscape_table_block(current):
+            normalized.append(current)
+            index += 1
+            continue
+
+        run_end = index
+        while run_end + 1 < total and _is_landscape_table_block(blocks[run_end + 1]):
+            run_end += 1
+
+        for table_index in range(index, run_end + 1):
+            table_block = dict(blocks[table_index])
+            if table_index < run_end:
+                table_block["restore_portrait"] = False
+            normalized.append(table_block)
+
+        index = run_end + 1
+
+    return normalized
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -1532,32 +1578,36 @@ def _normalize_operationalization_section(data: dict) -> list[Block]:
     ]
     if not tables:
         return []
-    blocks: list[Block] = [
-        {
-            "type": "paragraph",
-            "text": (
-                "La operacionalización organiza las variables del estudio en definiciones, "
-                "dimensiones, indicadores, índices y técnicas o instrumentos de medición."
-            ),
-        }
-    ]
-    blocks.extend(tables)
-    return blocks
+    if len(tables) == 1:
+        return tables
+
+    first = dict(tables[0])
+    second = dict(tables[1])
+    # 3.1 must stay immediately below heading 3.2 and 3.2 must start on a
+    # new horizontal page; keep landscape active between both tables.
+    first["restore_portrait"] = False
+    return [first, {"type": "page_break"}, second]
 
 
 def _normalize_project_structured_section(data: dict | None, item: dict) -> list[Block]:
+    # Keep a narrow fallback only for UNAC 3.2 operacionalizacion:
+    # if AI did not provide structured tables, recover 3.1/3.2 from
+    # operationalization values so those required tables are not lost.
     if not _is_unac_project_document(data):
         return []
+
     title = _norm_upper(item.get("texto", ""))
-    if "FORMULACION DEL PROBLEMA" in title:
-        return _normalize_problem_formulation(data or {})
-    if "OBJETIVOS" in title and "FORMULACION" not in title:
-        return _normalize_objectives(data or {})
-    if "HIPOTESIS" in title and "VARIABLES" not in title:
-        return _normalize_hypotheses(data or {})
-    if "OPERACIONALIZACION" in title:
-        return _normalize_operationalization_section(data or {})
-    return []
+    if "OPERACIONALIZACION" not in title:
+        return []
+
+    ai_content = item.get("_ai_content")
+    if isinstance(ai_content, list) and any(
+        isinstance(block, dict) and str(block.get("tipo", "")).strip().lower() == "tabla"
+        for block in ai_content
+    ):
+        return []
+
+    return _normalize_operationalization_section(data or {})
 
 
 def _normalize_cuerpo(data: dict) -> List[Block]:
@@ -1570,16 +1620,30 @@ def _normalize_cuerpo(data: dict) -> List[Block]:
     for index, cap in enumerate(cuerpo):
         # Salto de pagina antes de cada capitulo (excepto el primero).
         # Evita insertar un salto justo despues del titulo.
+        chapter_title = str(cap.get("titulo", "") or "")
         if index > 0:
             blocks.append({"type": "page_break"})
+
+        chapter_items = cap.get("contenido", []) if isinstance(cap.get("contenido"), list) else []
+        has_landscape_table = any(
+            isinstance(item, dict)
+            and str(item.get("tipo") or "").strip().lower() == "tabla"
+            and str(item.get("orientacion") or "").strip().lower() == "landscape"
+            for item in chapter_items
+        )
+        if has_landscape_table:
+            # Keep chapter heading and its first landscape table in the same
+            # landscape section to avoid blank portrait pages before the table.
+            blocks.append({"type": "section_switch", "orientation": "landscape"})
 
         # Título del capítulo
         blocks.append(
             {
                 "type": "heading",
-                "text": cap.get("titulo", ""),
+                "text": chapter_title,
                 "level": 1,
                 "centered": False,
+                "space_after": 12,
             }
         )
 
@@ -1656,6 +1720,7 @@ def _normalize_content_item(item, document_data: dict | None = None) -> List[Blo
                     "ancho_cm": item.get("ancho_cm"),
                     "placeholder": True,
                     "nota": item.get("nota") or item.get("note"),
+                    "nota_color": item.get("nota_color") or item.get("note_color"),
                     "placeholder_text": item.get("placeholder_text") or item.get("texto_placeholder"),
                 }
             )
@@ -1668,8 +1733,6 @@ def _normalize_content_item(item, document_data: dict | None = None) -> List[Blo
     # switch_to_landscape/switch_to_portrait, so we only need to resolve
     # "auto" orientation here and pass the correct value.
     if item.get("tipo") == "tabla":
-        if _is_unac_project_document(document_data) and "OPERACIONALIZACION" in _norm_upper(item.get("titulo", "")):
-            return blocks
         if _looks_like_placeholder_table_data(item) or _looks_like_template_example_title(item.get("titulo")):
             return blocks
         orientacion = (item.get("orientacion") or "auto").strip().lower()
@@ -1717,15 +1780,40 @@ def _normalize_content_item(item, document_data: dict | None = None) -> List[Blo
 def _normalize_ai_content(content: Any) -> List[Block]:
     """Render AI-injected content as the source of truth for a node."""
     if isinstance(content, str):
+        normalized_text = content.replace("\r\n", "\n").replace("\r", "\n")
         parts = [
             part.strip()
             for part in re.split(
                 r"\n\s*\n",
-                content.replace("\r\n", "\n").replace("\r", "\n"),
+                normalized_text,
             )
             if part and part.strip()
         ]
-        return [{"type": "paragraph", "text": part} for part in parts]
+        blocks: List[Block] = []
+        for part in parts:
+            lines = [line.strip() for line in part.split("\n") if line.strip()]
+            if not lines:
+                continue
+
+            heading_match = _AI_LEVEL3_HEADING_RE.match(lines[0])
+            if heading_match:
+                blocks.append(
+                    {
+                        "type": "heading",
+                        "text": f"{heading_match.group(1)} {heading_match.group(2)}".strip(),
+                        "level": 3,
+                        "centered": False,
+                        "space_before": 8,
+                        "space_after": 8,
+                    }
+                )
+                remainder = "\n".join(lines[1:]).strip()
+                if remainder:
+                    blocks.append({"type": "paragraph", "text": remainder})
+                continue
+
+            blocks.append({"type": "paragraph", "text": part})
+        return blocks
 
     if isinstance(content, dict):
         return _normalize_content_item(content)
@@ -1945,12 +2033,9 @@ def _normalize_anexos(data: dict, fin: dict) -> List[Block]:
             if titulo_anexo:
                 blocks.append(
                     {
-                        "type": "paragraph_centered",
+                        "type": "paragraph_bold",
                         "text": titulo_anexo,
-                        "bold": True,
                         "size": 13,
-                        "space_before": 12,
-                        "space_after": 12,
                     }
                 )
 
@@ -2000,12 +2085,9 @@ def _normalize_anexos(data: dict, fin: dict) -> List[Block]:
         )
         blocks.append(
             {
-                "type": "paragraph_centered",
+                "type": "paragraph_bold",
                 "text": "Anexo 1: Matriz de Consistencia",
-                "bold": True,
                 "size": 13,
-                "space_before": 12,
-                "space_after": 12,
             }
         )
         blocks.append(

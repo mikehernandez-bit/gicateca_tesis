@@ -393,12 +393,30 @@ def add_seq_field(
     *,
     reset_to: int | None = None,
     display_value: int | None = None,
+    font_name: str = "Arial",
+    font_size_pt: float = 10.0,
+    bold: bool = False,
 ) -> None:
     """Inserta un campo SEQ para auto-numeración (tablas, figuras).
 
     Permite que Word construya índices de tablas/figuras automáticamente.
     """
+    def _apply_run_font(run) -> None:
+        run.font.name = font_name
+        run.font.size = Pt(font_size_pt)
+        run.bold = bold
+        r_pr = run._r.get_or_add_rPr()
+        r_fonts = r_pr.find(qn("w:rFonts"))
+        if r_fonts is None:
+            r_fonts = OxmlElement("w:rFonts")
+            r_pr.append(r_fonts)
+        r_fonts.set(qn("w:ascii"), font_name)
+        r_fonts.set(qn("w:hAnsi"), font_name)
+        r_fonts.set(qn("w:cs"), font_name)
+        r_fonts.set(qn("w:eastAsia"), font_name)
+
     run = paragraph.add_run()
+    _apply_run_font(run)
     fld_begin = OxmlElement("w:fldChar")
     fld_begin.set(qn("w:fldCharType"), "begin")
     instr = OxmlElement("w:instrText")
@@ -414,9 +432,9 @@ def add_seq_field(
     run._r.append(fld_separate)
     # Placeholder number
     num_run = paragraph.add_run(str(display_value if display_value is not None else "#"))
-    num_run.font.size = Pt(10)
-    num_run.font.name = "Arial"
+    _apply_run_font(num_run)
     end_run = paragraph.add_run()
+    _apply_run_font(end_run)
     end_run._r.append(fld_end)
 
 

@@ -201,7 +201,7 @@
           "instruccion_detallada": "Sustenta adecuadamente el por qué se realiza el trabajo de investigación de acuerdo con la naturaleza del problema explicando cuáles son las contribuciones científicas o sociales y los beneficiarios de su trabajo. Definir los tipos de justificación (teórica, práctica, metodológica, etc) citando adecuadamente y el sustento respectivo explicando las razones por las cuales la investigación posee dicha justificación. Se redacta en tiempo futuro."
         },
         {
-            "texto": "1.5 Delimitaciones de la investigación",
+          "texto": "1.5 Delimitaciones de la investigación",
           "nota": "Delimitante Teórica, Temporal y Espacial.",
           "instruccion_detallada": "Delimitante Teórica: Especifica las teorías que soportan su investigación.\nDelimitante Temporal: Especifica en qué momento (tiempo) se realiza la investigación.\nDelimitante Espacial: Especifica en qué lugar se realiza la investigación."
         }
@@ -409,80 +409,6 @@
         {
           "texto": "4.7 Aspectos éticos en Investigación",
           "instruccion_detallada": "Considerar los principios del código de ética de la UNAC y especificar ¿Cómo se aplican los principios mencionados?"
-        },
-        {
-          "tipo": "tabla",
-          "titulo": "Cronograma Resumido de Actividades",
-          "orientacion": "portrait",
-          "encabezados": [
-            "Actividad",
-            "Mes 1",
-            "Mes 2",
-            "Mes 3",
-            "Mes 4",
-            "Mes 5",
-            "Mes 6"
-          ],
-          "filas": [
-            [
-              "Revisión bibliográfica",
-              "X",
-              "X",
-              "",
-              "",
-              "",
-              ""
-            ],
-            [
-              "Diseño metodológico",
-              "",
-              "X",
-              "X",
-              "",
-              "",
-              ""
-            ],
-            [
-              "Recolección de datos",
-              "",
-              "",
-              "X",
-              "X",
-              "",
-              ""
-            ],
-            [
-              "Análisis de resultados",
-              "",
-              "",
-              "",
-              "X",
-              "X",
-              ""
-            ],
-            [
-              "Redacción del informe",
-              "",
-              "",
-              "",
-              "",
-              "X",
-              "X"
-            ],
-            [
-              "Sustentación",
-              "",
-              "",
-              "",
-              "",
-              "",
-              "X"
-            ]
-          ],
-          "estilo": {
-            "encabezado_color": "4472C4",
-            "fuente_size": 10
-          }
         }
       ]
     },
@@ -490,42 +416,45 @@
       "titulo": "V. CRONOGRAMA DE ACTIVIDADES",
       "contenido": [
         {
-          "texto": "Cronograma de ejecución",
-          "nota": "Secuencia del desarrollo de la investigación.",
-          "instruccion_detallada": "Evidencia la secuencia del desarrollo de la investigación hasta la elaboración del informe final. La frecuencia (meses / semanas / días) va a depender de la investigación. No requiere enumerar como tabla. No requiere indicar elaboración propia.",
-          "imagenes": [
-            {
-              "titulo": "Diagrama ilustrativo",
-              "ruta": "figura_ejemplo.png",
-              "fuente": "Elaboración propia"
-            }
-          ]
-        },
-        {
           "tipo": "tabla",
-          "titulo": "Cronograma Detallado de Actividades",
-          "orientacion": "landscape",
+          "id": "tabla_5_1_cronograma_actividades",
+          "titulo": "Tabla 5.1 Cronograma de actividades",
           "encabezados": [
-            "Actividad",
-            "Mes 1",
-            "Mes 2",
-            "Mes 3",
-            "Mes 4",
-            "Mes 5",
-            "Mes 6",
-            "Mes 7",
-            "Mes 8",
-            "Mes 9",
-            "Mes 10",
-            "Mes 11",
-            "Mes 12"
+            "FASES Y ACTIVIDADES",
+            "2025",
+            "​",
+            "​",
+            "​",
+            "​",
+            "​",
+            "​",
+            "​",
+            "​",
+            "​",
+            "​",
+            "​"
           ],
           "filas": [
             [
-              "Revisión bibliográfica",
-              "X",
-              "X",
-              "X",
+              "",
+              "Ene",
+              "Feb",
+              "Mar",
+              "Abr",
+              "May",
+              "Jun",
+              "Jul",
+              "Ago",
+              "Set",
+              "Oct",
+              "Nov",
+              "Dic"
+            ],
+            [
+              "1. PLANIFICACIÓN Y DISEÑO",
+              "",
+              "",
+              "",
               "",
               "",
               "",
@@ -537,11 +466,11 @@
               ""
             ],
             [
-              "Elaboración del marco teórico",
+              "1.1. Definir alcance, unidad de análisis y límites del sistema",
               "",
-              "X",
-              "X",
-              "X",
+              "●",
+              "",
+              "",
               "",
               "",
               "",
@@ -552,11 +481,11 @@
               ""
             ],
             [
-              "Diseño metodológico",
+              "1.2. Plan de gestión de datos (fuentes, permisos, estructura)",
+              "",
+              "●",
               "",
               "",
-              "X",
-              "X",
               "",
               "",
               "",
@@ -567,13 +496,13 @@
               ""
             ],
             [
-              "Recolección de datos",
+              "1.3. Instrumentos y protocolos (ficha extracción, reglas TBF/TTR)",
+              "",
+              "●",
               "",
               "",
               "",
-              "X",
-              "X",
-              "X",
+              "",
               "",
               "",
               "",
@@ -582,37 +511,41 @@
               ""
             ],
             [
-              "Procesamiento y análisis",
+              "2. RECOLECCIÓN Y CONTEXTO OPERACIONAL",
               "",
               "",
               "",
               "",
               "",
-              "X",
-              "X",
-              "X",
+              "",
+              "",
+              "",
               "",
               "",
               "",
               ""
             ],
             [
-              "Redacción del informe",
+              "2.1. Recopilación de historiales (OTs, fallas, paradas, tiempos)",
+              "",
+              "●",
+              "●",
+              "●",
               "",
               "",
               "",
               "",
               "",
               "",
-              "",
-              "X",
-              "X",
-              "X",
               "",
               ""
             ],
             [
-              "Revisión y ajustes",
+              "2.2. Observación en campo / entrevistas breves (condiciones reales)",
+              "",
+              "",
+              "●",
+              "●",
               "",
               "",
               "",
@@ -620,14 +553,25 @@
               "",
               "",
               "",
-              "",
-              "",
-              "X",
-              "X",
               ""
             ],
             [
-              "Sustentación",
+              "2.3. Estandarización de taxonomía (sistemas, modos, causas, efectos)",
+              "",
+              "",
+              "",
+              "●",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "3. BASE DE DATOS Y DEPURACIÓN",
               "",
               "",
               "",
@@ -639,12 +583,646 @@
               "",
               "",
               "",
-              "X"
+              ""
+            ],
+            [
+              "3.1. Consolidación/digitalización de base (Excel/BD)",
+              "",
+              "",
+              "",
+              "●",
+              "●",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "3.2. Depuración y calidad (duplicados, faltantes, unidades, outliers)",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "●",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "3.3. Validación interna de datos (muestreo con responsables)",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "4. LÍNEA BASE",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "4.1. Cálculo indicadores base (MTBF, MTTR, Disponibilidad)",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "4.2. Segmentación por sistema/condición y preparación de análisis",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "●",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "4.3. Diagnóstico inicial (Pareto fallas/tiempos, tendencias)",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "5. CRITICIDAD Y AMEF",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "5.1. Análisis de criticidad (matriz/score por sistema/modo)",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "5.2. AMEF/AMFE (modos, causas, efectos, controles, NPR/RPN)",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "●",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "5.3. Priorización final de equipos/modos críticos",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "6. PLAN RCM + IMPLEMENTACIÓN",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "6.1. Diseño de tareas RCM (árbol decisión: PM/PdM/detectivo/rediseño)",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "●",
+              "●",
+              "",
+              "",
+              ""
+            ],
+            [
+              "6.2. Definición de frecuencias/intervalos y recursos",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "●",
+              "●",
+              "",
+              "",
+              ""
+            ],
+            [
+              "6.3. Modelado probabilístico (Weibull/Lognormal/Exponencial)",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "●",
+              "",
+              "●",
+              "●",
+              "",
+              ""
+            ],
+            [
+              "6.4. Implementación piloto",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "●",
+              "",
+              "●",
+              "",
+              ""
+            ],
+            [
+              "7. VALIDACIÓN Y CONTRASTE",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "7.1. Validación con expertos (taller y ajustes del plan)",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "",
+              "●",
+              "",
+              ""
+            ],
+            [
+              "7.2. Contrastación/validación estadística (bondad de ajuste, comparación pre vs post)",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "●",
+              "●",
+              ""
+            ],
+            [
+              "7.3. Análisis de sensibilidad (frecuencias, tiempos, tasas de falla)",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              ""
+            ],
+            [
+              "8. REDACCIÓN Y CIERRE",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "8.1. Redacción final (resultados, discusión, conclusiones, recomendaciones)",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "●",
+              ""
+            ],
+            [
+              "8.2. Revisión con asesor + levantamiento de observaciones",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "●"
+            ],
+            [
+              "8.3. Formato final (normas, anexos, tablas/figuras, similitud)",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●"
+            ],
+            [
+              "8.4. Diapositivas y preparación de sustentación",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●"
             ]
           ],
+          "orientacion": "landscape",
+          "subtipo": "cronograma_actividades",
+          "anio": "2025",
+          "meses": [
+            "Ene",
+            "Feb",
+            "Mar",
+            "Abr",
+            "May",
+            "Jun",
+            "Jul",
+            "Ago",
+            "Set",
+            "Oct",
+            "Nov",
+            "Dic"
+          ],
+          "simbolo_marca": "●",
+          "filas_fase": [
+            1,
+            5,
+            9,
+            13,
+            17,
+            21,
+            26,
+            30
+          ],
+          "celdas_combinadas": [
+            {
+              "fila": -1,
+              "fila_fin": 0,
+              "col_inicio": 0,
+              "col_fin": 0,
+              "texto": "FASES Y ACTIVIDADES"
+            },
+            {
+              "fila": -1,
+              "col_inicio": 1,
+              "col_fin": 12,
+              "texto": "2025"
+            },
+            {
+              "fila": 1,
+              "col_inicio": 0,
+              "col_fin": 12,
+              "texto": "1. PLANIFICACIÓN Y DISEÑO"
+            },
+            {
+              "fila": 5,
+              "col_inicio": 0,
+              "col_fin": 12,
+              "texto": "2. RECOLECCIÓN Y CONTEXTO OPERACIONAL"
+            },
+            {
+              "fila": 9,
+              "col_inicio": 0,
+              "col_fin": 12,
+              "texto": "3. BASE DE DATOS Y DEPURACIÓN"
+            },
+            {
+              "fila": 13,
+              "col_inicio": 0,
+              "col_fin": 12,
+              "texto": "4. LÍNEA BASE"
+            },
+            {
+              "fila": 17,
+              "col_inicio": 0,
+              "col_fin": 12,
+              "texto": "5. CRITICIDAD Y AMEF"
+            },
+            {
+              "fila": 21,
+              "col_inicio": 0,
+              "col_fin": 12,
+              "texto": "6. PLAN RCM + IMPLEMENTACIÓN"
+            },
+            {
+              "fila": 26,
+              "col_inicio": 0,
+              "col_fin": 12,
+              "texto": "7. VALIDACIÓN Y CONTRASTE"
+            },
+            {
+              "fila": 30,
+              "col_inicio": 0,
+              "col_fin": 12,
+              "texto": "8. REDACCIÓN Y CIERRE"
+            }
+          ],
+          "celdas_fusionadas": [
+            {
+              "fila": -1,
+              "col": 0,
+              "filas_span": 2,
+              "cols_span": 1,
+              "texto": "FASES Y ACTIVIDADES",
+              "bold": true,
+              "alignment": "center"
+            },
+            {
+              "fila": -1,
+              "col": 1,
+              "filas_span": 1,
+              "cols_span": 12,
+              "texto": "2025",
+              "bold": true,
+              "alignment": "center"
+            },
+            {
+              "fila": 1,
+              "col": 0,
+              "filas_span": 1,
+              "cols_span": 13,
+              "texto": "1. PLANIFICACIÓN Y DISEÑO",
+              "bold": true,
+              "alignment": "center"
+            },
+            {
+              "fila": 5,
+              "col": 0,
+              "filas_span": 1,
+              "cols_span": 13,
+              "texto": "2. RECOLECCIÓN Y CONTEXTO OPERACIONAL",
+              "bold": true,
+              "alignment": "center"
+            },
+            {
+              "fila": 9,
+              "col": 0,
+              "filas_span": 1,
+              "cols_span": 13,
+              "texto": "3. BASE DE DATOS Y DEPURACIÓN",
+              "bold": true,
+              "alignment": "center"
+            },
+            {
+              "fila": 13,
+              "col": 0,
+              "filas_span": 1,
+              "cols_span": 13,
+              "texto": "4. LÍNEA BASE",
+              "bold": true,
+              "alignment": "center"
+            },
+            {
+              "fila": 17,
+              "col": 0,
+              "filas_span": 1,
+              "cols_span": 13,
+              "texto": "5. CRITICIDAD Y AMEF",
+              "bold": true,
+              "alignment": "center"
+            },
+            {
+              "fila": 21,
+              "col": 0,
+              "filas_span": 1,
+              "cols_span": 13,
+              "texto": "6. PLAN RCM + IMPLEMENTACIÓN",
+              "bold": true,
+              "alignment": "center"
+            },
+            {
+              "fila": 26,
+              "col": 0,
+              "filas_span": 1,
+              "cols_span": 13,
+              "texto": "7. VALIDACIÓN Y CONTRASTE",
+              "bold": true,
+              "alignment": "center"
+            },
+            {
+              "fila": 30,
+              "col": 0,
+              "filas_span": 1,
+              "cols_span": 13,
+              "texto": "8. REDACCIÓN Y CIERRE",
+              "bold": true,
+              "alignment": "center"
+            }
+          ],
+          "estilos": {
+            "modelo_referencia": "cronograma_actividades.docx",
+            "titulo_capitulo": "V. CRONOGRAMA DE ACTIVIDADES",
+            "titulo_exacto": true,
+            "titulo_negrita": false,
+            "titulo_tamano_pt": 9.5,
+            "titulo_space_after_pt": 6,
+            "ancho_tabla": "100%",
+            "ancho_columnas": [
+              8.91,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59
+            ],
+            "alineacion_actividades": "left",
+            "alineacion_meses": "center",
+            "encabezados_negrita": true,
+            "encabezado_color": "",
+            "fases_negrita": true,
+            "fases_centradas": true,
+            "bordes": "grid",
+            "fuente_tamano_pt": 8,
+            "fuente_size": 8,
+            "fuente_meses_pt": 8,
+            "fuente_actividades_pt": 8,
+            "fuente_fases_pt": 8,
+            "fuente_marcas_pt": 10,
+            "compactar_cronograma": false,
+            "orientacion_pagina": "landscape",
+            "margenes_reducidos": true
+          },
           "estilo": {
-            "encabezado_color": "BDD7EE",
-            "fuente_size": 8
+            "modelo_referencia": "cronograma_actividades.docx",
+            "titulo_capitulo": "V. CRONOGRAMA DE ACTIVIDADES",
+            "titulo_exacto": true,
+            "titulo_negrita": false,
+            "titulo_tamano_pt": 9.5,
+            "titulo_space_after_pt": 6,
+            "ancho_tabla": "100%",
+            "ancho_columnas": [
+              8.91,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59
+            ],
+            "alineacion_actividades": "left",
+            "alineacion_meses": "center",
+            "encabezados_negrita": true,
+            "encabezado_color": "",
+            "fases_negrita": true,
+            "fases_centradas": true,
+            "bordes": "grid",
+            "fuente_tamano_pt": 8,
+            "fuente_size": 8,
+            "fuente_meses_pt": 8,
+            "fuente_actividades_pt": 8,
+            "fuente_fases_pt": 8,
+            "fuente_marcas_pt": 10,
+            "compactar_cronograma": false,
+            "orientacion_pagina": "landscape",
+            "margenes_reducidos": true
           }
         }
       ]
@@ -653,75 +1231,263 @@
       "titulo": "VI. PRESUPUESTO",
       "contenido": [
         {
-          "texto": "Recursos y Presupuesto",
-          "nota": "Inversión, recursos humanos, materiales y financieros.",
-          "instruccion_detallada": "Se debe presentar lo que el investigador ha invertido bajo su responsabilidad, en la investigación. Se considera los recursos humanos, materiales y financieros necesarios para el desarrollo de la investigación (en soles) e indicar la fuente de financiamiento.",
-          "imagenes": [
-            {
-              "titulo": "Distribución del presupuesto",
-              "ruta": "figura_ejemplo.png",
-              "fuente": "Elaboración propia"
-            }
-          ]
-        },
-        {
           "tipo": "tabla",
-          "titulo": "Presupuesto del Proyecto",
-          "orientacion": "portrait",
+          "id": "tabla_6_1_presupuesto_investigacion",
+          "titulo": "Tabla 6.1 Presupuesto de investigación",
           "encabezados": [
-            "Rubro",
-            "Descripción",
-            "Cantidad",
-            "Costo Unit. (S/)",
-            "Total (S/)"
+            "N°",
+            "DESCRIPCIÓN DEL GASTO",
+            "CANTIDAD",
+            "COSTO UNIT. (S/.)",
+            "COSTO TOTAL (S/.)"
           ],
           "filas": [
             [
-              "Materiales",
-              "Útiles de escritorio",
+              "1. RECURSOS HUMANOS",
+              "",
+              "",
+              "",
+              "2,000.00"
+            ],
+            [
+              "1.1",
+              "Investigador (dedicación/asistencia de investigación)",
               "1",
+              "2,000.00",
+              "2,000.00"
+            ],
+            [
+              "2. RECURSOS DE INVESTIGACIÓN",
+              "",
+              "",
+              "",
+              "4,849.00"
+            ],
+            [
+              "2.1",
+              "Equipo de cómputo para procesamiento y análisis (Laptop)",
+              "1",
+              "2,999.00",
+              "2,999.00"
+            ],
+            [
+              "2.2",
+              "Servicio de Internet (Datos)",
+              "12",
               "50.00",
-              "50.00"
+              "600.00"
             ],
             [
-              "Impresiones",
-              "Copias y anillados",
-              "5",
-              "30.00",
+              "2.3",
+              "Movilidad y Viáticos (Lima–Junín)",
+              "4",
+              "250.00",
+              "1,000.00"
+            ],
+            [
+              "2.4",
+              "Software / licencias (Office / almacenamiento nube o equivalente)",
+              "1",
+              "250.00",
+              "250.00"
+            ],
+            [
+              "3. RECURSOS CONSUMIBLES",
+              "",
+              "",
+              "",
+              "560.00"
+            ],
+            [
+              "3.1",
+              "Material de escritorio (papel, bolígrafos, etc.)",
+              "1",
+              "150.00",
               "150.00"
             ],
             [
-              "Software",
-              "Licencia SPSS/NVivo",
+              "3.2",
+              "Impresiones y anillados (incluye versión final)",
               "1",
-              "200.00",
-              "200.00"
+              "350.00",
+              "350.00"
             ],
             [
-              "Transporte",
-              "Movilidad para trabajo de campo",
-              "10",
-              "15.00",
-              "150.00"
-            ],
-            [
-              "Otros",
-              "Imprevistos",
+              "3.3",
+              "Dispositivo de almacenamiento (USB)",
               "1",
-              "100.00",
-              "100.00"
+              "60.00",
+              "60.00"
             ],
             [
+              "4. CONTINGENCIA / IMPREVISTOS",
               "",
               "",
               "",
-              "TOTAL",
-              "650.00"
+              "370.00"
+            ],
+            [
+              "4.1",
+              "Imprevistos (5% del subtotal)",
+              "1",
+              "370.00",
+              "370.00"
+            ],
+            [
+              "TOTAL GENERAL",
+              "",
+              "",
+              "",
+              "S/. 7,779.00"
             ]
           ],
+          "orientacion": "portrait",
+          "subtipo": "presupuesto_investigacion",
+          "filas_categoria": [
+            0,
+            2,
+            7,
+            11
+          ],
+          "fila_total": 13,
+          "celdas_combinadas": [
+            {
+              "fila": 0,
+              "col_inicio": 0,
+              "col_fin": 3,
+              "texto": "1. RECURSOS HUMANOS"
+            },
+            {
+              "fila": 2,
+              "col_inicio": 0,
+              "col_fin": 3,
+              "texto": "2. RECURSOS DE INVESTIGACIÓN"
+            },
+            {
+              "fila": 7,
+              "col_inicio": 0,
+              "col_fin": 3,
+              "texto": "3. RECURSOS CONSUMIBLES"
+            },
+            {
+              "fila": 11,
+              "col_inicio": 0,
+              "col_fin": 3,
+              "texto": "4. CONTINGENCIA / IMPREVISTOS"
+            },
+            {
+              "fila": 13,
+              "col_inicio": 0,
+              "col_fin": 3,
+              "texto": "TOTAL GENERAL"
+            }
+          ],
+          "celdas_fusionadas": [
+            {
+              "fila": 0,
+              "col": 0,
+              "filas_span": 1,
+              "cols_span": 4,
+              "texto": "1. RECURSOS HUMANOS",
+              "bold": true,
+              "alignment": "left"
+            },
+            {
+              "fila": 2,
+              "col": 0,
+              "filas_span": 1,
+              "cols_span": 4,
+              "texto": "2. RECURSOS DE INVESTIGACIÓN",
+              "bold": true,
+              "alignment": "left"
+            },
+            {
+              "fila": 7,
+              "col": 0,
+              "filas_span": 1,
+              "cols_span": 4,
+              "texto": "3. RECURSOS CONSUMIBLES",
+              "bold": true,
+              "alignment": "left"
+            },
+            {
+              "fila": 11,
+              "col": 0,
+              "filas_span": 1,
+              "cols_span": 4,
+              "texto": "4. CONTINGENCIA / IMPREVISTOS",
+              "bold": true,
+              "alignment": "left"
+            },
+            {
+              "fila": 13,
+              "col": 0,
+              "filas_span": 1,
+              "cols_span": 4,
+              "texto": "TOTAL GENERAL",
+              "bold": true,
+              "alignment": "center"
+            }
+          ],
+          "estilos": {
+            "modelo_referencia": "presupuesto_investigacion_vertical.docx",
+            "titulo_capitulo": "VI. PRESUPUESTO",
+            "titulo_exacto": true,
+            "titulo_negrita": false,
+            "titulo_tamano_pt": 10,
+            "titulo_space_after_pt": 10,
+            "ancho_tabla": "100%",
+            "ancho_columnas": [
+              1.4,
+              8.0,
+              2.0,
+              3.2,
+              3.2
+            ],
+            "orientacion_pagina": "portrait",
+            "encabezados_negrita": true,
+            "encabezado_color": "",
+            "categorias_negrita": true,
+            "total_negrita": true,
+            "alineacion_descripcion": "left",
+            "alineacion_numeros": "center",
+            "alineacion_costos": "right",
+            "bordes": "grid",
+            "fuente_tamano_pt": 9,
+            "fuente_size": 9,
+            "fuente_encabezado_pt": 8.5,
+            "fuente_categoria_pt": 9,
+            "fuente_total_pt": 9
+          },
           "estilo": {
-            "encabezado_color": "4472C4",
-            "fuente_size": 10
+            "modelo_referencia": "presupuesto_investigacion_vertical.docx",
+            "titulo_capitulo": "VI. PRESUPUESTO",
+            "titulo_exacto": true,
+            "titulo_negrita": false,
+            "titulo_tamano_pt": 10,
+            "titulo_space_after_pt": 10,
+            "ancho_tabla": "100%",
+            "ancho_columnas": [
+              1.4,
+              8.0,
+              2.0,
+              3.2,
+              3.2
+            ],
+            "orientacion_pagina": "portrait",
+            "encabezados_negrita": true,
+            "encabezado_color": "",
+            "categorias_negrita": true,
+            "total_negrita": true,
+            "alineacion_descripcion": "left",
+            "alineacion_numeros": "center",
+            "alineacion_costos": "right",
+            "bordes": "grid",
+            "fuente_tamano_pt": 9,
+            "fuente_size": 9,
+            "fuente_encabezado_pt": 8.5,
+            "fuente_categoria_pt": 9,
+            "fuente_total_pt": 9
           }
         }
       ]

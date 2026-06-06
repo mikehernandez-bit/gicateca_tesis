@@ -401,6 +401,19 @@ class TestTable:
         # Should have at least 3 sections: default + landscape + portrait restore
         assert len(doc.sections) >= 3
 
+    def test_table_landscape_without_restore_keeps_landscape_section(self):
+        doc = _render(
+            {
+                "type": "table",
+                "orientacion": "landscape",
+                "restore_portrait": False,
+                "encabezados": ["A", "B"],
+                "filas": [["1", "2"]],
+            }
+        )
+        # default + landscape (without portrait restore)
+        assert len(doc.sections) == 2
+
     def test_table_portrait_no_extra_sections(self):
         doc = _render({
             "type": "table",
@@ -523,6 +536,27 @@ class TestImage:
         assert "Fuente: Elaboración propia." in texts
         assert "Nota. Construir el Pareto con sistemas, frecuencias y curva acumulada." in texts
 
+    def test_image_note_can_render_as_plain_blue_instruction(self):
+        doc = _render_many([
+            {"type": "heading", "text": "I. PLANTEAMIENTO DEL PROBLEMA", "level": 1},
+            {
+                "type": "image",
+                "titulo": "Diagrama de Pareto de modos de falla en flota CAT 24M",
+                "ruta": "assets/placeholder_figura.png",
+                "fuente": "Elaboración propia.",
+                "nota": "Guía para elaborar la figura: usar datos reales y eje Y derecho acumulado.",
+                "nota_color": "0000FF",
+            },
+        ])
+
+        note_paragraph = next(
+            p for p in doc.paragraphs if p.text.startswith("Guía para elaborar la figura:")
+        )
+        assert note_paragraph.text == "Guía para elaborar la figura: usar datos reales y eje Y derecho acumulado."
+        assert len(note_paragraph.runs) == 1
+        assert note_paragraph.runs[0].italic is None
+        assert str(note_paragraph.runs[0].font.color.rgb) == "0000FF"
+
 
 def test_table_caption_uses_chapter_aware_label():
     doc = _render_many([
@@ -536,6 +570,88 @@ def test_table_caption_uses_chapter_aware_label():
     ])
     texts = [p.text.strip() for p in doc.paragraphs if p.text.strip()]
     assert any(text.startswith("Tabla 3.1 Operacionalización de variable independiente") for text in texts)
+
+
+
+def test_table_accepts_gicagen_schedule_aliases_and_merges():
+    headers = ["FASES Y ACTIVIDADES", "2025", *["\u200b" for _ in range(11)]]
+    rows = [
+        ["", "Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Set", "Oct", "Nov", "Dic"],
+        ["1. PLANIFICACIÓN Y DISEÑO", *["" for _ in range(12)]],
+        ["1.1. Actividad", "", "✖", "", "", "", "", "", "", "", "", "", ""],
+    ]
+    doc = _render(
+        {
+            "type": "table",
+            "subtipo": "cronograma_actividades",
+            "titulo": "Tabla 5.1 Cronograma de actividades",
+            "encabezados": headers,
+            "filas": rows,
+            "orientacion": "landscape",
+            "filas_fase": [1],
+            "celdas_combinadas": [
+                {"fila": -1, "fila_fin": 0, "col_inicio": 0, "col_fin": 0, "texto": "FASES Y ACTIVIDADES"},
+                {"fila": -1, "col_inicio": 1, "col_fin": 12, "texto": "2025"},
+                {"fila": 1, "col_inicio": 0, "col_fin": 12, "texto": "1. PLANIFICACIÓN Y DISEÑO"},
+            ],
+            "estilos": {
+                "titulo_exacto": True,
+                "titulo_negrita": False,
+                "titulo_tamano_pt": 9.5,
+                "encabezado_color": "",
+                "margenes_reducidos": True,
+                "ancho_columnas": [1.0 for _ in range(13)],
+                "fuente_size": 8,
+            },
+        }
+    )
+
+    assert [p.text for p in doc.paragraphs if p.text.strip()][0] == "Tabla 5.1 Cronograma de actividades"
+    table = doc.tables[0]
+    assert len(table.rows) == 4
+    assert table.rows[0].cells[0].text == "FASES Y ACTIVIDADES"
+    assert table.rows[1].cells[1].text == "Ene"
+    assert len(table._tbl.xpath(".//w:gridSpan")) >= 2
+    assert len(table._tbl.xpath(".//w:vMerge")) >= 1
+    assert len(table._tbl.xpath(".//w:tblHeader")) >= 2
+    assert len(table._tbl.xpath(".//w:cantSplit")) == len(table.rows)
+
+
+def test_table_accepts_gicagen_budget_aliases_and_merges():
+    doc = _render(
+        {
+            "type": "table",
+            "subtipo": "presupuesto_investigacion",
+            "titulo": "Tabla 6.1 Presupuesto de investigación",
+            "encabezados": ["N°", "DESCRIPCIÓN DEL GASTO", "CANTIDAD", "COSTO UNIT. (S/.)", "COSTO TOTAL (S/.)"],
+            "filas": [
+                ["1. RECURSOS HUMANOS", "", "", "", "2,000.00"],
+                ["1.1", "Investigador", "1", "2,000.00", "2,000.00"],
+                ["TOTAL GENERAL", "", "", "", "S/. 2,000.00"],
+            ],
+            "filas_categoria": [0],
+            "fila_total": 2,
+            "celdas_combinadas": [
+                {"fila": 0, "col_inicio": 0, "col_fin": 3, "texto": "1. RECURSOS HUMANOS"},
+                {"fila": 2, "col_inicio": 0, "col_fin": 3, "texto": "TOTAL GENERAL"},
+            ],
+            "estilos": {
+                "titulo_exacto": True,
+                "titulo_negrita": False,
+                "titulo_tamano_pt": 10,
+                "encabezado_color": "",
+                "ancho_columnas": [1.02, 8.51, 1.78, 3.43, 3.43],
+                "fuente_size": 10,
+            },
+        }
+    )
+
+    assert [p.text for p in doc.paragraphs if p.text.strip()][0] == "Tabla 6.1 Presupuesto de investigación"
+    table = doc.tables[0]
+    assert len(table.rows) == 4
+    assert table.rows[1].cells[0].text == "1. RECURSOS HUMANOS"
+    assert table.rows[3].cells[0].text == "TOTAL GENERAL"
+    assert len(table._tbl.xpath(".//w:gridSpan")) >= 2
 
 
 # ─────────────────────────────────────────────────────────────
@@ -601,6 +717,50 @@ class TestIndexItems:
     def test_empty_items_noop(self):
         doc = _render({"type": "index_items", "items": []})
         assert len(doc.paragraphs) == 0
+
+
+class TestInfoBasicaUnacMaestria:
+    def test_does_not_insert_explicit_page_break(self):
+        from docx.oxml.ns import qn as _qn
+
+        doc = _render(
+            {
+                "type": "info_basica_unac_maestria",
+                "data": {},
+                "info": {
+                    "titulo": "INFORMACIÓN BÁSICA",
+                    "facultad": "FIME",
+                    "unidad_investigacion": "Unidad X",
+                    "titulo": "INFORMACIÓN BÁSICA",
+                    "titulo_investigacion": "Proyecto de prueba",
+                    "autores": [
+                        {
+                            "nombre": "Autor Uno",
+                            "dni": "12345678",
+                            "orcid": "0000-0000-0000-0000",
+                        }
+                    ],
+                    "asesor": {
+                        "nombre": "Asesor Uno",
+                        "dni": "87654321",
+                        "orcid": "1111-1111-1111-1111",
+                    },
+                    "lugar_ejecucion": "Lima",
+                    "unidad_analisis": "Unidad",
+                    "tipo": "Aplicada",
+                    "enfoque": "Cuantitativo",
+                    "diseno_investigacion": "No experimental",
+                    "tema_ocde": ["Tema principal"],
+                },
+            }
+        )
+
+        page_breaks = 0
+        for p_elem in doc.element.body.iterchildren(_qn("w:p")):
+            for br in p_elem.iter(_qn("w:br")):
+                if br.get(_qn("w:type")) == "page":
+                    page_breaks += 1
+        assert page_breaks == 0
 
 
 class TestAbbreviationsTable:

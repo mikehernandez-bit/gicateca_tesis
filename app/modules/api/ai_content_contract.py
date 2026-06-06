@@ -41,8 +41,7 @@ class TableBlock(BaseModel):
     @classmethod
     def _validate_headers(cls, value: list[str]) -> list[str]:
         headers = [str(item or "").strip() for item in value]
-        headers = [item for item in headers if item]
-        if not headers:
+        if not any(item for item in headers):
             raise ValueError("Table must define at least one non-empty header")
         return headers
 
@@ -86,6 +85,8 @@ class FigureBlock(BaseModel):
     id: Optional[str] = None
     titulo: Optional[str] = None
     fuente: Optional[str] = None
+    nota: Optional[str] = None
+    nota_color: Optional[str] = None
 
     @field_validator("caption")
     @classmethod
@@ -104,8 +105,29 @@ class FigureBlock(BaseModel):
         return text
 
 
+class FormulaBlock(BaseModel):
+    tipo: Literal["formula"]
+    id: Optional[str] = None
+    texto: Optional[str] = None
+    latex: Optional[str] = None
+    numero: Optional[str] = None
+    alineacion: Literal["center", "left", "right"] = "center"
+
+    @model_validator(mode="after")
+    def _validate_formula_text(self) -> "FormulaBlock":
+        text = str(self.texto or "").strip()
+        latex = str(self.latex or "").strip()
+        if not text and not latex:
+            raise ValueError("Formula must define texto or latex")
+        self.texto = text or None
+        self.latex = latex or None
+        if self.numero is not None:
+            self.numero = str(self.numero or "").strip() or None
+        return self
+
+
 AIBlock = Annotated[
-    Union[ParagraphBlock, TableBlock, FigureBlock],
+    Union[ParagraphBlock, TableBlock, FigureBlock, FormulaBlock],
     Field(discriminator="tipo"),
 ]
 AIContent = Union[str, list[AIBlock]]

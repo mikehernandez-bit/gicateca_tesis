@@ -17,6 +17,7 @@ Dependencias:
 
 from __future__ import annotations
 
+import inspect
 import json
 import tempfile
 from pathlib import Path
@@ -55,6 +56,10 @@ class RenderRequest(BaseModel):
     aiResult: Optional[AIResult] = Field(
         default=None, description="AI-generated content"
     )
+    selectedSections: list[dict[str, Any]] = Field(
+        default_factory=list,
+        description="Selected sections to keep in final render",
+    )
 
 
 def _validate_publishable(format_id: str) -> None:
@@ -68,6 +73,7 @@ def _generate_simulation_docx(
     format_id: str,
     values: Dict[str, Any],
     ai_result: Optional[AIResult],
+    selected_sections: list[dict[str, Any]] | None = None,
 ) -> Tuple[Path, str]:
     """
     Generate DOCX in simulation mode:
@@ -100,7 +106,11 @@ def _generate_simulation_docx(
     ai_sections = []
     if ai_result and ai_result.sections:
         ai_sections = serialize_ai_sections(ai_result.sections)
-    sanitized = apply_ai_content(sanitized, ai_sections)
+    sanitized = apply_ai_content(
+        sanitized,
+        ai_sections,
+        selected_sections=selected_sections,
+    )
 
     # 4) Write processed JSON to temp file
     tmp_json = tempfile.NamedTemporaryFile(
@@ -130,6 +140,24 @@ def _generate_simulation_docx(
     return output_path, sim_filename
 
 
+def _invoke_simulation_docx(
+    format_id: str,
+    values: Dict[str, Any],
+    ai_result: Optional[AIResult],
+    selected_sections: list[dict[str, Any]] | None,
+) -> Tuple[Path, str]:
+    """Call simulation generator with backwards compatibility for patched tests."""
+    signature = inspect.signature(_generate_simulation_docx)
+    if "selected_sections" in signature.parameters:
+        return _generate_simulation_docx(
+            format_id,
+            values,
+            ai_result,
+            selected_sections=selected_sections,
+        )
+    return _generate_simulation_docx(format_id, values, ai_result)
+
+
 @router.post("/docx")
 def render_docx(request: RenderRequest, background_tasks: BackgroundTasks):
     """
@@ -143,10 +171,11 @@ def render_docx(request: RenderRequest, background_tasks: BackgroundTasks):
 
     try:
         if request.mode == "simulation":
-            output_path, filename = _generate_simulation_docx(
+            output_path, filename = _invoke_simulation_docx(
                 request.formatId,
                 request.values,
                 request.aiResult,
+                request.selectedSections,
             )
         else:
             # Final mode: use existing pipeline unchanged
@@ -184,10 +213,11 @@ def render_pdf(request: RenderRequest, background_tasks: BackgroundTasks):
     try:
         if request.mode == "simulation":
             # Generate simulation DOCX first
-            docx_path, docx_filename = _generate_simulation_docx(
+            docx_path, docx_filename = _invoke_simulation_docx(
                 request.formatId,
                 request.values,
                 request.aiResult,
+                request.selectedSections,
             )
 
             if not docx_path.exists():

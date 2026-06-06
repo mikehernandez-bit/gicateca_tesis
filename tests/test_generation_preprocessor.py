@@ -301,6 +301,347 @@ def test_apply_ai_content_skips_unac_project_chapter_level_text() -> None:
     assert child["_ai_content"] == "Hipotesis general validada."
 
 
+def test_apply_ai_content_allows_unac_project_chapter_level_when_no_child_sections() -> None:
+    data = {
+        "_meta": {"id": "unac-proyecto-cuant"},
+        "cuerpo": [
+            {
+                "titulo": "V. CRONOGRAMA DE ACTIVIDADES",
+                "contenido": [],
+            }
+        ],
+    }
+    ai_sections = [
+        {
+            "path": "V. CRONOGRAMA DE ACTIVIDADES",
+            "content": [
+                {
+                    "tipo": "tabla",
+                    "titulo": "Cronograma dinamico",
+                    "encabezados": ["Actividad", "Periodo"],
+                    "filas": [["Revision", "Mes 1"]],
+                }
+            ],
+        }
+    ]
+
+    result = apply_ai_content(data, ai_sections)
+    chapter = result["cuerpo"][0]
+
+    assert chapter["_ai_content"][0]["titulo"] == "Cronograma dinamico"
+    assert chapter["contenido"][0]["titulo"] == "Cronograma dinamico"
+    assert chapter["contenido"][0]["_ai_generated"] is True
+
+
+def test_apply_ai_content_ignores_chapter_text_for_schedule_when_static_table_exists() -> None:
+    data = {
+        "_meta": {"id": "unac-proyecto-cuant"},
+        "cuerpo": [
+            {
+                "titulo": "V. CRONOGRAMA DE ACTIVIDADES",
+                "contenido": [
+                    {
+                        "tipo": "tabla",
+                        "titulo": "Tabla 5.1 Cronograma de actividades",
+                        "encabezados": ["Actividad", "Mes 1"],
+                        "filas": [["Planificacion", "X"]],
+                        "orientacion": "landscape",
+                    }
+                ],
+            }
+        ],
+    }
+    ai_sections = [
+        {
+            "path": "V. CRONOGRAMA DE ACTIVIDADES",
+            "content": "Texto narrativo no permitido antes de la tabla.",
+        }
+    ]
+
+    result = apply_ai_content(data, ai_sections)
+    chapter = result["cuerpo"][0]
+    contenido = chapter["contenido"]
+
+    assert "_ai_content" not in chapter
+    assert isinstance(contenido, list)
+    assert len(contenido) == 1
+    assert contenido[0]["tipo"] == "tabla"
+    assert contenido[0]["titulo"] == "Tabla 5.1 Cronograma de actividades"
+
+
+def test_apply_ai_content_prunes_unselected_chapters_with_selected_sections() -> None:
+    data = {
+        "_meta": {"id": "unac-proyecto-cuant"},
+        "cuerpo": [
+            {
+                "titulo": "III. HIPOTESIS Y VARIABLES",
+                "contenido": [{"texto": "3.1 Hipotesis"}],
+            },
+            {
+                "titulo": "V. CRONOGRAMA DE ACTIVIDADES",
+                "contenido": [
+                    {
+                        "tipo": "tabla",
+                        "titulo": "Tabla 5.1 Cronograma de actividades",
+                        "encabezados": ["Actividad", "Mes 1"],
+                        "filas": [["Planificacion", "X"]],
+                    }
+                ],
+            },
+            {
+                "titulo": "VI. PRESUPUESTO",
+                "contenido": [
+                    {
+                        "tipo": "tabla",
+                        "titulo": "Tabla 6.1 Presupuesto de investigacion",
+                        "encabezados": ["Concepto", "Costo"],
+                        "filas": [["Analisis", "1000"]],
+                    }
+                ],
+            },
+        ],
+    }
+    ai_sections = [
+        {
+            "path": "III. HIPOTESIS Y VARIABLES/3.1 Hipotesis",
+            "content": "Hipotesis general aplicada al proyecto.",
+        }
+    ]
+    selected_sections = [
+        {"section_path": "Título + Información Básica"},
+        {"section_path": "III. HIPOTESIS Y VARIABLES/3.1 Hipotesis"},
+    ]
+
+    result = apply_ai_content(data, ai_sections, selected_sections=selected_sections)
+
+    assert [cap["titulo"] for cap in result["cuerpo"]] == ["III. HIPOTESIS Y VARIABLES"]
+    assert result["cuerpo"][0]["contenido"][0]["_ai_content"].startswith("Hipotesis general")
+
+
+def test_apply_ai_content_prunes_unselected_introduccion_with_selected_sections() -> None:
+    data = {
+        "_meta": {"id": "unac-proyecto-cuant"},
+        "preliminares": {
+            "introduccion": {
+                "titulo": "INTRODUCCION",
+                "texto": "Texto base de introduccion",
+            }
+        },
+        "cuerpo": [
+            {
+                "titulo": "III. HIPOTESIS Y VARIABLES",
+                "contenido": [{"texto": "3.1 Hipotesis"}],
+            }
+        ],
+    }
+    ai_sections = [
+        {
+            "path": "INTRODUCCION",
+            "content": "Contenido que no debe aparecer si la introduccion no fue seleccionada.",
+        },
+        {
+            "path": "III. HIPOTESIS Y VARIABLES/3.1 Hipotesis",
+            "content": "Hipotesis general aplicada al proyecto.",
+        },
+    ]
+    selected_sections = [
+        {"section_path": "TÃ­tulo + InformaciÃ³n BÃ¡sica"},
+        {"section_path": "III. HIPOTESIS Y VARIABLES/3.1 Hipotesis"},
+    ]
+
+    result = apply_ai_content(data, ai_sections, selected_sections=selected_sections)
+
+    assert "introduccion" not in result["preliminares"]
+    assert [cap["titulo"] for cap in result["cuerpo"]] == ["III. HIPOTESIS Y VARIABLES"]
+
+
+def test_apply_ai_content_keeps_selected_introduccion_with_selected_sections() -> None:
+    data = {
+        "_meta": {"id": "unac-proyecto-cuant"},
+        "preliminares": {
+            "introduccion": {
+                "titulo": "INTRODUCCION",
+                "texto": "Texto base de introduccion",
+            }
+        },
+    }
+    ai_sections = [
+        {
+            "path": "INTRODUCCION",
+            "content": "Introduccion seleccionada para el documento final.",
+        }
+    ]
+    selected_sections = [
+        {"section_path": "INTRODUCCION"},
+    ]
+
+    result = apply_ai_content(data, ai_sections, selected_sections=selected_sections)
+
+    assert result["preliminares"]["introduccion"]["_ai_content"].startswith(
+        "Introduccion seleccionada"
+    )
+
+
+def test_apply_ai_content_merges_child_schedule_table_into_static_template() -> None:
+    data = {
+        "_meta": {"id": "unac-proyecto-cuant"},
+        "cuerpo": [
+            {
+                "titulo": "V. CRONOGRAMA DE ACTIVIDADES",
+                "contenido": [
+                    {
+                        "tipo": "tabla",
+                        "id": "tabla_5_1_cronograma_actividades",
+                        "titulo": "Tabla 5.1 Cronograma de actividades",
+                        "orientacion": "landscape",
+                        "subtipo": "cronograma_actividades",
+                        "encabezados": ["Actividad", "Mes 1"],
+                        "filas": [["Planificacion", "X"]],
+                        "estilo": {"modelo_referencia": "cronograma_actividades.docx"},
+                    }
+                ],
+            }
+        ],
+    }
+    ai_sections = [
+        {
+            "path": "V. CRONOGRAMA DE ACTIVIDADES/Cronograma Detallado de Actividades",
+            "content": [
+                {"tipo": "parrafo", "texto": "Tabla dinamica actualizada por IA."},
+                {
+                    "tipo": "tabla",
+                    "titulo": "Cronograma dinamico del proyecto",
+                    "subtipo": "cronograma_actividades",
+                    "encabezados": ["Actividad", "Mes 1", "Mes 2"],
+                    "filas": [["Levantamiento", "X", ""], ["Validacion", "", "X"]],
+                },
+            ],
+        }
+    ]
+    selected_sections = [
+        {"section_path": "V. CRONOGRAMA DE ACTIVIDADES/Cronograma Detallado de Actividades"},
+    ]
+
+    result = apply_ai_content(data, ai_sections, selected_sections=selected_sections)
+    chapter = result["cuerpo"][0]
+    contenido = chapter["contenido"]
+
+    assert len(contenido) == 1
+    assert contenido[0]["tipo"] == "tabla"
+    assert contenido[0]["titulo"] == "Tabla 5.1 Cronograma de actividades"
+    assert contenido[0]["id"] == "tabla_5_1_cronograma_actividades"
+    assert contenido[0]["orientacion"] == "landscape"
+    assert contenido[0]["subtipo"] == "cronograma_actividades"
+    assert contenido[0]["estilo"]["modelo_referencia"] == "cronograma_actividades.docx"
+    assert contenido[0]["encabezados"] == ["Actividad", "Mes 1", "Mes 2"]
+    assert contenido[0]["filas"] == [["Levantamiento", "X", ""], ["Validacion", "", "X"]]
+    assert contenido[0]["_ai_generated"] is True
+
+
+def test_apply_ai_content_keeps_static_schedule_and_budget_tables_when_no_ai_table_arrives() -> None:
+    data = {
+        "_meta": {"id": "unac-proyecto-cuant"},
+        "cuerpo": [
+            {
+                "titulo": "V. CRONOGRAMA DE ACTIVIDADES",
+                "contenido": [
+                    {
+                        "tipo": "tabla",
+                        "titulo": "Tabla 5.1 Cronograma de actividades",
+                        "encabezados": ["Actividad", "Mes 1"],
+                        "filas": [["Planificacion", "X"]],
+                    }
+                ],
+            },
+            {
+                "titulo": "VI. PRESUPUESTO",
+                "contenido": [
+                    {
+                        "tipo": "tabla",
+                        "titulo": "Tabla 6.1 Presupuesto de investigacion",
+                        "encabezados": ["Concepto", "Costo"],
+                        "filas": [["Analisis", "1000"]],
+                    }
+                ],
+            },
+        ],
+    }
+    ai_sections: list[dict[str, object]] = []
+    selected_sections = [
+        {"section_path": "V. CRONOGRAMA DE ACTIVIDADES"},
+        {"section_path": "VI. PRESUPUESTO"},
+    ]
+
+    result = apply_ai_content(data, ai_sections, selected_sections=selected_sections)
+
+    assert [cap["titulo"] for cap in result["cuerpo"]] == [
+        "V. CRONOGRAMA DE ACTIVIDADES",
+        "VI. PRESUPUESTO",
+    ]
+    assert result["cuerpo"][0]["contenido"][0]["titulo"] == "Tabla 5.1 Cronograma de actividades"
+    assert result["cuerpo"][1]["contenido"][0]["titulo"] == "Tabla 6.1 Presupuesto de investigacion"
+    assert "_ai_content" not in result["cuerpo"][0]
+    assert "_ai_content" not in result["cuerpo"][1]
+
+
+def test_apply_ai_content_merges_budget_table_into_static_template() -> None:
+    data = {
+        "_meta": {"id": "unac-proyecto-cuant"},
+        "cuerpo": [
+            {
+                "titulo": "VI. PRESUPUESTO",
+                "contenido": [
+                    {
+                        "tipo": "tabla",
+                        "id": "tabla_6_1_presupuesto_investigacion",
+                        "titulo": "Tabla 6.1 Presupuesto de investigacion",
+                        "orientacion": "portrait",
+                        "subtipo": "presupuesto_investigacion",
+                        "encabezados": ["Base", "Costo"],
+                        "filas": [["Analisis", "1000"]],
+                        "estilo": {"modelo_referencia": "presupuesto_investigacion_vertical.docx"},
+                    }
+                ],
+            }
+        ],
+    }
+    ai_sections = [
+        {
+            "path": "VI. PRESUPUESTO/Presupuesto del Proyecto",
+            "content": [
+                {
+                    "tipo": "tabla",
+                    "titulo": "Presupuesto dinamico",
+                    "subtipo": "presupuesto_investigacion",
+                    "encabezados": ["N°", "Descripcion", "Cantidad", "Costo unit.", "Costo total"],
+                    "filas": [
+                        ["1. RECURSOS HUMANOS", "", "", "", "2,000.00"],
+                        ["1.1", "Investigador", "1", "2,000.00", "2,000.00"],
+                    ],
+                    "filas_categoria": [0],
+                    "fila_total": 1,
+                    "celdas_combinadas": [{"fila": 0, "col_inicio": 0, "col_fin": 3, "texto": "1. RECURSOS HUMANOS"}],
+                    "celdas_fusionadas": [{"fila": 1, "col": 0, "filas_span": 1, "cols_span": 4, "texto": "TOTAL GENERAL"}],
+                }
+            ],
+        }
+    ]
+    selected_sections = [{"section_path": "VI. PRESUPUESTO/Presupuesto del Proyecto"}]
+
+    result = apply_ai_content(data, ai_sections, selected_sections=selected_sections)
+    contenido = result["cuerpo"][0]["contenido"]
+
+    assert len(contenido) == 1
+    assert contenido[0]["titulo"] == "Tabla 6.1 Presupuesto de investigacion"
+    assert contenido[0]["id"] == "tabla_6_1_presupuesto_investigacion"
+    assert contenido[0]["orientacion"] == "portrait"
+    assert contenido[0]["subtipo"] == "presupuesto_investigacion"
+    assert contenido[0]["estilo"]["modelo_referencia"] == "presupuesto_investigacion_vertical.docx"
+    assert contenido[0]["encabezados"] == ["N°", "Descripcion", "Cantidad", "Costo unit.", "Costo total"]
+    assert contenido[0]["filas"][0][0] == "1. RECURSOS HUMANOS"
+    assert contenido[0]["_ai_generated"] is True
+
+
 def test_apply_ai_content_injects_final_references_section() -> None:
     data = {
         "finales": {
