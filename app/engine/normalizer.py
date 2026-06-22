@@ -68,6 +68,17 @@ _ABBR_REVERSED_IN_TEXT_RE = re.compile(r"\b([A-Za-z][A-Za-z0-9./-]{1,19})\s*\(([
 _ABBR_MEANING_TOKEN_RE = re.compile(r"[A-Za-zÃÃ‰ÃÃ“ÃšÃœÃ‘Ã¡Ã©Ã­Ã³ÃºÃ¼Ã±]+")
 _ABBR_REFERENCE_RE = re.compile(r"\b(?:19|20)\d{2}\b")
 _AI_LEVEL3_HEADING_RE = re.compile(r"^\s*(\d+\.\d+\.\d+\.?)\s+(.+?)\s*$")
+# Detecta caracteres típicos de fórmulas matemáticas para evitar que sean
+# interpretados como subtítulos nivel 3 y aparezcan en el índice de contenidos.
+_MATH_FORMULA_RE = re.compile(
+    r"[=²³⁴⁵⁶⁷⁸⁹·±∑∫√÷×αβγδσμλπεζηθ]"
+    r"|[+\-*/]{1}(?:\s|$)"   # operadores aritméticos en contexto de fórmula
+    r"|\b[a-z]\s*=\s*[A-Za-z0-9(]"  # variable = expresión (e.g. n = N...)
+    r"|\([^)]{1,10}\)\s*[+\-*/]"  # (expr) OP ...
+    r"|\d+\s*/\s*\d+"  # fracción numérica: 1 / 2
+)
+# Elimina marcadores Markdown de negrita/cursiva (**texto**, __texto__, *texto*)
+_MARKDOWN_BOLD_RE = re.compile(r"(\*{1,3}|_{1,3})(.+?)\1")
 _ABBR_AUTHOR_LIKE_RE = re.compile(
     r"^[A-ZÃÃ‰ÃÃ“ÃšÃ‘][a-zÃ¡Ã©Ã­Ã³ÃºÃ±]+(?:\s+[A-ZÃÃ‰ÃÃ“ÃšÃ‘][a-zÃ¡Ã©Ã­Ã³ÃºÃ±]+){0,3}(?:\s+et al\.?)?(?:,\s*(?:19|20)\d{2})?$",
     re.IGNORECASE,
@@ -1678,7 +1689,11 @@ def _normalize_cuerpo(data: dict) -> List[Block]:
     return blocks
 
 
-def _normalize_content_item(item, document_data: dict | None = None) -> List[Block]:
+def _normalize_content_item(
+    item,
+    document_data: dict | None = None,
+    parent_item: dict | None = None,
+) -> List[Block]:
     """Normaliza un item de contenido (dentro de cuerpo o anexos).
 
     Soporta:
@@ -1702,7 +1717,45 @@ def _normalize_content_item(item, document_data: dict | None = None) -> List[Blo
     if item.get("tipo") == "parrafo":
         texto = item.get("texto", "")
         if texto:
-            blocks.append({"type": "paragraph", "text": texto})
+            normalized_text = texto.replace("\r\n", "\n").replace("\r", "\n")
+            lines = normalized_text.split("\n")
+            
+            # Buscar la primera línea no vacía para ver si es un encabezado
+            first_line_idx = -1
+            for idx, line in enumerate(lines):
+                if line.strip():
+                    first_line_idx = idx
+                    break
+            
+            if first_line_idx != -1:
+                first_line = lines[first_line_idx]
+                # Limpiar marcadores Markdown antes de detectar headings de nivel 3.
+                # e.g. **2.2.1 Título** → 2.2.1 Título, ### 2.2.1 Título → 2.2.1 Título
+                first_line_clean = _MARKDOWN_BOLD_RE.sub(r"\2", first_line.strip()).strip()
+                if first_line_clean.startswith("###"):
+                    first_line_clean = first_line_clean.lstrip("#").strip()
+                
+                heading_match = _AI_LEVEL3_HEADING_RE.match(first_line_clean)
+                # Excluir fórmulas matemáticas: no tratarlas como headings de nivel 3
+                # (evita que aparezcan en el índice de contenidos).
+                if heading_match and not _MATH_FORMULA_RE.search(heading_match.group(2)):
+                    blocks.append(
+                        {
+                            "type": "heading",
+                            "text": f"{heading_match.group(1)} {heading_match.group(2)}".strip(),
+                            "level": 3,
+                            "centered": False,
+                            "space_before": 8,
+                            "space_after": 8,
+                        }
+                    )
+                    remainder = "\n".join(lines[first_line_idx + 1:]).strip()
+                    if remainder:
+                        blocks.append({"type": "paragraph", "text": remainder})
+                else:
+                    blocks.append({"type": "paragraph", "text": texto})
+            else:
+                blocks.append({"type": "paragraph", "text": texto})
         return blocks
 
     # Figura sugerida por IA (tipo == "figura")
@@ -1711,6 +1764,43 @@ def _normalize_content_item(item, document_data: dict | None = None) -> List[Blo
         title = str(item.get("titulo") or "").strip() or _strip_figure_caption_prefix(caption)
         ruta = item.get("ruta_placeholder") or item.get("ruta", "")
         if ruta and ruta.lower() != "placeholder":
+            # Heredar nota de instrucción detallada del padre si la figura no tiene una propia
+            nota_actual = item.get("nota") or item.get("note")
+            if not nota_actual and parent_item:
+                nota_actual = (
+                    parent_item.get("nota")
+                    or parent_item.get("note")
+                    or parent_item.get("instruccion_detallada")
+                )
+
+            # Si aún no hay nota, generar una genérica azul para guiar al estudiante.
+            # Esto garantiza que todas las figuras (incluidas las de 2.2 Bases Teóricas)
+            # siempre tengan una instrucción visible debajo de la imagen.
+            if not nota_actual:
+                figure_label = title or caption or "la figura"
+                nota_actual = (
+                    f"Guía para elaborar la figura: Diseña un esquema gráfico profesional titulado \"{figure_label}\" "
+                    "que sirva como soporte visual y académico del desarrollo de esta sección. El diagrama debe "
+                    "estructurarse mediante bloques relacionales, diagramas de flujo o mapas conceptuales según "
+                    "corresponda a la naturaleza del subtema. Define con claridad las variables clave, los procesos "
+                    "involucrados o la arquitectura del sistema. Conecta los elementos conceptuales con líneas "
+                    "y flechas direccionales que muestren la secuencia lógica y el sentido de las relaciones. "
+                    "Utiliza formas geométricas consistentes (rectángulos, óvalos o círculos) y un esquema de colores "
+                    "sobrio y contrastante para mejorar la legibilidad. Asegura que todos los textos, variables y "
+                    "rótulos de la figura utilicen una fuente Arial de 10 puntos sin negritas ni marcadores adicionales. "
+                    "En la parte inferior de la figura, incluye siempre la fuente correspondiente en formato APA "
+                    "estándar (por ejemplo, 'Fuente: Elaboración propia' o la cita del autor correspondiente) "
+                    "y una nota técnica descriptiva que explique brevemente el contenido de la figura y su "
+                    "vinculación directa con el sustento analítico del proyecto."
+                )
+
+            # Heredar color o forzar azul si se heredó una nota
+            color_actual = item.get("nota_color") or item.get("note_color")
+            if not color_actual and parent_item:
+                color_actual = parent_item.get("nota_color") or parent_item.get("note_color")
+            if nota_actual and not color_actual:
+                color_actual = "0000FF"  # Azul institucional para notas
+
             blocks.append(
                 {
                     "type": "image",
@@ -1719,8 +1809,8 @@ def _normalize_content_item(item, document_data: dict | None = None) -> List[Blo
                     "fuente": item.get("fuente", "Elaboración propia"),
                     "ancho_cm": item.get("ancho_cm"),
                     "placeholder": True,
-                    "nota": item.get("nota") or item.get("note"),
-                    "nota_color": item.get("nota_color") or item.get("note_color"),
+                    "nota": nota_actual,
+                    "nota_color": color_actual,
                     "placeholder_text": item.get("placeholder_text") or item.get("texto_placeholder"),
                 }
             )
@@ -1751,15 +1841,40 @@ def _normalize_content_item(item, document_data: dict | None = None) -> List[Blo
 
     # Subtítulo
     if "texto" in item:
-        blocks.append(
-            {
-                "type": "black_heading",
-                "text": item["texto"],
-                "level": 2,
-                "size": 12,
-                "centered": False,
-            }
-        )
+        _subtitulo_text = str(item["texto"] or "").strip()
+        # Limpiar marcadores Markdown (e.g. **2.2.1 Título** → 2.2.1 Título,
+        # ### 2.2.1 Título → 2.2.1 Título)
+        _subtitulo_clean = _MARKDOWN_BOLD_RE.sub(r"\2", _subtitulo_text).strip()
+        if _subtitulo_clean.startswith("###"):
+            _subtitulo_clean = _subtitulo_clean.lstrip("#").strip()
+        _heading_match = _AI_LEVEL3_HEADING_RE.match(_subtitulo_clean)
+        if _heading_match and not _MATH_FORMULA_RE.search(_heading_match.group(2)):
+            # e.g. "2.2.1 Título" → Heading 3 formal (aparece en TOC)
+            blocks.append(
+                {
+                    "type": "heading",
+                    "text": f"{_heading_match.group(1)} {_heading_match.group(2)}".strip(),
+                    "level": 3,
+                    "centered": False,
+                    "space_before": 8,
+                    "space_after": 8,
+                }
+            )
+        elif _MATH_FORMULA_RE.search(_subtitulo_clean) or not re.match(r"^\d+\.", _subtitulo_clean):
+            # Si el texto parece una fórmula matemática (p.ej. "D = MTBF / (MTBF + MTTR)")
+            # o no tiene un prefijo numérico (p.ej. "N.N"), emitirlo como párrafo para que
+            # NO aparezca en el índice de contenidos (TOC) de Word.
+            blocks.append({"type": "paragraph", "text": _subtitulo_clean or _subtitulo_text})
+        else:
+            blocks.append(
+                {
+                    "type": "black_heading",
+                    "text": _subtitulo_clean or _subtitulo_text,
+                    "level": 2,
+                    "size": 12,
+                    "centered": False,
+                }
+            )
 
     special_blocks = _normalize_project_structured_section(document_data, item)
     if special_blocks:
@@ -1768,7 +1883,7 @@ def _normalize_content_item(item, document_data: dict | None = None) -> List[Blo
 
     ai_content = item.get("_ai_content")
     if ai_content:
-        blocks.extend(_normalize_ai_content(ai_content))
+        blocks.extend(_normalize_ai_content(ai_content, parent_item=item))
         return blocks
 
     # Content block compartido (notas, párrafos, tablas, imágenes)
@@ -1777,7 +1892,10 @@ def _normalize_content_item(item, document_data: dict | None = None) -> List[Blo
     return blocks
 
 
-def _normalize_ai_content(content: Any) -> List[Block]:
+def _normalize_ai_content(
+    content: Any,
+    parent_item: dict | None = None,
+) -> List[Block]:
     """Render AI-injected content as the source of truth for a node."""
     if isinstance(content, str):
         normalized_text = content.replace("\r\n", "\n").replace("\r", "\n")
@@ -1795,8 +1913,10 @@ def _normalize_ai_content(content: Any) -> List[Block]:
             if not lines:
                 continue
 
-            heading_match = _AI_LEVEL3_HEADING_RE.match(lines[0])
-            if heading_match:
+            # Limpiar marcadores Markdown (e.g. **2.2.1 Título** → 2.2.1 Título)
+            first_line_clean = _MARKDOWN_BOLD_RE.sub(r"\2", lines[0]).strip()
+            heading_match = _AI_LEVEL3_HEADING_RE.match(first_line_clean)
+            if heading_match and not _MATH_FORMULA_RE.search(heading_match.group(2)):
                 blocks.append(
                     {
                         "type": "heading",
@@ -1816,14 +1936,14 @@ def _normalize_ai_content(content: Any) -> List[Block]:
         return blocks
 
     if isinstance(content, dict):
-        return _normalize_content_item(content)
+        return _normalize_content_item(content, parent_item=parent_item)
 
     if not isinstance(content, list):
         return []
 
     blocks: List[Block] = []
     for item in content:
-        blocks.extend(_normalize_content_item(item))
+        blocks.extend(_normalize_content_item(item, parent_item=parent_item))
     return blocks
 
 

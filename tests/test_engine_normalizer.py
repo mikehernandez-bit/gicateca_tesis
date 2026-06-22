@@ -665,6 +665,34 @@ class TestNormalizeCuerpo:
         hdgs = _blocks_of_type(blocks, "heading")
         assert any(b["text"] == "CAP I" and b["level"] == 1 for b in hdgs)
 
+    def test_ai_figure_inherits_parent_note_and_color_blue(self):
+        """Una figura inyectada por IA hereda la nota e instrucción del padre y se marca azul."""
+        data = _minimal_json()
+        data["cuerpo"] = [
+            {
+                "titulo": "CAP I",
+                "contenido": [
+                    {
+                        "texto": "1.1 Descripcion",
+                        "nota": "Instruccion de prueba de la seccion",
+                        "_ai_content": [
+                            {
+                                "tipo": "figura",
+                                "titulo": "Figura de IA",
+                                "ruta": "figura_real.png",
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+        blocks = normalize(data)
+        images = _blocks_of_type(blocks, "image")
+        assert len(images) == 1
+        assert images[0]["titulo"] == "Figura de IA"
+        assert images[0]["nota"] == "Instruccion de prueba de la seccion"
+        assert images[0]["nota_color"] == "0000FF"
+
     def test_page_break_before_second_chapter_only(self):
         """Los saltos de capitulo van antes del siguiente capitulo, no despues del titulo."""
         data = _minimal_json()
@@ -876,6 +904,133 @@ class TestNormalizeCuerpo:
         apa = _blocks_of_type(blocks, "apa_examples")
         assert len(apa) == 1
         assert apa[0]["ejemplos"] == ["Ej1", "Ej2"]
+
+
+    def test_formula_text_not_treated_as_heading(self):
+        """Texto con patrón N.N.N seguido de fórmula matemática no debe ser Heading 3.
+
+        Regresión: la IA puede generar una línea como '4.2.1 n = N·Z²·p·q / (N-1)·e²'
+        que coincide con el regex de nivel 3, pero es una fórmula, no un título.
+        No debe aparecer en el índice de contenidos.
+        """
+        data = _minimal_json()
+        data["cuerpo"][0]["contenido"] = [{
+            "texto": "4.2 Diseño muestral",
+            "_ai_content": (
+                "4.2.1 Fórmula de tamaño de muestra\n\n"
+                "n = N · Z² · p · q / (N-1) · e² + Z² · p · q\n\n"
+                "Donde N es el tamaño de la población."
+            ),
+        }]
+        blocks = normalize(data)
+        hdgs = _blocks_of_type(blocks, "heading")
+        # La fórmula con operadores matemáticos NO debe generar heading nivel 3
+        formula_headings = [
+            b for b in hdgs
+            if "=" in b.get("text", "") or "·" in b.get("text", "")
+        ]
+        assert formula_headings == [], f"Fórmulas no deben ser heading: {formula_headings}"
+        # El texto de la fórmula debe aparecer como párrafo
+        pars = _blocks_of_type(blocks, "paragraph")
+        assert any("N · Z²" in b.get("text", "") or "N-1" in b.get("text", "") for b in pars)
+
+    def test_formula_as_item_texto_not_treated_as_black_heading(self):
+        """Una fórmula matemática como 'texto' de un item del JSON estructurado NO debe
+        ser emitida como black_heading, ya que eso la haría aparecer en el TOC de Word.
+
+        Regresión: cuando la IA genera {'texto': 'D = MTBF / (MTBF + MTTR)', '_ai_content': [...]},
+        el normalizer lo convertía en black_heading (Heading 2 en Word → visible en TOC).
+        Debe convertirse en un párrafo normal.
+        """
+        data = _minimal_json()
+        data["cuerpo"][0]["contenido"] = [{
+            "texto": "D = MTBF / (MTBF + MTTR)",
+            "_ai_content": ["La disponibilidad inherente mide la probabilidad de que el equipo funcione."],
+        }]
+        blocks = normalize(data)
+        # La fórmula NO debe ser black_heading
+        bh = _blocks_of_type(blocks, "black_heading")
+        formula_bh = [b for b in bh if "=" in b.get("text", "") or "MTBF" in b.get("text", "")]
+        assert formula_bh == [], f"Fórmulas no deben ser black_heading (aparecen en TOC): {formula_bh}"
+        # La fórmula NO debe ser heading
+        hdgs = _blocks_of_type(blocks, "heading")
+        formula_hdgs = [b for b in hdgs if "=" in b.get("text", "") or "MTBF" in b.get("text", "")]
+        assert formula_hdgs == [], f"Fórmulas no deben ser heading: {formula_hdgs}"
+
+    def test_subtitulo_22x_with_markdown_bold_detected_as_heading3(self):
+        """Un subtítulo con asteriscos Markdown (**2.2.1 Título**) debe renderizarse
+        como Heading nivel 3, eliminando los asteriscos del texto final.
+
+        Regresión: la IA puede devolver texto con formato Markdown que el regex
+        no detectaba por los caracteres adicionales.
+        """
+        data = _minimal_json()
+        data["cuerpo"][0]["contenido"] = [{
+            "tipo": "parrafo",
+            "texto": "**2.2.1 Mantenimiento Centrado en Confiabilidad (RCM)**",
+        }]
+        blocks = normalize(data)
+        hdgs = _blocks_of_type(blocks, "heading")
+        h3 = [b for b in hdgs if b.get("level") == 3]
+        assert len(h3) == 1, f"Se esperaba un Heading 3, se obtuvo: {h3}"
+        assert "**" not in h3[0]["text"], "El texto del heading no debe tener asteriscos"
+        assert "2.2.1" in h3[0]["text"]
+        assert "RCM" in h3[0]["text"] or "Mantenimiento" in h3[0]["text"]
+
+    def test_subtitulo_22x_multiline_parrafo_detected_as_heading3(self):
+        """Un párrafo multi-línea que empieza con un título de nivel 3 (e.g. 2.2.1)
+        debe ser correctamente dividido en un bloque de heading 3 y otro bloque de párrafo.
+        """
+        data = _minimal_json()
+        data["cuerpo"][0]["contenido"] = [{
+            "tipo": "parrafo",
+            "texto": "2.2.1 Mantenimiento Centrado en Confiabilidad (RCM)\nEl Mantenimiento Centrado en Confiabilidad es una metodología...",
+        }]
+        blocks = normalize(data)
+        
+        hdgs = _blocks_of_type(blocks, "heading")
+        h3 = [b for b in hdgs if b.get("level") == 3]
+        assert len(h3) == 1, f"Se esperaba un Heading 3, se obtuvo: {h3}"
+        assert h3[0]["text"] == "2.2.1 Mantenimiento Centrado en Confiabilidad (RCM)"
+        
+        pars = _blocks_of_type(blocks, "paragraph")
+        rcm_pars = [p for p in pars if "El Mantenimiento" in p.get("text", "")]
+        assert len(rcm_pars) == 1
+        assert rcm_pars[0]["text"] == "El Mantenimiento Centrado en Confiabilidad es una metodología..."
+
+    def test_figure_without_nota_gets_generic_blue_instruction(self):
+        """Figura sin nota propia ni en el parent_item debe recibir una nota genérica
+        azul para guiar al estudiante.
+
+        Regresión: las figuras generadas por IA en 2.2 Bases Teóricas no traen
+        nota ni instruccion_detallada, por lo que antes no aparecía instrucción
+        debajo de la imagen.
+        """
+        data = _minimal_json()
+        data["cuerpo"][0]["contenido"] = [{
+            "texto": "2.2.1 Mantenimiento Centrado en Confiabilidad",
+            "_ai_content": [
+                {
+                    "tipo": "figura",
+                    "titulo": "Árbol de fallas del sistema",
+                    "ruta": "assets/figura_rcm.png",
+                    "fuente": "Elaboración propia",
+                    # Sin 'nota' ni 'instruccion_detallada' — ni en la figura ni en el padre
+                }
+            ],
+        }]
+        blocks = normalize(data)
+        images = _blocks_of_type(blocks, "image")
+        assert len(images) == 1
+        # La figura debe tener una nota genérica (no vacía)
+        assert images[0]["nota"], "La figura debe tener una nota de instrucción genérica"
+        assert images[0]["nota_color"] == "0000FF", "La nota debe ser azul (0000FF)"
+        # El texto genérico debe mencionar la figura o ser una instrucción útil
+        nota_text = images[0]["nota"].lower()
+        assert any(
+            keyword in nota_text
+            for keyword in ["elaborar", "figura", "datos", "fuente", "incluir"]
+        ), f"La nota genérica debe ser instructiva, se obtuvo: {images[0]['nota']!r}"
 
 
 # ─────────────────────────────────────────────────────────────
@@ -1092,11 +1247,11 @@ class TestNormalizeFinales:
         }
 
         blocks = normalize(data)
-        centered = _blocks_of_type(blocks, "paragraph_centered")
+        bold_blocks = _blocks_of_type(blocks, "paragraph_bold")
         paragraphs = _blocks_of_type(blocks, "paragraph")
         tables = _blocks_of_type(blocks, "table")
 
-        assert any("Anexo 1: Matriz de consistencia final" == b["text"] for b in centered)
+        assert any("Anexo 1: Matriz de consistencia final" == b["text"] for b in bold_blocks)
         assert all(
             "A continuacion se muestra" not in b["text"] for b in paragraphs if "text" in b
         )
@@ -1121,10 +1276,10 @@ class TestNormalizeFinales:
         }
 
         blocks = normalize(data)
-        centered = _blocks_of_type(blocks, "paragraph_centered")
+        bold_blocks = _blocks_of_type(blocks, "paragraph_bold")
         tables = _blocks_of_type(blocks, "table")
 
-        assert any("Anexo 1: Cronograma de validacion" == b["text"] for b in centered)
+        assert any("Anexo 1: Cronograma de validacion" == b["text"] for b in bold_blocks)
         assert len(tables) == 1
         assert not tables[0].get("titulo")
 
@@ -1278,11 +1433,11 @@ class TestNormalizeFinales:
         }
 
         blocks = normalize(data)
-        centered = _blocks_of_type(blocks, "paragraph_centered")
+        bold_blocks = _blocks_of_type(blocks, "paragraph_bold")
         paragraphs = _blocks_of_type(blocks, "paragraph")
 
-        assert any("Anexo 1: Registro fotográfico" == b["text"] for b in centered)
-        assert all("Figura A1" not in b["text"] for b in centered if "text" in b)
+        assert any("Anexo 1: Registro fotográfico" == b["text"] for b in bold_blocks)
+        assert all("Figura A1" not in b["text"] for b in bold_blocks if "text" in b)
         assert any("Evidencia 1: Vista frontal del equipo." == b["text"] for b in paragraphs)
 
     def test_anexos_fallback_matriz(self):

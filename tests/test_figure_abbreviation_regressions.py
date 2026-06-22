@@ -149,7 +149,7 @@ def test_annex_image_uses_annex_heading_without_figure_caption() -> None:
     annex_heading = [
         block
         for block in blocks
-        if block["type"] == "paragraph_centered"
+        if block["type"] == "paragraph_bold"
         and "Anexo 2: Diagrama de flujo del proceso de recoleccion de datos" in block["text"]
     ]
     assert annex_heading

@@ -263,10 +263,9 @@ def test_apply_ai_content_tags_structured_chapter_blocks_as_ai_generated() -> No
     result = apply_ai_content(data, ai_sections)
     contenido = result["cuerpo"][0]["contenido"]
 
-    assert contenido[0]["titulo"] == "Cronograma final"
+    assert len(contenido) == 1
+    assert contenido[0]["titulo"] == "Cronograma base"
     assert contenido[0]["_ai_generated"] is True
-    assert contenido[1]["titulo"] == "Cronograma base"
-    assert "_ai_generated" not in contenido[1]
 
 
 def test_apply_ai_content_skips_unac_project_chapter_level_text() -> None:
