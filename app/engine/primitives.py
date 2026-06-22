@@ -149,7 +149,7 @@ def configure_styles(
     style.paragraph_format.line_spacing = 1.5
     style.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
     # Evita páginas en blanco por "page break before" heredado en estilos heading.
-    for heading_name in ("Heading 1", "Heading 2"):
+    for heading_name in ("Heading 1", "Heading 2", "Heading 3"):
         try:
             heading_style = doc.styles[heading_name]
             heading_style.paragraph_format.page_break_before = False
@@ -216,11 +216,25 @@ def add_heading_formal(
     h.paragraph_format.space_after = Pt(space_after)
     h.alignment = WD_ALIGN_PARAGRAPH.CENTER if centered else WD_ALIGN_PARAGRAPH.LEFT
 
+    # Asegura que el párrafo tenga configurado el outline level correcto (0-based)
+    # para que Word lo reconozca en el TOC.
+    try:
+        pPr = h._p.get_or_add_pPr()
+        outlineLvl = pPr.find(qn('w:outlineLvl'))
+        if outlineLvl is None:
+            outlineLvl = OxmlElement('w:outlineLvl')
+            outlineLvl.set(qn('w:val'), str(level - 1))
+            pPr.append(outlineLvl)
+        else:
+            outlineLvl.set(qn('w:val'), str(level - 1))
+    except Exception as e:
+        logger.warning("Error setting outline level on heading: %s", e)
+
     run = h.runs[0] if h.runs else h.add_run(text)
     if run.text != text:
         run.text = text
     run.font.name = "Arial"
-    run.font.size = Pt(14 if level == 1 else 12)
+    run.font.size = Pt(14 if level == 1 else (12 if level == 2 else 11))
     run.bold = True
     run.font.color.rgb = RGBColor(0, 0, 0)
 

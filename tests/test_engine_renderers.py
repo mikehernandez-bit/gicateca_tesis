@@ -189,6 +189,15 @@ class TestHeadings:
         p = [p for p in doc.paragraphs if "SUBTITULO" in p.text][0]
         assert p.paragraph_format.page_break_before is False
 
+    def test_heading_level_3_outline_level(self):
+        doc = _render({"type": "heading", "text": "2.2.1 Antecedentes", "level": 3})
+        p = [p for p in doc.paragraphs if "2.2.1 Antecedentes" in p.text][0]
+        from docx.oxml.ns import qn
+        pPr = p._p.get_or_add_pPr()
+        outlineLvl = pPr.find(qn('w:outlineLvl'))
+        assert outlineLvl is not None
+        assert outlineLvl.get(qn('w:val')) == '2'
+
 
 # ─────────────────────────────────────────────────────────────
 # PARAGRAPH + PARAGRAPH_CENTERED
