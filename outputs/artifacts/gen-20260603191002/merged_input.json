@@ -1,0 +1,2564 @@
+{
+  "_meta": {
+    "entity": "format",
+    "publish": true,
+    "id": "unac-proyecto-cuant",
+    "university": "unac",
+    "category": "Proyecto de Tesis",
+    "documentType": "cuant",
+    "title": "Proyecto de Tesis UNAC - Enfoque Cuantitativo",
+    "descripcion": "Formato de proyecto de tesis con enfoque cuantitativo para la Universidad Nacional del Callao.",
+    "version": "2.0.0"
+  },
+  "configuracion": {
+    "fuente_normal": "Times New Roman",
+    "tamano_normal": 12,
+    "ruta_logo": "app/static/assets/LogoUNAC.png",
+    "color_encabezado": "BDD7EE"
+  },
+  "caratula": {
+    "universidad": "UNIVERSIDAD NACIONAL DEL CALLAO",
+    "facultad": "ESCUELA DE POSGRADO",
+    "escuela": "UNIDAD DE POSGRADO DE LA FACULTAD DE INGENIERÍA MECÁNICA Y DE ENERGÍA",
+    "tipo_documento": "PROYECTO DE INVESTIGACIÓN",
+    "titulo_placeholder": "\"PLAN DE MANTENIMIENTO CENTRADO EN CONFIABILIDAD PARA MEJORAR LA DISPONIBILIDAD INHERENTE DE LA FLOTA DE MOTONIVELADORAS CAT 24M EN UNA UNIDAD MINERA CUPRÍFERA, SIERRA CENTRAL, 2025\"",
+    "frase_grado": "PARA OPTAR EL GRADO ACADÉMICO DE MAESTRO EN GERENCIA DE MANTENIMIENTO",
+    "label_autor": "AUTORES:",
+    "autores": [
+      "Bach. Lenin Walter Cruz Julca",
+      "Bach. Eliseo Antonio Torres Roque"
+    ],
+    "label_asesor": "ASESOR:",
+    "asesor": "Dr. Robert William Castillo Alva",
+    "label_linea": "LÍNEA DE INVESTIGACIÓN:",
+    "linea_investigacion": "Ingeniería y Tecnología",
+    "lugar": "Callao",
+    "anio": "2026",
+    "pais": "PERÚ",
+    "titulo": "PLAN DE MANTENIMIENTO CENTRADO EN CONFIABILIDAD PARA MEJORAR LA DISPONIBILIDAD INHERENTE DE LA FLOTA DE MOTONIVELADORAS CAT 24M EN UNA UNIDAD MINERA CUPRÍFERA, SIERRA CENTRAL, 2025",
+    "titulo_investigacion": "PLAN DE MANTENIMIENTO CENTRADO EN CONFIABILIDAD PARA MEJORAR LA DISPONIBILIDAD INHERENTE DE LA FLOTA DE MOTONIVELADORAS CAT 24M EN UNA UNIDAD MINERA CUPRÍFERA, SIERRA CENTRAL, 2025",
+    "autor1_nombres": "Bach. Lenin Walter Cruz Julca",
+    "asesor_nombres": "Dr. Robert William Castillo Alva"
+  },
+  "preliminares": {
+    "indices": [
+      {
+        "titulo": "ÍNDICE",
+        "items": [
+          {
+            "texto": "ÍNDICE",
+            "pag": 1
+          },
+          {
+            "texto": "ÍNDICE DE TABLAS",
+            "pag": 2
+          },
+          {
+            "texto": "ÍNDICE DE FIGURAS",
+            "pag": 3
+          },
+          {
+            "texto": "ÍNDICE DE ABREVIATURAS",
+            "pag": 4
+          },
+          {
+            "texto": "INTRODUCCIÓN",
+            "pag": 5
+          },
+          {
+            "texto": "I. PLANTEAMIENTO DEL PROBLEMA",
+            "pag": 6,
+            "bold": true
+          },
+          {
+            "texto": "II. MARCO TEÓRICO",
+            "pag": 10,
+            "bold": true
+          },
+          {
+            "texto": "III. HIPÓTESIS Y VARIABLES",
+            "pag": 17,
+            "bold": true
+          },
+          {
+            "texto": "IV. METODOLOGÍA DEL PROYECTO",
+            "pag": 19,
+            "bold": true
+          },
+          {
+            "texto": "V. CRONOGRAMA DE ACTIVIDADES",
+            "pag": 21,
+            "bold": true
+          },
+          {
+            "texto": "VI. PRESUPUESTO",
+            "pag": 22,
+            "bold": true
+          },
+          {
+            "texto": "VII. REFERENCIAS BIBLIOGRÁFICAS",
+            "pag": 23,
+            "bold": true
+          },
+          {
+            "texto": "VIII. ANEXOS",
+            "pag": 24,
+            "bold": true
+          }
+        ]
+      },
+      {
+        "titulo": "ÍNDICE DE TABLAS",
+        "items": [
+          {
+            "texto": "Tabla 1.1. Frecuencia de fallas en los equipos",
+            "pag": 8
+          },
+          {
+            "texto": "Tabla 1.2. Diagrama de Pareto",
+            "pag": 8
+          },
+          {
+            "texto": "Tabla 2.1. Mapa de Procesos",
+            "pag": 12
+          },
+          {
+            "texto": "Tabla 2.2. Diagrama de Procesos",
+            "pag": 12
+          }
+        ]
+      },
+      {
+        "titulo": "ÍNDICE DE FIGURAS",
+        "items": [
+          {
+            "texto": "Figura 1.1 Frecuencia de los fallas en el área de mantenimiento",
+            "pag": 7
+          },
+          {
+            "texto": "Figura 1.2 Ejemplo",
+            "pag": 7
+          },
+          {
+            "texto": "Figura 2.1 Matriz de consistencia de variable simple",
+            "pag": 13
+          },
+          {
+            "texto": "Figura 2.2 Matriz de consistencia de implementación",
+            "pag": 13
+          },
+          {
+            "texto": "Figura 2.3 Matriz de operacionalización de diseño",
+            "pag": 14
+          },
+          {
+            "texto": "Figura 2.4 Matriz de operacionalización de diseño",
+            "pag": 15
+          }
+        ]
+      },
+      {
+        "titulo": "ÍNDICE DE ABREVIATURAS",
+        "items": [
+          {
+            "texto": "ORGANIZACIÓN MUNDIAL DE LA SALUD (OMS)",
+            "pag": 6
+          }
+        ]
+      }
+    ],
+    "introduccion": {
+      "titulo": "INTRODUCCIÓN",
+      "texto": "Manifiesta la importancia y las razones por las que realiza el proyecto de tesis, referencia algunos trabajos similares anteriormente publicados, menciona los objetivos de estudio, la problemática y las soluciones. Asimismo presentar una descripción de la estructura del proyecto (máximo 02 páginas)."
+    }
+  },
+  "cuerpo": [
+    {
+      "titulo": "I. PLANTEAMIENTO DEL PROBLEMA",
+      "contenido": [
+        {
+          "texto": "1.1 Descripción de la realidad problemática",
+          "imagenes": [
+            {
+              "titulo": "Árbol de problemas",
+              "ruta": "figura_ejemplo.png",
+              "fuente": "Elaboración propia"
+            }
+          ]
+        },
+        {
+          "texto": "1.2 Formulación del problema"
+        },
+        {
+          "texto": "1.3 Objetivos"
+        },
+        {
+          "texto": "1.4 Justificación"
+        },
+        {
+          "texto": "1.5 Delimitaciones de la investigación"
+        }
+      ]
+    },
+    {
+      "titulo": "II. MARCO TEÓRICO",
+      "contenido": [
+        {
+          "texto": "2.1 Antecedentes",
+          "imagenes": [
+            {
+              "titulo": "Marco conceptual de la investigación",
+              "ruta": "figura_ejemplo.png",
+              "fuente": "Elaboración propia basada en la revisión de literatura"
+            }
+          ]
+        },
+        {
+          "texto": "2.2 Bases teóricas"
+        },
+        {
+          "texto": "2.3 Marco conceptual"
+        },
+        {
+          "texto": "2.4 Definición de términos básicos"
+        }
+      ]
+    },
+    {
+      "titulo": "III. HIPÓTESIS Y VARIABLES",
+      "contenido": [
+        {
+          "texto": "3.1 Hipótesis",
+          "imagenes": [
+            {
+              "titulo": "Modelo de relación entre variables",
+              "ruta": "figura_ejemplo.png",
+              "fuente": "Elaboración propia"
+            }
+          ]
+        },
+        {
+          "texto": "3.2 Operacionalización de variable",
+          "tabla": {
+            "headers": [
+              "VARIABLES",
+              "DEFINICIÓN CONCEPTUAL",
+              "DEFINICIÓN OPERACIONAL",
+              "DIMENSIONES",
+              "INDICADORES",
+              "ÍNDICE",
+              "MÉTODO Y TÉCNICA"
+            ],
+            "rows": [
+              [
+                "",
+                "Definición según un autor de un libro, ley, norma o artículo científico (Citar)",
+                "Constituye el conjunto de procedimientos, actividades u operaciones que deben realizarse para medir una variable.",
+                "Pueden denominarse como sub variables. En conjunto detallan el comportamiento de la variable en estudio; se recomienda que las dimensiones provengan de teorías, las cuales deben estar detalladas en el marco teórico.",
+                "Elemento observable, que permiten estudiar o cuantificar las dimensiones. Información transformable en valores numéricos que nos permitirán realizar operaciones de cálculo, estadísticas, que nos permiten nuevas operaciones para describir la realidad estudiada, comprenderla, explicar e, incluso, predecir acontecimientos en términos probabilísticos.",
+                "Permiten medir características de las variables de manera general según dimensiones. Debe tener coherencia con el marco teórico y con lo que propuesto en los instrumentos de recolección de datos.\nLos índices expresan la intensidad de la cualidad de los indicadores.",
+                "Menciona el método y la técnica que empleará para cuantificar u observar las variables."
+              ]
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "titulo": "IV. METODOLOGÍA DEL PROYECTO",
+      "contenido": [
+        {
+          "texto": "4.1 Diseño metodológico",
+          "imagenes": [
+            {
+              "titulo": "Diseño metodológico de la investigación",
+              "ruta": "figura_ejemplo.png",
+              "fuente": "Elaboración propia"
+            }
+          ]
+        },
+        {
+          "texto": "4.2 Método de investigación"
+        },
+        {
+          "texto": "4.3 Población y muestra"
+        },
+        {
+          "texto": "4.4 Lugar de estudio"
+        },
+        {
+          "texto": "4.5 Técnicas e instrumentos para la recolección de la información"
+        },
+        {
+          "texto": "4.6 Análisis y procesamiento de datos"
+        },
+        {
+          "texto": "4.7 Aspectos éticos en Investigación"
+        }
+      ]
+    },
+    {
+      "titulo": "V. CRONOGRAMA DE ACTIVIDADES",
+      "contenido": [
+        {
+          "tipo": "tabla",
+          "id": "tabla_5_1_cronograma_actividades",
+          "titulo": "Tabla 5.1 Cronograma de actividades",
+          "encabezados": [
+            "FASES Y ACTIVIDADES",
+            "2025",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          "filas": [
+            [
+              "",
+              "Ene",
+              "Feb",
+              "Mar",
+              "Abr",
+              "May",
+              "Jun",
+              "Jul",
+              "Ago",
+              "Set",
+              "Oct",
+              "Nov",
+              "Dic"
+            ],
+            [
+              "1. Revisión bibliográfica y marco teórico",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "1.1. Recopilación de antecedentes sobre mantenimiento centrado en confiabilidad",
+              "",
+              "●",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "1.2. Análisis de literatura sobre disponibilidad inherente en equipos mineros",
+              "",
+              "●",
+              "●",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "1.3. Elaboración del marco teórico conceptual",
+              "",
+              "",
+              "●",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "2. Diagnóstico inicial de la flota de motoniveladoras",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "2.1. Evaluación del estado actual de las motoniveladoras CAT 24M",
+              "",
+              "●",
+              "●",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "2.2. Identificación de fallas recurrentes en la flota",
+              "",
+              "",
+              "●",
+              "●",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "2.3. Análisis de datos históricos de mantenimiento",
+              "",
+              "",
+              "",
+              "●",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "3. Diseño metodológico",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "3.1. Definición de variables e indicadores de disponibilidad",
+              "",
+              "",
+              "",
+              "●",
+              "●",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "3.2. Selección de técnicas de recolección de datos",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "3.3. Elaboración de instrumentos de medición",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "●",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "4. Implementación del plan RCM",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "4.1. Capacitación del personal en mantenimiento centrado en confiabilidad",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "4.2. Aplicación de estrategias de mantenimiento preventivo",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "●",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "4.3. Monitoreo inicial de resultados",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "5. Recolección y procesamiento de datos",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "5.1. Aplicación de instrumentos de medición",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "5.2. Registro de datos operativos de las motoniveladoras",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "●",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "5.3. Procesamiento estadístico de la información",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "6. Análisis de resultados",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "6.1. Evaluación de la disponibilidad inherente post-implementación",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "●",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "6.2. Comparación con datos históricos de mantenimiento",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "●",
+              "",
+              "",
+              ""
+            ],
+            [
+              "6.3. Identificación de mejoras en los indicadores de confiabilidad",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "●",
+              "",
+              ""
+            ],
+            [
+              "6.4. Validación de hipótesis de investigación",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "",
+              ""
+            ],
+            [
+              "7. Elaboración del informe final",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "7.1. Redacción de resultados y discusión",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "●",
+              "",
+              "",
+              ""
+            ],
+            [
+              "7.2. Formulación de conclusiones y recomendaciones",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "●",
+              "",
+              ""
+            ],
+            [
+              "7.3. Revisión y ajuste del documento final",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "●",
+              ""
+            ],
+            [
+              "8. Presentación y defensa del proyecto",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "8.1. Preparación de la exposición oral",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "●",
+              ""
+            ],
+            [
+              "8.2. Elaboración de material de apoyo visual",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              ""
+            ],
+            [
+              "8.3. Ensayo de presentación ante comité evaluador",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "●"
+            ],
+            [
+              "8.4. Defensa pública del proyecto de investigación",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●"
+            ]
+          ],
+          "orientacion": "landscape",
+          "subtipo": "cronograma_actividades",
+          "anio": "2025",
+          "meses": [
+            "Ene",
+            "Feb",
+            "Mar",
+            "Abr",
+            "May",
+            "Jun",
+            "Jul",
+            "Ago",
+            "Set",
+            "Oct",
+            "Nov",
+            "Dic"
+          ],
+          "simbolo_marca": "●",
+          "filas_fase": [
+            1,
+            5,
+            9,
+            13,
+            17,
+            21,
+            26,
+            30
+          ],
+          "celdas_combinadas": [
+            {
+              "fila": -1,
+              "fila_fin": 0,
+              "col_inicio": 0,
+              "col_fin": 0,
+              "texto": "FASES Y ACTIVIDADES"
+            },
+            {
+              "fila": -1,
+              "col_inicio": 1,
+              "col_fin": 12,
+              "texto": "2025"
+            },
+            {
+              "fila": 1,
+              "col_inicio": 0,
+              "col_fin": 12,
+              "texto": "1. Revisión bibliográfica y marco teórico"
+            },
+            {
+              "fila": 5,
+              "col_inicio": 0,
+              "col_fin": 12,
+              "texto": "2. Diagnóstico inicial de la flota de motoniveladoras"
+            },
+            {
+              "fila": 9,
+              "col_inicio": 0,
+              "col_fin": 12,
+              "texto": "3. Diseño metodológico"
+            },
+            {
+              "fila": 13,
+              "col_inicio": 0,
+              "col_fin": 12,
+              "texto": "4. Implementación del plan RCM"
+            },
+            {
+              "fila": 17,
+              "col_inicio": 0,
+              "col_fin": 12,
+              "texto": "5. Recolección y procesamiento de datos"
+            },
+            {
+              "fila": 21,
+              "col_inicio": 0,
+              "col_fin": 12,
+              "texto": "6. Análisis de resultados"
+            },
+            {
+              "fila": 26,
+              "col_inicio": 0,
+              "col_fin": 12,
+              "texto": "7. Elaboración del informe final"
+            },
+            {
+              "fila": 30,
+              "col_inicio": 0,
+              "col_fin": 12,
+              "texto": "8. Presentación y defensa del proyecto"
+            }
+          ],
+          "celdas_fusionadas": [
+            {
+              "fila": -1,
+              "col": 0,
+              "filas_span": 2,
+              "cols_span": 1,
+              "texto": "FASES Y ACTIVIDADES",
+              "bold": true,
+              "alignment": "center"
+            },
+            {
+              "fila": -1,
+              "col": 1,
+              "filas_span": 1,
+              "cols_span": 12,
+              "texto": "2025",
+              "bold": true,
+              "alignment": "center"
+            },
+            {
+              "fila": 1,
+              "col": 0,
+              "filas_span": 1,
+              "cols_span": 13,
+              "texto": "1. Revisión bibliográfica y marco teórico",
+              "bold": true,
+              "alignment": "center"
+            },
+            {
+              "fila": 5,
+              "col": 0,
+              "filas_span": 1,
+              "cols_span": 13,
+              "texto": "2. Diagnóstico inicial de la flota de motoniveladoras",
+              "bold": true,
+              "alignment": "center"
+            },
+            {
+              "fila": 9,
+              "col": 0,
+              "filas_span": 1,
+              "cols_span": 13,
+              "texto": "3. Diseño metodológico",
+              "bold": true,
+              "alignment": "center"
+            },
+            {
+              "fila": 13,
+              "col": 0,
+              "filas_span": 1,
+              "cols_span": 13,
+              "texto": "4. Implementación del plan RCM",
+              "bold": true,
+              "alignment": "center"
+            },
+            {
+              "fila": 17,
+              "col": 0,
+              "filas_span": 1,
+              "cols_span": 13,
+              "texto": "5. Recolección y procesamiento de datos",
+              "bold": true,
+              "alignment": "center"
+            },
+            {
+              "fila": 21,
+              "col": 0,
+              "filas_span": 1,
+              "cols_span": 13,
+              "texto": "6. Análisis de resultados",
+              "bold": true,
+              "alignment": "center"
+            },
+            {
+              "fila": 26,
+              "col": 0,
+              "filas_span": 1,
+              "cols_span": 13,
+              "texto": "7. Elaboración del informe final",
+              "bold": true,
+              "alignment": "center"
+            },
+            {
+              "fila": 30,
+              "col": 0,
+              "filas_span": 1,
+              "cols_span": 13,
+              "texto": "8. Presentación y defensa del proyecto",
+              "bold": true,
+              "alignment": "center"
+            }
+          ],
+          "estilos": {
+            "modelo_referencia": "cronograma_actividades.docx",
+            "titulo_capitulo": "V. CRONOGRAMA DE ACTIVIDADES",
+            "titulo_exacto": true,
+            "titulo_negrita": false,
+            "titulo_tamano_pt": 9.5,
+            "titulo_space_after_pt": 6,
+            "ancho_tabla": "100%",
+            "ancho_columnas": [
+              8.91,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59
+            ],
+            "alineacion_actividades": "left",
+            "alineacion_meses": "center",
+            "encabezados_negrita": true,
+            "encabezado_color": "",
+            "fases_negrita": true,
+            "fases_centradas": true,
+            "bordes": "grid",
+            "fuente_tamano_pt": 8,
+            "fuente_size": 8,
+            "fuente_meses_pt": 8,
+            "fuente_actividades_pt": 8,
+            "fuente_fases_pt": 8,
+            "fuente_marcas_pt": 10,
+            "compactar_cronograma": false,
+            "orientacion_pagina": "landscape",
+            "margenes_reducidos": true
+          },
+          "estilo": {
+            "modelo_referencia": "cronograma_actividades.docx",
+            "titulo_capitulo": "V. CRONOGRAMA DE ACTIVIDADES",
+            "titulo_exacto": true,
+            "titulo_negrita": false,
+            "titulo_tamano_pt": 9.5,
+            "titulo_space_after_pt": 6,
+            "ancho_tabla": "100%",
+            "ancho_columnas": [
+              8.91,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59
+            ],
+            "alineacion_actividades": "left",
+            "alineacion_meses": "center",
+            "encabezados_negrita": true,
+            "encabezado_color": "",
+            "fases_negrita": true,
+            "fases_centradas": true,
+            "bordes": "grid",
+            "fuente_tamano_pt": 8,
+            "fuente_size": 8,
+            "fuente_meses_pt": 8,
+            "fuente_actividades_pt": 8,
+            "fuente_fases_pt": 8,
+            "fuente_marcas_pt": 10,
+            "compactar_cronograma": false,
+            "orientacion_pagina": "landscape",
+            "margenes_reducidos": true
+          },
+          "_ai_generated": true
+        }
+      ],
+      "_ai_content": [
+        {
+          "tipo": "tabla",
+          "encabezados": [
+            "FASES Y ACTIVIDADES",
+            "2025",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          "filas": [
+            [
+              "",
+              "Ene",
+              "Feb",
+              "Mar",
+              "Abr",
+              "May",
+              "Jun",
+              "Jul",
+              "Ago",
+              "Set",
+              "Oct",
+              "Nov",
+              "Dic"
+            ],
+            [
+              "1. Revisión bibliográfica y marco teórico",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "1.1. Recopilación de antecedentes sobre mantenimiento centrado en confiabilidad",
+              "",
+              "●",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "1.2. Análisis de literatura sobre disponibilidad inherente en equipos mineros",
+              "",
+              "●",
+              "●",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "1.3. Elaboración del marco teórico conceptual",
+              "",
+              "",
+              "●",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "2. Diagnóstico inicial de la flota de motoniveladoras",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "2.1. Evaluación del estado actual de las motoniveladoras CAT 24M",
+              "",
+              "●",
+              "●",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "2.2. Identificación de fallas recurrentes en la flota",
+              "",
+              "",
+              "●",
+              "●",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "2.3. Análisis de datos históricos de mantenimiento",
+              "",
+              "",
+              "",
+              "●",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "3. Diseño metodológico",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "3.1. Definición de variables e indicadores de disponibilidad",
+              "",
+              "",
+              "",
+              "●",
+              "●",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "3.2. Selección de técnicas de recolección de datos",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "3.3. Elaboración de instrumentos de medición",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "●",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "4. Implementación del plan RCM",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "4.1. Capacitación del personal en mantenimiento centrado en confiabilidad",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "4.2. Aplicación de estrategias de mantenimiento preventivo",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "●",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "4.3. Monitoreo inicial de resultados",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "5. Recolección y procesamiento de datos",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "5.1. Aplicación de instrumentos de medición",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "5.2. Registro de datos operativos de las motoniveladoras",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "●",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "5.3. Procesamiento estadístico de la información",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "6. Análisis de resultados",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "6.1. Evaluación de la disponibilidad inherente post-implementación",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "●",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "6.2. Comparación con datos históricos de mantenimiento",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "●",
+              "",
+              "",
+              ""
+            ],
+            [
+              "6.3. Identificación de mejoras en los indicadores de confiabilidad",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "●",
+              "",
+              ""
+            ],
+            [
+              "6.4. Validación de hipótesis de investigación",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "",
+              ""
+            ],
+            [
+              "7. Elaboración del informe final",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "7.1. Redacción de resultados y discusión",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "●",
+              "",
+              "",
+              ""
+            ],
+            [
+              "7.2. Formulación de conclusiones y recomendaciones",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "●",
+              "",
+              ""
+            ],
+            [
+              "7.3. Revisión y ajuste del documento final",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "●",
+              ""
+            ],
+            [
+              "8. Presentación y defensa del proyecto",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ],
+            [
+              "8.1. Preparación de la exposición oral",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "●",
+              ""
+            ],
+            [
+              "8.2. Elaboración de material de apoyo visual",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              ""
+            ],
+            [
+              "8.3. Ensayo de presentación ante comité evaluador",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●",
+              "●"
+            ],
+            [
+              "8.4. Defensa pública del proyecto de investigación",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "●"
+            ]
+          ],
+          "orientacion": "landscape",
+          "id": "tabla_5_1_cronograma_actividades",
+          "titulo": "Tabla 5.1 Cronograma de actividades",
+          "subtipo": "cronograma_actividades",
+          "anio": "2025",
+          "meses": [
+            "Ene",
+            "Feb",
+            "Mar",
+            "Abr",
+            "May",
+            "Jun",
+            "Jul",
+            "Ago",
+            "Set",
+            "Oct",
+            "Nov",
+            "Dic"
+          ],
+          "simbolo_marca": "●",
+          "filas_fase": [
+            1,
+            5,
+            9,
+            13,
+            17,
+            21,
+            26,
+            30
+          ],
+          "celdas_combinadas": [
+            {
+              "fila": -1,
+              "fila_fin": 0,
+              "col_inicio": 0,
+              "col_fin": 0,
+              "texto": "FASES Y ACTIVIDADES"
+            },
+            {
+              "fila": -1,
+              "col_inicio": 1,
+              "col_fin": 12,
+              "texto": "2025"
+            },
+            {
+              "fila": 1,
+              "col_inicio": 0,
+              "col_fin": 12,
+              "texto": "1. Revisión bibliográfica y marco teórico"
+            },
+            {
+              "fila": 5,
+              "col_inicio": 0,
+              "col_fin": 12,
+              "texto": "2. Diagnóstico inicial de la flota de motoniveladoras"
+            },
+            {
+              "fila": 9,
+              "col_inicio": 0,
+              "col_fin": 12,
+              "texto": "3. Diseño metodológico"
+            },
+            {
+              "fila": 13,
+              "col_inicio": 0,
+              "col_fin": 12,
+              "texto": "4. Implementación del plan RCM"
+            },
+            {
+              "fila": 17,
+              "col_inicio": 0,
+              "col_fin": 12,
+              "texto": "5. Recolección y procesamiento de datos"
+            },
+            {
+              "fila": 21,
+              "col_inicio": 0,
+              "col_fin": 12,
+              "texto": "6. Análisis de resultados"
+            },
+            {
+              "fila": 26,
+              "col_inicio": 0,
+              "col_fin": 12,
+              "texto": "7. Elaboración del informe final"
+            },
+            {
+              "fila": 30,
+              "col_inicio": 0,
+              "col_fin": 12,
+              "texto": "8. Presentación y defensa del proyecto"
+            }
+          ],
+          "celdas_fusionadas": [
+            {
+              "fila": -1,
+              "col": 0,
+              "filas_span": 2,
+              "cols_span": 1,
+              "texto": "FASES Y ACTIVIDADES",
+              "bold": true,
+              "alignment": "center"
+            },
+            {
+              "fila": -1,
+              "col": 1,
+              "filas_span": 1,
+              "cols_span": 12,
+              "texto": "2025",
+              "bold": true,
+              "alignment": "center"
+            },
+            {
+              "fila": 1,
+              "col": 0,
+              "filas_span": 1,
+              "cols_span": 13,
+              "texto": "1. Revisión bibliográfica y marco teórico",
+              "bold": true,
+              "alignment": "center"
+            },
+            {
+              "fila": 5,
+              "col": 0,
+              "filas_span": 1,
+              "cols_span": 13,
+              "texto": "2. Diagnóstico inicial de la flota de motoniveladoras",
+              "bold": true,
+              "alignment": "center"
+            },
+            {
+              "fila": 9,
+              "col": 0,
+              "filas_span": 1,
+              "cols_span": 13,
+              "texto": "3. Diseño metodológico",
+              "bold": true,
+              "alignment": "center"
+            },
+            {
+              "fila": 13,
+              "col": 0,
+              "filas_span": 1,
+              "cols_span": 13,
+              "texto": "4. Implementación del plan RCM",
+              "bold": true,
+              "alignment": "center"
+            },
+            {
+              "fila": 17,
+              "col": 0,
+              "filas_span": 1,
+              "cols_span": 13,
+              "texto": "5. Recolección y procesamiento de datos",
+              "bold": true,
+              "alignment": "center"
+            },
+            {
+              "fila": 21,
+              "col": 0,
+              "filas_span": 1,
+              "cols_span": 13,
+              "texto": "6. Análisis de resultados",
+              "bold": true,
+              "alignment": "center"
+            },
+            {
+              "fila": 26,
+              "col": 0,
+              "filas_span": 1,
+              "cols_span": 13,
+              "texto": "7. Elaboración del informe final",
+              "bold": true,
+              "alignment": "center"
+            },
+            {
+              "fila": 30,
+              "col": 0,
+              "filas_span": 1,
+              "cols_span": 13,
+              "texto": "8. Presentación y defensa del proyecto",
+              "bold": true,
+              "alignment": "center"
+            }
+          ],
+          "estilo": {
+            "modelo_referencia": "cronograma_actividades.docx",
+            "titulo_capitulo": "V. CRONOGRAMA DE ACTIVIDADES",
+            "titulo_exacto": true,
+            "titulo_tamano_pt": 9.5,
+            "titulo_space_after_pt": 6,
+            "ancho_tabla": "100%",
+            "ancho_columnas": [
+              8.91,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59,
+              1.59
+            ],
+            "alineacion_actividades": "left",
+            "alineacion_meses": "center",
+            "encabezados_negrita": true,
+            "fases_negrita": true,
+            "fases_centradas": true,
+            "bordes": "grid",
+            "fuente_tamano_pt": 8,
+            "fuente_meses_pt": 8,
+            "fuente_actividades_pt": 8,
+            "fuente_fases_pt": 8,
+            "fuente_marcas_pt": 10,
+            "compactar_cronograma": false,
+            "orientacion_pagina": "landscape",
+            "margenes_reducidos": true
+          }
+        }
+      ]
+    },
+    {
+      "titulo": "VI. PRESUPUESTO",
+      "contenido": [
+        {
+          "tipo": "tabla",
+          "id": "tabla_6_1_presupuesto_investigacion",
+          "titulo": "Tabla 6.1 Presupuesto de investigación",
+          "encabezados": [
+            "N°",
+            "DESCRIPCIÓN DEL GASTO",
+            "CANTIDAD",
+            "COSTO UNIT. (S/.)",
+            "COSTO TOTAL (S/.)"
+          ],
+          "filas": [
+            [
+              "1. RECURSOS HUMANOS",
+              "",
+              "",
+              "",
+              "2,000.00"
+            ],
+            [
+              "1.1",
+              "Investigador (dedicación/asistencia de investigación)",
+              "1",
+              "2,000.00",
+              "2,000.00"
+            ],
+            [
+              "2. RECURSOS DE INVESTIGACIÓN",
+              "",
+              "",
+              "",
+              "4,849.00"
+            ],
+            [
+              "2.1",
+              "Equipo de cómputo para procesamiento y análisis (Laptop)",
+              "1",
+              "2,999.00",
+              "2,999.00"
+            ],
+            [
+              "2.2",
+              "Servicio de Internet (Datos)",
+              "12",
+              "50.00",
+              "600.00"
+            ],
+            [
+              "2.3",
+              "Movilidad y Viáticos (Lima–Junín)",
+              "4",
+              "250.00",
+              "1,000.00"
+            ],
+            [
+              "2.4",
+              "Software / licencias (Office / almacenamiento nube o equivalente)",
+              "1",
+              "250.00",
+              "250.00"
+            ],
+            [
+              "3. RECURSOS CONSUMIBLES",
+              "",
+              "",
+              "",
+              "560.00"
+            ],
+            [
+              "3.1",
+              "Material de escritorio (papel, bolígrafos, etc.)",
+              "1",
+              "150.00",
+              "150.00"
+            ],
+            [
+              "3.2",
+              "Impresiones y anillados (incluye versión final)",
+              "1",
+              "350.00",
+              "350.00"
+            ],
+            [
+              "3.3",
+              "Dispositivo de almacenamiento (USB)",
+              "1",
+              "60.00",
+              "60.00"
+            ],
+            [
+              "4. CONTINGENCIA / IMPREVISTOS",
+              "",
+              "",
+              "",
+              "370.00"
+            ],
+            [
+              "4.1",
+              "Imprevistos (5% del subtotal)",
+              "1",
+              "370.00",
+              "370.00"
+            ],
+            [
+              "TOTAL GENERAL",
+              "",
+              "",
+              "",
+              "S/. 7,779.00"
+            ]
+          ],
+          "orientacion": "portrait",
+          "subtipo": "presupuesto_investigacion",
+          "filas_categoria": [
+            0,
+            2,
+            7,
+            11
+          ],
+          "fila_total": 13,
+          "celdas_combinadas": [
+            {
+              "fila": 0,
+              "col_inicio": 0,
+              "col_fin": 3,
+              "texto": "1. RECURSOS HUMANOS"
+            },
+            {
+              "fila": 2,
+              "col_inicio": 0,
+              "col_fin": 3,
+              "texto": "2. RECURSOS DE INVESTIGACIÓN"
+            },
+            {
+              "fila": 7,
+              "col_inicio": 0,
+              "col_fin": 3,
+              "texto": "3. RECURSOS CONSUMIBLES"
+            },
+            {
+              "fila": 11,
+              "col_inicio": 0,
+              "col_fin": 3,
+              "texto": "4. CONTINGENCIA / IMPREVISTOS"
+            },
+            {
+              "fila": 13,
+              "col_inicio": 0,
+              "col_fin": 3,
+              "texto": "TOTAL GENERAL"
+            }
+          ],
+          "celdas_fusionadas": [
+            {
+              "fila": 0,
+              "col": 0,
+              "filas_span": 1,
+              "cols_span": 4,
+              "texto": "1. RECURSOS HUMANOS",
+              "bold": true,
+              "alignment": "left"
+            },
+            {
+              "fila": 2,
+              "col": 0,
+              "filas_span": 1,
+              "cols_span": 4,
+              "texto": "2. RECURSOS DE INVESTIGACIÓN",
+              "bold": true,
+              "alignment": "left"
+            },
+            {
+              "fila": 7,
+              "col": 0,
+              "filas_span": 1,
+              "cols_span": 4,
+              "texto": "3. RECURSOS CONSUMIBLES",
+              "bold": true,
+              "alignment": "left"
+            },
+            {
+              "fila": 11,
+              "col": 0,
+              "filas_span": 1,
+              "cols_span": 4,
+              "texto": "4. CONTINGENCIA / IMPREVISTOS",
+              "bold": true,
+              "alignment": "left"
+            },
+            {
+              "fila": 13,
+              "col": 0,
+              "filas_span": 1,
+              "cols_span": 4,
+              "texto": "TOTAL GENERAL",
+              "bold": true,
+              "alignment": "center"
+            }
+          ],
+          "estilos": {
+            "modelo_referencia": "presupuesto_investigacion_vertical.docx",
+            "titulo_capitulo": "VI. PRESUPUESTO",
+            "titulo_exacto": true,
+            "titulo_negrita": false,
+            "titulo_tamano_pt": 10,
+            "titulo_space_after_pt": 10,
+            "ancho_tabla": "100%",
+            "ancho_columnas": [
+              1.4,
+              8,
+              2,
+              3.2,
+              3.2
+            ],
+            "orientacion_pagina": "portrait",
+            "encabezados_negrita": true,
+            "encabezado_color": "",
+            "categorias_negrita": true,
+            "total_negrita": true,
+            "alineacion_descripcion": "left",
+            "alineacion_numeros": "center",
+            "alineacion_costos": "right",
+            "bordes": "grid",
+            "fuente_tamano_pt": 9,
+            "fuente_size": 9,
+            "fuente_encabezado_pt": 8.5,
+            "fuente_categoria_pt": 9,
+            "fuente_total_pt": 9
+          },
+          "estilo": {
+            "modelo_referencia": "presupuesto_investigacion_vertical.docx",
+            "titulo_capitulo": "VI. PRESUPUESTO",
+            "titulo_exacto": true,
+            "titulo_negrita": false,
+            "titulo_tamano_pt": 10,
+            "titulo_space_after_pt": 10,
+            "ancho_tabla": "100%",
+            "ancho_columnas": [
+              1.4,
+              8,
+              2,
+              3.2,
+              3.2
+            ],
+            "orientacion_pagina": "portrait",
+            "encabezados_negrita": true,
+            "encabezado_color": "",
+            "categorias_negrita": true,
+            "total_negrita": true,
+            "alineacion_descripcion": "left",
+            "alineacion_numeros": "center",
+            "alineacion_costos": "right",
+            "bordes": "grid",
+            "fuente_tamano_pt": 9,
+            "fuente_size": 9,
+            "fuente_encabezado_pt": 8.5,
+            "fuente_categoria_pt": 9,
+            "fuente_total_pt": 9
+          }
+        }
+      ]
+    }
+  ],
+  "finales": {
+    "referencias": {
+      "titulo": "VII. REFERENCIAS BIBLIOGRÁFICAS"
+    },
+    "anexos": {
+      "titulo_seccion": "ANEXOS",
+      "lista": [
+        {
+          "titulo": "Anexo 1: Matriz de consistencia"
+        }
+      ]
+    }
+  },
+  "matriz_consistencia": {
+    "problema_general": "¿De qué manera el plan de mantenimiento centrado en confiabilidad mejora la disponibilidad inherente de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025?",
+    "objetivo_general": "Determinar cómo el plan de mantenimiento centrado en confiabilidad mejora la disponibilidad inherente de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025.",
+    "hipotesis_general": "El plan de mantenimiento centrado en confiabilidad mejora la disponibilidad inherente de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025.",
+    "variable_independiente": "Mantenimiento Centrado en la Confiabilidad (RCM)",
+    "dimensiones_variable_independiente": [
+      "Taxonomía de equipos (ISO 14224),Análisis de criticidad,AMEF,Plan de mantenimiento"
+    ],
+    "problemas_especificos": [
+      "¿De qué manera el plan de mantenimiento centrado en confiabilidad mejora la mantenibilidad de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025?",
+      "¿De qué manera el plan de mantenimiento centrado en confiabilidad mejora la confiabilidad de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025?"
+    ],
+    "objetivos_especificos": [
+      "Determinar cómo el plan de mantenimiento centrado en confiabilidad mejora la mantenibilidad de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025.",
+      "Determinar cómo el plan de mantenimiento centrado en confiabilidad mejora la confiabilidad de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025."
+    ],
+    "hipotesis_especificas": [
+      "El plan de mantenimiento centrado en confiabilidad mejora la mantenibilidad de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025.",
+      "El plan de mantenimiento centrado en confiabilidad mejora la confiabilidad de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025."
+    ],
+    "variable_dependiente": "Disponibilidad inherente",
+    "dimensiones_variable_dependiente": [
+      "Confiabilidad,Mantenibilidad"
+    ],
+    "tipo_investigacion": "Aplicada",
+    "nivel_investigacion": "Explicativa",
+    "enfoque_investigacion": "Cuantitativo",
+    "diseno": "Pre experimental (Pre test y Post Test)",
+    "poblacion": "05 motoniveladoras Caterpillar (CAT) modelo 24M",
+    "muestra": "Muestreo no probabilístico de tipo censal, la muestra es coincidente con la población (n = 5 unidades)",
+    "tecnicas": "Análisis documental, observación directa, análisis de datos, encuesta y juicio de expertos.",
+    "instrumentos": "Fichas de recolección de datos (ISO 14224), Matriz de Criticidad, Hojas de trabajo AMEF (SAE JA 1011) y Hojas de decisión RCM, cuestionario de encuesta y matriz/ficha de validación de expertos.",
+    "procesamiento_datos": "Análisis estadístico de KPIs (MTBF, MTTR), modelamiento de fallas mediante distribución de Weibull y uso de software especializado (Excel/Minitab).",
+    "problemas": {
+      "general": "¿De qué manera el plan de mantenimiento centrado en confiabilidad mejora la disponibilidad inherente de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025?",
+      "especificos": [
+        "¿De qué manera el plan de mantenimiento centrado en confiabilidad mejora la mantenibilidad de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025?",
+        "¿De qué manera el plan de mantenimiento centrado en confiabilidad mejora la confiabilidad de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025?"
+      ]
+    },
+    "objetivos": {
+      "general": "Determinar cómo el plan de mantenimiento centrado en confiabilidad mejora la disponibilidad inherente de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025.",
+      "especificos": [
+        "Determinar cómo el plan de mantenimiento centrado en confiabilidad mejora la mantenibilidad de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025.",
+        "Determinar cómo el plan de mantenimiento centrado en confiabilidad mejora la confiabilidad de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025."
+      ]
+    },
+    "hipotesis": {
+      "general": "El plan de mantenimiento centrado en confiabilidad mejora la disponibilidad inherente de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025.",
+      "especificos": [
+        "El plan de mantenimiento centrado en confiabilidad mejora la mantenibilidad de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025.",
+        "El plan de mantenimiento centrado en confiabilidad mejora la confiabilidad de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025."
+      ]
+    },
+    "variables": {
+      "independiente": {
+        "nombre": "Mantenimiento Centrado en la Confiabilidad (RCM)",
+        "dimensiones": [
+          "Taxonomía de equipos (ISO 14224),Análisis de criticidad,AMEF,Plan de mantenimiento"
+        ]
+      },
+      "dependiente": {
+        "nombre": "Disponibilidad inherente",
+        "dimensiones": [
+          "Confiabilidad,Mantenibilidad"
+        ]
+      }
+    },
+    "metodologia": {
+      "tipo": "Aplicada",
+      "nivel": "Explicativa",
+      "enfoque": "Cuantitativo",
+      "diseno": "Pre experimental (Pre test y Post Test)",
+      "diseño": "Pre experimental (Pre test y Post Test)",
+      "poblacion": "05 motoniveladoras Caterpillar (CAT) modelo 24M",
+      "muestra": "Muestreo no probabilístico de tipo censal, la muestra es coincidente con la población (n = 5 unidades)",
+      "tecnicas": "Análisis documental, observación directa, análisis de datos, encuesta y juicio de expertos.",
+      "instrumentos": "Fichas de recolección de datos (ISO 14224), Matriz de Criticidad, Hojas de trabajo AMEF (SAE JA 1011) y Hojas de decisión RCM, cuestionario de encuesta y matriz/ficha de validación de expertos.",
+      "procesamiento_datos": "Análisis estadístico de KPIs (MTBF, MTTR), modelamiento de fallas mediante distribución de Weibull y uso de software especializado (Excel/Minitab)."
+    }
+  },
+  "pagina_respeto": {},
+  "informacion_basica": {
+    "titulo": "INFORMACIÓN BÁSICA",
+    "facultad": "ESCUELA DE POSGRADO",
+    "unidad_investigacion": "Unidad de Posgrado de la Facultad de Ingeniería Mecánica y de Energía",
+    "titulo_investigacion": "PLAN DE MANTENIMIENTO CENTRADO EN CONFIABILIDAD PARA MEJORAR LA DISPONIBILIDAD INHERENTE DE LA FLOTA DE MOTONIVELADORAS CAT 24M EN UNA UNIDAD MINERA CUPRÍFERA, SIERRA CENTRAL, 2025",
+    "autores": [
+      {
+        "nombre": "Bach. Bach. Lenin Walter Cruz Julca",
+        "dni": "71716262",
+        "orcid": "0009-0006-1664-5032"
+      },
+      {
+        "nombre": "Bach. Bach. Eliseo Antonio Torres Roque",
+        "dni": "09841017",
+        "orcid": "0009-0008-7823-6976"
+      }
+    ],
+    "asesor": {
+      "nombre": "Dr. Dr. Robert William Castillo Alva",
+      "dni": "18140556",
+      "orcid": "0009-0002-5258-3319"
+    },
+    "lugar_ejecucion": "Mina a cielo abierto.",
+    "unidad_analisis": "Flota de Motoniveladoras CAT 24M (5 unidades)",
+    "tipo": "Aplicada",
+    "enfoque": "Cuantitativo",
+    "diseno_investigacion": "Pre experimental (Pre test y Post Test)",
+    "tema_ocde": [
+      "2.00.00 -- Ingeniería, Tecnología",
+      "2.03.00 -- Ingeniería Mecánica",
+      "2.03.06 -- Análisis de confiabilidad"
+    ]
+  },
+  "values": {
+    "titulo": "PLAN DE MANTENIMIENTO CENTRADO EN CONFIABILIDAD PARA MEJORAR LA DISPONIBILIDAD INHERENTE DE LA FLOTA DE MOTONIVELADORAS CAT 24M EN UNA UNIDAD MINERA CUPRÍFERA, SIERRA CENTRAL, 2025",
+    "title": "PLAN DE MANTENIMIENTO CENTRADO EN CONFIABILIDAD PARA MEJORAR LA DISPONIBILIDAD INHERENTE DE LA FLOTA DE MOTONIVELADORAS CAT 24M EN UNA UNIDAD MINERA CUPRÍFERA, SIERRA CENTRAL, 2025",
+    "tema": "PLAN DE MANTENIMIENTO CENTRADO EN CONFIABILIDAD PARA MEJORAR LA DISPONIBILIDAD INHERENTE DE LA FLOTA DE MOTONIVELADORAS CAT 24M EN UNA UNIDAD MINERA CUPRÍFERA, SIERRA CENTRAL, 2025",
+    "linea_investigacion": "Ingeniería y Tecnología",
+    "anio": "2026",
+    "lugar_caratula": "Callao",
+    "autor1_nombres": "Bach. Lenin Walter Cruz Julca",
+    "autor1_dni": "71716262",
+    "autor1_orcid": "0009-0006-1664-5032",
+    "autor2_nombres": "Bach. Eliseo Antonio Torres Roque",
+    "autor2_dni": "09841017",
+    "autor2_orcid": "0009-0008-7823-6976",
+    "asesor_nombres": "Dr. Robert William Castillo Alva",
+    "asesor_dni": "18140556",
+    "asesor_orcid": "0009-0002-5258-3319",
+    "coasesor_nombres": "",
+    "coasesor_dni": "",
+    "coasesor_orcid": "",
+    "facultad": "ESCUELA DE POSGRADO",
+    "unidad_investigacion": "Unidad de Posgrado de la Facultad de Ingeniería Mecánica y de Energía",
+    "objeto_estudio": "Flota de Motoniveladoras CAT 24M (5 unidades)",
+    "variable_independiente": "Mantenimiento Centrado en la Confiabilidad (RCM)",
+    "variable_dependiente": "Disponibilidad inherente",
+    "vi": "Mantenimiento Centrado en la Confiabilidad (RCM)",
+    "vd": "Disponibilidad inherente",
+    "lugar_ejecucion": "Mina a cielo abierto.",
+    "unidad_analisis": "Flota de Motoniveladoras CAT 24M (5 unidades)",
+    "tipo": "Aplicada",
+    "enfoque": "Cuantitativo",
+    "diseno_investigacion": "Pre experimental (Pre test y Post Test)",
+    "nivel_investigacion": "Explicativa",
+    "poblacion": "05 motoniveladoras Caterpillar (CAT) modelo 24M",
+    "muestra": "Muestreo no probabilístico de tipo censal, la muestra es coincidente con la población (n = 5 unidades)",
+    "lugar": "Sierra Central",
+    "temporal": "2025",
+    "tema_ocde_1": "2.00.00 -- Ingeniería, Tecnología",
+    "tema_ocde_2": "2.03.00 -- Ingeniería Mecánica",
+    "tema_ocde_3": "2.03.06 -- Análisis de confiabilidad",
+    "tema_ocde": [
+      "2.00.00 -- Ingeniería, Tecnología",
+      "2.03.00 -- Ingeniería Mecánica",
+      "2.03.06 -- Análisis de confiabilidad"
+    ],
+    "abreviaturas": [],
+    "matriz_consistencia": {
+      "problema_general": "¿De qué manera el plan de mantenimiento centrado en confiabilidad mejora la disponibilidad inherente de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025?",
+      "objetivo_general": "Determinar cómo el plan de mantenimiento centrado en confiabilidad mejora la disponibilidad inherente de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025.",
+      "hipotesis_general": "El plan de mantenimiento centrado en confiabilidad mejora la disponibilidad inherente de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025.",
+      "variable_independiente": "Mantenimiento Centrado en la Confiabilidad (RCM)",
+      "dimensiones_variable_independiente": [
+        "Taxonomía de equipos (ISO 14224),Análisis de criticidad,AMEF,Plan de mantenimiento"
+      ],
+      "problemas_especificos": [
+        "¿De qué manera el plan de mantenimiento centrado en confiabilidad mejora la mantenibilidad de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025?",
+        "¿De qué manera el plan de mantenimiento centrado en confiabilidad mejora la confiabilidad de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025?"
+      ],
+      "objetivos_especificos": [
+        "Determinar cómo el plan de mantenimiento centrado en confiabilidad mejora la mantenibilidad de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025.",
+        "Determinar cómo el plan de mantenimiento centrado en confiabilidad mejora la confiabilidad de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025."
+      ],
+      "hipotesis_especificas": [
+        "El plan de mantenimiento centrado en confiabilidad mejora la mantenibilidad de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025.",
+        "El plan de mantenimiento centrado en confiabilidad mejora la confiabilidad de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025."
+      ],
+      "variable_dependiente": "Disponibilidad inherente",
+      "dimensiones_variable_dependiente": [
+        "Confiabilidad,Mantenibilidad"
+      ],
+      "tipo_investigacion": "Aplicada",
+      "nivel_investigacion": "Explicativa",
+      "enfoque_investigacion": "Cuantitativo",
+      "diseno": "Pre experimental (Pre test y Post Test)",
+      "poblacion": "05 motoniveladoras Caterpillar (CAT) modelo 24M",
+      "muestra": "Muestreo no probabilístico de tipo censal, la muestra es coincidente con la población (n = 5 unidades)",
+      "tecnicas": "Análisis documental, observación directa, análisis de datos, encuesta y juicio de expertos.",
+      "instrumentos": "Fichas de recolección de datos (ISO 14224), Matriz de Criticidad, Hojas de trabajo AMEF (SAE JA 1011) y Hojas de decisión RCM, cuestionario de encuesta y matriz/ficha de validación de expertos.",
+      "procesamiento_datos": "Análisis estadístico de KPIs (MTBF, MTTR), modelamiento de fallas mediante distribución de Weibull y uso de software especializado (Excel/Minitab).",
+      "problemas": {
+        "general": "¿De qué manera el plan de mantenimiento centrado en confiabilidad mejora la disponibilidad inherente de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025?",
+        "especificos": [
+          "¿De qué manera el plan de mantenimiento centrado en confiabilidad mejora la mantenibilidad de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025?",
+          "¿De qué manera el plan de mantenimiento centrado en confiabilidad mejora la confiabilidad de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025?"
+        ]
+      },
+      "objetivos": {
+        "general": "Determinar cómo el plan de mantenimiento centrado en confiabilidad mejora la disponibilidad inherente de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025.",
+        "especificos": [
+          "Determinar cómo el plan de mantenimiento centrado en confiabilidad mejora la mantenibilidad de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025.",
+          "Determinar cómo el plan de mantenimiento centrado en confiabilidad mejora la confiabilidad de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025."
+        ]
+      },
+      "hipotesis": {
+        "general": "El plan de mantenimiento centrado en confiabilidad mejora la disponibilidad inherente de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025.",
+        "especificos": [
+          "El plan de mantenimiento centrado en confiabilidad mejora la mantenibilidad de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025.",
+          "El plan de mantenimiento centrado en confiabilidad mejora la confiabilidad de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025."
+        ]
+      },
+      "variables": {
+        "independiente": {
+          "nombre": "Mantenimiento Centrado en la Confiabilidad (RCM)",
+          "dimensiones": [
+            "Taxonomía de equipos (ISO 14224),Análisis de criticidad,AMEF,Plan de mantenimiento"
+          ]
+        },
+        "dependiente": {
+          "nombre": "Disponibilidad inherente",
+          "dimensiones": [
+            "Confiabilidad,Mantenibilidad"
+          ]
+        }
+      },
+      "metodologia": {
+        "tipo": "Aplicada",
+        "nivel": "Explicativa",
+        "enfoque": "Cuantitativo",
+        "diseno": "Pre experimental (Pre test y Post Test)",
+        "diseño": "Pre experimental (Pre test y Post Test)",
+        "poblacion": "05 motoniveladoras Caterpillar (CAT) modelo 24M",
+        "muestra": "Muestreo no probabilístico de tipo censal, la muestra es coincidente con la población (n = 5 unidades)",
+        "tecnicas": "Análisis documental, observación directa, análisis de datos, encuesta y juicio de expertos.",
+        "instrumentos": "Fichas de recolección de datos (ISO 14224), Matriz de Criticidad, Hojas de trabajo AMEF (SAE JA 1011) y Hojas de decisión RCM, cuestionario de encuesta y matriz/ficha de validación de expertos.",
+        "procesamiento_datos": "Análisis estadístico de KPIs (MTBF, MTTR), modelamiento de fallas mediante distribución de Weibull y uso de software especializado (Excel/Minitab)."
+      }
+    },
+    "operacionalizacion_vd": {
+      "variable": "Disponibilidad inherente",
+      "definicion_conceptual": "Según Global Mining Guidelines Group [GMG] (2020), la disponibilidad inherente representa el tiempo durante el cual el equipo está disponible como un porcentaje del tiempo en que es requerido por la operación, y puede usarse para identificar el impacto del mantenimiento en la operación.",
+      "definicion_operacional": "Se operacionaliza como la métrica de desempeño técnico que determina la proporción de tiempo operativo del equipo. Su cálculo matemático se deriva de la relación entre la dimensión de Confiabilidad, medida por el Tiempo Medio Entre Fallas (MTBF), y la dimensión de Mantenibilidad, cuantificada mediante el Tiempo Medio Para Reparar (MTTR), y considera únicamente paradas imprevistas por falla y tiempos de reparación correctiva (MTTR), excluyendo intervenciones programadas.",
+      "filas": [
+        {
+          "dimension": "Confiabilidad",
+          "indicador": "MTBF",
+          "indice": "MTBF=(Tiempo total de operación)/(número de fallas)",
+          "metodo_tecnica": "Análisis de Datos",
+          "tecnica_instrumentos": "Fichas de recolección de datos (ISO 14224)"
+        },
+        {
+          "dimension": "Mantenibilidad",
+          "indicador": "MTTR",
+          "indice": "MTTR=(Tiempo total de reparación)/(número de fallas)",
+          "metodo_tecnica": "Observación Directa, Análisis de Datos",
+          "tecnica_instrumentos": "Fichas de recolección de datos (ISO 14224)"
+        }
+      ]
+    },
+    "operacionalizacion_vi": {
+      "variable": "Mantenimiento Centrado en la Confiabilidad (RCM)",
+      "definicion_conceptual": "Según FLOREA et al. (2022), el RCM es un enfoque/metodología de mantenimiento orientado a integrar el sistema de mantenimiento y mejorar la confiabilidad del equipo, cuyo objetivo principal es reducir los costos de mantenimiento concentrándose en las funciones más importantes del sistema y eliminando o reubicando aquellas acciones de mantenimiento que no son estrictamente necesarias.",
+      "definicion_operacional": "Se operacionaliza como la metodología técnica que integra el análisis de criticidad para jerarquizar los sistemas del equipo, seguida del desarrollo del AMEF para evaluar los modos de falla y su riesgo, y culmina en la estructuración de un plan de mantenimiento que establece las tareas preventivas y frecuencias óptimas para preservar la función del activo.",
+      "filas": [
+        {
+          "dimension": "Taxonomía de equipos (ISO 14224)",
+          "indicador": "Nivel de jerarquía taxonómica",
+          "indice": "Ordinal",
+          "metodo_tecnica": "Análisis documental",
+          "tecnica_instrumentos": "Fichas de análisis de datos (ISO 14224)"
+        },
+        {
+          "dimension": "Análisis de criticidad",
+          "indicador": "Nivel de criticidad",
+          "indice": "Ordinal",
+          "metodo_tecnica": "Análisis de datos y Juicio de expertos",
+          "tecnica_instrumentos": "Matriz de criticidad"
+        },
+        {
+          "dimension": "AMEF",
+          "indicador": "NPR",
+          "indice": "Razón",
+          "metodo_tecnica": "Juicio de expertos",
+          "tecnica_instrumentos": "Hojas de trabajo AMEF (SAE JA1011)"
+        },
+        {
+          "dimension": "Plan de mantenimiento",
+          "indicador": "Tareas de mantenimiento definidas",
+          "indice": "Ordinal",
+          "metodo_tecnica": "Análisis Datos, encuesta y Juicio de expertos",
+          "tecnica_instrumentos": "Hojas de decisión RCM, Cuestionario de encuesta y Matriz/ficha de validación de expertos"
+        }
+      ]
+    },
+    "problema_general": "¿De qué manera el plan de mantenimiento centrado en confiabilidad mejora la disponibilidad inherente de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025?",
+    "objetivo_general": "Determinar cómo el plan de mantenimiento centrado en confiabilidad mejora la disponibilidad inherente de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025.",
+    "hipotesis_general": "El plan de mantenimiento centrado en confiabilidad mejora la disponibilidad inherente de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025.",
+    "problemas_especificos": [
+      "¿De qué manera el plan de mantenimiento centrado en confiabilidad mejora la mantenibilidad de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025?",
+      "¿De qué manera el plan de mantenimiento centrado en confiabilidad mejora la confiabilidad de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025?"
+    ],
+    "objetivos_especificos": [
+      "Determinar cómo el plan de mantenimiento centrado en confiabilidad mejora la mantenibilidad de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025.",
+      "Determinar cómo el plan de mantenimiento centrado en confiabilidad mejora la confiabilidad de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025."
+    ],
+    "hipotesis_especificas": [
+      "El plan de mantenimiento centrado en confiabilidad mejora la mantenibilidad de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025.",
+      "El plan de mantenimiento centrado en confiabilidad mejora la confiabilidad de la flota de motoniveladoras CAT 24M en una unidad minera cuprífera, Sierra Central, 2025."
+    ],
+    "dimensiones_variable_independiente": [
+      "Taxonomía de equipos (ISO 14224),Análisis de criticidad,AMEF,Plan de mantenimiento"
+    ],
+    "dimensiones_variable_dependiente": [
+      "Confiabilidad,Mantenibilidad"
+    ],
+    "matriz_tipo_investigacion": "Aplicada",
+    "matriz_nivel_investigacion": "Explicativa",
+    "matriz_enfoque_investigacion": "Cuantitativo",
+    "matriz_diseno": "Pre experimental (Pre test y Post Test)",
+    "matriz_poblacion": "05 motoniveladoras Caterpillar (CAT) modelo 24M",
+    "matriz_muestra": "Muestreo no probabilístico de tipo censal, la muestra es coincidente con la población (n = 5 unidades)",
+    "matriz_tecnicas": "Análisis documental, observación directa, análisis de datos, encuesta y juicio de expertos.",
+    "matriz_instrumentos": "Fichas de recolección de datos (ISO 14224), Matriz de Criticidad, Hojas de trabajo AMEF (SAE JA 1011) y Hojas de decisión RCM, cuestionario de encuesta y matriz/ficha de validación de expertos.",
+    "matriz_procesamiento_datos": "Análisis estadístico de KPIs (MTBF, MTTR), modelamiento de fallas mediante distribución de Weibull y uso de software especializado (Excel/Minitab).",
+    "tipo_documento": "PROYECTO DE INVESTIGACIÓN",
+    "frase_grado": "PARA OPTAR EL GRADO ACADÉMICO DE MAESTRO EN GERENCIA DE MANTENIMIENTO",
+    "escuela": "UNIDAD DE POSGRADO DE LA FACULTAD DE INGENIERÍA MECÁNICA Y DE ENERGÍA"
+  },
+  "operacionalizacion_vi": {
+    "variable": "Mantenimiento Centrado en la Confiabilidad (RCM)",
+    "definicion_conceptual": "Según FLOREA et al. (2022), el RCM es un enfoque/metodología de mantenimiento orientado a integrar el sistema de mantenimiento y mejorar la confiabilidad del equipo, cuyo objetivo principal es reducir los costos de mantenimiento concentrándose en las funciones más importantes del sistema y eliminando o reubicando aquellas acciones de mantenimiento que no son estrictamente necesarias.",
+    "definicion_operacional": "Se operacionaliza como la metodología técnica que integra el análisis de criticidad para jerarquizar los sistemas del equipo, seguida del desarrollo del AMEF para evaluar los modos de falla y su riesgo, y culmina en la estructuración de un plan de mantenimiento que establece las tareas preventivas y frecuencias óptimas para preservar la función del activo.",
+    "filas": [
+      {
+        "dimension": "Taxonomía de equipos (ISO 14224)",
+        "indicador": "Nivel de jerarquía taxonómica",
+        "indice": "Ordinal",
+        "metodo_tecnica": "Análisis documental",
+        "tecnica_instrumentos": "Fichas de análisis de datos (ISO 14224)"
+      },
+      {
+        "dimension": "Análisis de criticidad",
+        "indicador": "Nivel de criticidad",
+        "indice": "Ordinal",
+        "metodo_tecnica": "Análisis de datos y Juicio de expertos",
+        "tecnica_instrumentos": "Matriz de criticidad"
+      },
+      {
+        "dimension": "AMEF",
+        "indicador": "NPR",
+        "indice": "Razón",
+        "metodo_tecnica": "Juicio de expertos",
+        "tecnica_instrumentos": "Hojas de trabajo AMEF (SAE JA1011)"
+      },
+      {
+        "dimension": "Plan de mantenimiento",
+        "indicador": "Tareas de mantenimiento definidas",
+        "indice": "Ordinal",
+        "metodo_tecnica": "Análisis Datos, encuesta y Juicio de expertos",
+        "tecnica_instrumentos": "Hojas de decisión RCM, Cuestionario de encuesta y Matriz/ficha de validación de expertos"
+      }
+    ]
+  },
+  "operacionalizacion_vd": {
+    "variable": "Disponibilidad inherente",
+    "definicion_conceptual": "Según Global Mining Guidelines Group [GMG] (2020), la disponibilidad inherente representa el tiempo durante el cual el equipo está disponible como un porcentaje del tiempo en que es requerido por la operación, y puede usarse para identificar el impacto del mantenimiento en la operación.",
+    "definicion_operacional": "Se operacionaliza como la métrica de desempeño técnico que determina la proporción de tiempo operativo del equipo. Su cálculo matemático se deriva de la relación entre la dimensión de Confiabilidad, medida por el Tiempo Medio Entre Fallas (MTBF), y la dimensión de Mantenibilidad, cuantificada mediante el Tiempo Medio Para Reparar (MTTR), y considera únicamente paradas imprevistas por falla y tiempos de reparación correctiva (MTTR), excluyendo intervenciones programadas.",
+    "filas": [
+      {
+        "dimension": "Confiabilidad",
+        "indicador": "MTBF",
+        "indice": "MTBF=(Tiempo total de operación)/(número de fallas)",
+        "metodo_tecnica": "Análisis de Datos",
+        "tecnica_instrumentos": "Fichas de recolección de datos (ISO 14224)"
+      },
+      {
+        "dimension": "Mantenibilidad",
+        "indicador": "MTTR",
+        "indice": "MTTR=(Tiempo total de reparación)/(número de fallas)",
+        "metodo_tecnica": "Observación Directa, Análisis de Datos",
+        "tecnica_instrumentos": "Fichas de recolección de datos (ISO 14224)"
+      }
+    ]
+  },
+  "escuela": "UNIDAD DE POSGRADO DE LA FACULTAD DE INGENIERÍA MECÁNICA Y DE ENERGÍA",
+  "tipo_documento": "PROYECTO DE INVESTIGACIÓN",
+  "frase_grado": "PARA OPTAR EL GRADO ACADÉMICO DE MAESTRO EN GERENCIA DE MANTENIMIENTO",
+  "titulo": "PLAN DE MANTENIMIENTO CENTRADO EN CONFIABILIDAD PARA MEJORAR LA DISPONIBILIDAD INHERENTE DE LA FLOTA DE MOTONIVELADORAS CAT 24M EN UNA UNIDAD MINERA CUPRÍFERA, SIERRA CENTRAL, 2025",
+  "titulo_investigacion": "PLAN DE MANTENIMIENTO CENTRADO EN CONFIABILIDAD PARA MEJORAR LA DISPONIBILIDAD INHERENTE DE LA FLOTA DE MOTONIVELADORAS CAT 24M EN UNA UNIDAD MINERA CUPRÍFERA, SIERRA CENTRAL, 2025",
+  "autor1_nombres": "Bach. Lenin Walter Cruz Julca",
+  "asesor_nombres": "Dr. Robert William Castillo Alva",
+  "linea_investigacion": "Ingeniería y Tecnología",
+  "anio": "2026",
+  "lugar": "Callao",
+  "universidad": "UNIVERSIDAD NACIONAL DEL CALLAO",
+  "facultad": "ESCUELA DE POSGRADO",
+  "pais": "PERÚ"
+}
