@@ -20,6 +20,8 @@ def render_paragraph(doc: Document, block: Block) -> None:
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
     p.paragraph_format.line_spacing = 1.5
+    from docx.shared import Cm
+    p.paragraph_format.first_line_indent = Cm(1.27)
     run = p.add_run(block.get("text", ""))
     run.font.name = "Arial"
     run.font.size = Pt(12)
