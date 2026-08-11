@@ -33,9 +33,14 @@
       "texto": "[Escriba aquí su dedicatoria o agradecimientos...]"
     },
     "resumen": {
-      "titulo": "RESUMEN / ABSTRACT",
+      "titulo": "RESUMEN",
       "nota": "Nota: Síntesis de objetivos, métodos y resultados principales.",
-      "texto": "\n[Escriba aquí el cuerpo del resumen. Debe contener el objetivo, el método, los resultados y las conclusiones principales. No exceder las 200 palabras.]"
+      "texto": "\n[Escriba aquí el cuerpo del resumen. Debe contener el objetivo, el método, los resultados y las conclusiones principales. No exceder las 200 palabras.]\n\nPalabras clave: [Palabra 1, Palabra 2, Palabra 3]"
+    },
+    "abstract": {
+      "titulo": "ABSTRACT",
+      "nota": "Nota: Síntesis de objetivos, métodos y resultados principales en inglés.",
+      "texto": "\n[Write here the abstract body. It must contain the objective, method, results, and main conclusions. Do not exceed 200 words.]\n\nKeywords: [Keyword 1, Keyword 2, Keyword 3]"
     },
     "indices": {
       "contenido": "ÍNDICE DE CONTENIDO",
@@ -67,8 +72,7 @@
           ]
         },
         {
-          "texto": "1.2 Formulación del problema",
-          "instruccion_detallada": "Redacta un párrafo breve (2-3 líneas) que introduzca la formulación del problema de investigación, antes de presentar el problema general y los problemas específicos en los apartados siguientes."
+          "texto": "1.2 Formulación del problema"
         },
         {
           "texto": "1.2.1 Problema General",
@@ -79,8 +83,7 @@
           "instruccion_detallada": "Formula las sub-preguntas que desglosan el análisis del problema general. Generalmente relacionan las Dimensiones de la Variable Independiente con la Variable Dependiente o sus dimensiones. Deben ser medibles, concretas y guardar correspondencia directa con los objetivos específicos e hipótesis específicas del estudio."
         },
         {
-          "texto": "1.3 Objetivos",
-          "instruccion_detallada": "Redacta un párrafo breve (2-3 líneas) que introduzca los objetivos de la investigación, antes de presentar el objetivo general y los objetivos específicos en los apartados siguientes."
+          "texto": "1.3 Objetivos"
         },
         {
           "texto": "1.3.1 Objetivo General",
@@ -99,8 +102,7 @@
           "instruccion_detallada": "Describe las restricciones o dificultades externas al investigador que condicionaron el desarrollo del estudio y que deben declararse por transparencia metodológica (no confundir con las Delimitantes, que son fronteras definidas voluntariamente).\n\nDebes considerar, según aplique:\n- Limitantes de acceso a la información: Restricciones para obtener datos históricos, confidencialidad empresarial o falta de registros completos en el periodo de estudio.\n- Limitantes de tiempo y recursos: Plazos acotados para la recolección de datos, presupuesto limitado para instrumentación o pruebas adicionales.\n- Limitantes técnicas u operativas: Condiciones de operación de la entidad que impidieron pruebas controladas, paradas programadas o acceso irrestricto a los equipos/áreas de estudio.\n- Limitantes de generalización: Alcance de los resultados, explicando por qué las conclusiones aplican al caso de estudio y las condiciones bajo las cuales podrían replicarse."
         },
         {
-          "texto": "1.6 Delimitantes de la investigación",
-          "instruccion_detallada": "Redacta un párrafo breve (2-3 líneas) que introduzca las fronteras y alcances definidos para el estudio, antes de precisar la delimitación teórica, temporal y espacial en los apartados siguientes."
+          "texto": "1.6 Delimitantes de la investigación"
         },
         {
           "texto": "1.6.1 Delimitante Teórica",
@@ -122,8 +124,7 @@
       "tipo_vista": "pdf_capitulo",
       "contenido": [
         {
-          "texto": "2.1 Antecedentes",
-          "instruccion_detallada": "Redacta un párrafo breve (2-3 líneas) que introduzca la revisión del estado del arte, antes de presentar los antecedentes internacionales y nacionales en los apartados siguientes."
+          "texto": "2.1 Antecedentes"
         },
         {
           "texto": "2.1.1 Antecedentes Internacionales",
@@ -160,8 +161,7 @@
       "tipo_vista": "pdf_capitulo",
       "contenido": [
         {
-          "texto": "3.1 Hipótesis",
-          "instruccion_detallada": "Redacta un párrafo breve (2-3 líneas) que introduzca las hipótesis de la investigación, antes de presentar la hipótesis general y las hipótesis específicas en los apartados siguientes."
+          "texto": "3.1 Hipótesis"
         },
         {
           "texto": "3.1.1 Hipótesis General",

@@ -1096,10 +1096,10 @@ def _normalize_preliminares(data: dict) -> List[Block]:
     # Nueva sección
     blocks.append({"type": "section_break"})
 
-    optional_preliminary_keys = {"dedicatoria", "agradecimiento", "agradecimientos"}
+    optional_preliminary_keys = {"dedicatoria", "agradecimiento", "agradecimientos", "abstract"}
 
     # Secciones de texto simples
-    for key in ["dedicatoria", "agradecimiento", "agradecimientos", "resumen"]:
+    for key in ["dedicatoria", "agradecimiento", "agradecimientos", "resumen", "abstract"]:
         if key not in pre:
             continue
         item = pre[key]
@@ -1618,17 +1618,46 @@ def _normalize_project_structured_section(data: dict | None, item: dict) -> list
         return []
 
     title = _norm_upper(item.get("texto", ""))
-    if "OPERACIONALIZACION" not in title:
-        return []
+    if "OPERACIONALIZACION" in title:
+        ai_content = item.get("_ai_content")
+        if isinstance(ai_content, list) and any(
+            isinstance(block, dict) and str(block.get("tipo", "")).strip().lower() == "tabla"
+            for block in ai_content
+        ):
+            return []
+        return _normalize_operationalization_section(data or {})
 
-    ai_content = item.get("_ai_content")
-    if isinstance(ai_content, list) and any(
-        isinstance(block, dict) and str(block.get("tipo", "")).strip().lower() == "tabla"
-        for block in ai_content
-    ):
-        return []
+    if "PROBLEMA GENERAL" in title:
+        general = _matrix_value(data, "problema_general", "problemas", "general")
+        if general:
+            return [{"type": "paragraph", "text": general}]
+    
+    if "PROBLEMA ESPEC" in title or "PROBLEMAS ESPEC" in title:
+        specific = _matrix_list(data, "problemas_especificos", "problemas", "especificos")
+        if specific:
+            return _make_bullet_paragraphs(specific)
 
-    return _normalize_operationalization_section(data or {})
+    if "OBJETIVO GENERAL" in title:
+        general = _matrix_value(data, "objetivo_general", "objetivos", "general")
+        if general:
+            return [{"type": "paragraph", "text": general}]
+            
+    if "OBJETIVO ESPEC" in title or "OBJETIVOS ESPEC" in title:
+        specific = _matrix_list(data, "objetivos_especificos", "objetivos", "especificos")
+        if specific:
+            return _make_bullet_paragraphs(specific)
+            
+    if "HIPÓTESIS GENERAL" in title or "HIPOTESIS GENERAL" in title:
+        general = _matrix_value(data, "hipotesis_general", "hipotesis", "general")
+        if general:
+            return [{"type": "paragraph", "text": general}]
+            
+    if "HIPÓTESIS ESPEC" in title or "HIPOTESIS ESPEC" in title:
+        specific = _matrix_list(data, "hipotesis_especificas", "hipotesis", "especificos")
+        if specific:
+            return _make_bullet_paragraphs(specific)
+
+    return []
 
 
 def _normalize_cuerpo(data: dict) -> List[Block]:
