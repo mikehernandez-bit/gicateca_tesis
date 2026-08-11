@@ -55,8 +55,8 @@ DEFAULT_HEADER_COLOR = "D9D9D9"
 DEFAULT_TABLE_FONT_SIZE = 10
 LANDSCAPE_FONT_SIZE = 9
 
-PORTRAIT_MARGINS = {"left": 3.5, "right": 2.5, "top": 3.0, "bottom": 3.0}
-LANDSCAPE_MARGINS = {"left": 2.0, "right": 2.0, "top": 2.0, "bottom": 2.0}
+PORTRAIT_MARGINS = {"left": 2.54, "right": 2.54, "top": 2.54, "bottom": 2.54}
+LANDSCAPE_MARGINS = {"left": 2.54, "right": 2.54, "top": 2.54, "bottom": 2.54}
 
 # Raíz del proyecto: engine/ → app/ → gicateca_tesis/
 _ENGINE_DIR = Path(__file__).resolve().parent
@@ -147,7 +147,7 @@ def configure_styles(
     font.name = font_name
     font.size = Pt(font_size)
     style.paragraph_format.line_spacing = 1.5
-    style.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+    style.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.LEFT
     # Evita páginas en blanco por "page break before" heredado en estilos heading.
     for heading_name in ("Heading 1", "Heading 2", "Heading 3"):
         try:

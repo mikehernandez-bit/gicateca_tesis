@@ -1923,8 +1923,18 @@ def _normalize_ai_content(
             if not lines:
                 continue
 
+            if parent_item and "texto" in parent_item:
+                parent_title = _norm_upper(_MARKDOWN_BOLD_RE.sub(r"\2", str(parent_item["texto"])).strip())
+                first_line_norm = _norm_upper(_MARKDOWN_BOLD_RE.sub(r"\2", lines[0]).strip()).lstrip("# ").strip()
+                if first_line_norm == parent_title or first_line_norm.startswith(parent_title + " "):
+                    lines = lines[1:]
+                    if not lines:
+                        continue
+
             # Limpiar marcadores Markdown (e.g. **2.2.1 Título** → 2.2.1 Título)
             first_line_clean = _MARKDOWN_BOLD_RE.sub(r"\2", lines[0]).strip()
+            if first_line_clean.startswith("###"):
+                first_line_clean = first_line_clean.lstrip("#").strip()
             heading_match = _AI_LEVEL3_HEADING_RE.match(first_line_clean)
             if heading_match and not _MATH_FORMULA_RE.search(heading_match.group(2)):
                 blocks.append(
