@@ -35,7 +35,7 @@ from pathlib import Path
 from typing import Optional
 
 from docx.document import Document
-from docx.enum.section import WD_SECTION
+from docx.enum.section import WD_ORIENT, WD_SECTION
 from docx.enum.table import WD_CELL_VERTICAL_ALIGNMENT
 from docx.enum.text import (
     WD_ALIGN_PARAGRAPH,
@@ -552,8 +552,17 @@ def _shrink_section_break_paragraph(doc: Document) -> None:
 
 
 def switch_to_landscape(doc: Document) -> None:
-    """Agrega nueva sección en orientación landscape."""
+    """Agrega nueva sección en orientación landscape.
+
+    Ademas de invertir ancho/alto, hay que marcar explicitamente
+    ``section.orientation = WD_ORIENT.LANDSCAPE``. Sin esto el atributo XML
+    ``w:pgSz w:orient`` queda en "portrait" aunque las dimensiones ya sean
+    de landscape, lo que confunde a Word/LibreOffice al convertir a PDF y
+    produce columnas angostas / tablas mal cortadas en vez de una pagina
+    ancha real.
+    """
     new_section = doc.add_section(WD_SECTION.NEW_PAGE)
+    new_section.orientation = WD_ORIENT.LANDSCAPE
     new_section.page_width = Cm(29.7)
     new_section.page_height = Cm(21.0)
     new_section.left_margin = Cm(LANDSCAPE_MARGINS["left"])
@@ -566,6 +575,7 @@ def switch_to_landscape(doc: Document) -> None:
 def switch_to_portrait(doc: Document) -> None:
     """Agrega nueva sección para restaurar orientación portrait."""
     new_section = doc.add_section(WD_SECTION.NEW_PAGE)
+    new_section.orientation = WD_ORIENT.PORTRAIT
     new_section.page_width = Cm(21.0)
     new_section.page_height = Cm(29.7)
     new_section.left_margin = Cm(PORTRAIT_MARGINS["left"])

@@ -802,9 +802,12 @@ def _normalize_caratula(data: dict) -> List[Block]:
 
     is_unac_maestria = data.get("_meta", {}).get("id", "").startswith("unac-maestria")
     is_unac_proyecto = data.get("_meta", {}).get("id", "").startswith("unac-proyecto")
-    # Proyecto de Tesis UNAC debe compartir exactamente la misma maqueta
-    # de carátula que Maestría.
-    if is_unac_maestria or is_unac_proyecto:
+    is_unac_informe = data.get("_meta", {}).get("id", "").startswith("unac-informe")
+    # Proyecto e Informe de Tesis UNAC deben compartir exactamente la misma
+    # maqueta de carátula que Maestría: es la única que sustituye autor,
+    # asesor, línea de investigación y título con los datos reales del
+    # proyecto en vez de imprimir el texto placeholder tal cual del JSON.
+    if is_unac_maestria or is_unac_proyecto or is_unac_informe:
         return [{"type": "caratula_unac_maestria", "data": data, "caratula": c}]
 
     blocks: List[Block] = []
@@ -1334,9 +1337,16 @@ def _clean_list(value: Any) -> list[str]:
 
 
 def _is_unac_project_document(data: dict | None) -> bool:
+    """True para documentos UNAC que usan el pipeline de datos estructurados
+    (matriz de consistencia + operacionalizacion de variables): Proyecto e
+    Informe de Tesis. Sin esto, las tablas 3.1/3.2 y los bloques de
+    problema/objetivos/hipotesis recuperados desde los datos del proyecto
+    quedan vacios para cualquier formato que no sea "unac-proyecto".
+    """
     if not isinstance(data, dict):
         return False
-    return str(data.get("_meta", {}).get("id", "") or "").startswith("unac-proyecto")
+    format_id = str(data.get("_meta", {}).get("id", "") or "")
+    return format_id.startswith("unac-proyecto") or format_id.startswith("unac-informe")
 
 
 def _document_values(data: dict | None) -> dict:

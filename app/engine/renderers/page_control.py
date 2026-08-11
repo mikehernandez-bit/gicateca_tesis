@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from docx.document import Document
 from docx.enum.section import WD_SECTION
-from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_BREAK
 from docx.oxml.ns import qn
 
 from app.engine.registry import register
@@ -45,6 +45,42 @@ def _last_content_is_section_break(doc: Document) -> bool:
     return False
 
 
+def _last_empty_trailing_paragraph(doc: Document):
+    """Return the body's last paragraph if it is a bare, run-less spacer.
+
+    ``python-docx`` (and our own ``add_styled_note``/table helpers) always
+    leave an empty ``<w:p>`` right after a table, because OOXML forbids a
+    table from being the very last element of the body/section. When a
+    ``page_break`` block follows a table, ``doc.add_page_break()`` creates a
+    brand-new paragraph *in addition to* that spacer, so two near-empty
+    paragraphs stack up right at the page boundary. On some renderers
+    (observed via Word/LibreOffice DOCX->PDF conversion) that pairing
+    produces one extra blank page. Reusing the existing empty spacer for the
+    page-break run avoids ever having two of them back to back.
+    """
+    body = doc.element.body
+    children = list(body)
+    if not children:
+        return None
+    last = children[-1]
+    tag = last.tag
+    if tag == qn("w:sectPr"):
+        if len(children) < 2:
+            return None
+        last = children[-2]
+        tag = last.tag
+    if tag != qn("w:p"):
+        return None
+    if last.find(qn("w:tbl")) is not None:
+        return None
+    if "".join(last.itertext()).strip():
+        return None
+    for paragraph in reversed(doc.paragraphs):
+        if paragraph._p is last:
+            return paragraph
+    return None
+
+
 def _last_content_has_page_break(doc: Document) -> bool:
     """Verifica si el último contenido del body contiene un salto de página explícito."""
     body = doc.element.body
@@ -74,6 +110,16 @@ def render_page_break(doc: Document, block: Block) -> None:
     # Evita doble page break consecutivo (otra fuente típica de hoja en blanco).
     if not force and _last_content_has_page_break(doc):
         return
+
+    # Si el body ya termina en un parrafo vacio (el spacer que OOXML exige
+    # despues de una tabla, p.ej. tras una nota en caja azul), reutilizalo
+    # para el salto de pagina en vez de crear otro parrafo nuevo justo al
+    # lado -- ver docstring de _last_empty_trailing_paragraph.
+    trailing = _last_empty_trailing_paragraph(doc)
+    if trailing is not None:
+        trailing.add_run().add_break(WD_BREAK.PAGE)
+        return
+
     doc.add_page_break()
 
 

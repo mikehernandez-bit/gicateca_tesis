@@ -797,7 +797,15 @@ def apply_ai_content(
         ).get("id", "")
         or ""
     ).strip().lower()
-    is_unac_project = document_id.startswith("unac-proyecto")
+    # NOTA: nombre historico "is_unac_project" pero ahora tambien cubre
+    # Informe de Tesis UNAC. Ambos formatos usan el mismo patron de capitulo
+    # con subsecciones numeradas (1.1, 1.2, ...); sin este flag, el
+    # contenido generado para el capitulo "raiz" (ej. "V. RESULTADOS") se
+    # inyectaba ADEMAS del de cada subseccion (5.1, 5.2, ...), duplicando
+    # parrafos, tablas y figuras a lo largo de todo el documento.
+    is_unac_project = document_id.startswith("unac-proyecto") or document_id.startswith(
+        "unac-informe"
+    )
 
     preliminares = result.get("preliminares")
     if isinstance(preliminares, dict):

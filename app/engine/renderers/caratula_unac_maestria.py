@@ -5,10 +5,10 @@ from __future__ import annotations
 import logging
 from docx.document import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.shared import Inches
+from docx.shared import Cm, Inches
 
 from app.engine.registry import register
-from app.engine.primitives import add_p_centered, resolve_logo_path
+from app.engine.primitives import add_p_centered, resolve_logo_path, switch_to_portrait
 from app.engine.types import Block
 
 logger = logging.getLogger(__name__)
@@ -60,6 +60,17 @@ def _looks_like_cover_title_placeholder(text: str) -> bool:
 def render_caratula_unac_maestria(doc: Document, block: Block) -> None:
     data = block.get("data", {})
     c = block.get("caratula", {})
+
+    # La caratula usa parrafos centrados (WD_ALIGN_PARAGRAPH.CENTER), que
+    # Word centra respecto de los MARGENES activos, no respecto del ancho
+    # fisico de la pagina. El resto del documento usa margenes asimetricos
+    # (izq. 3.5cm / der. 2.5cm) para dejar espacio de encuadernado, pero esa
+    # misma asimetria hace que el texto "centrado" de la portada se vea
+    # corrido 0.5cm hacia la derecha. Se le da a esta primera seccion
+    # margenes simetricos solo para la portada.
+    cover_section = doc.sections[0]
+    cover_section.left_margin = Cm(3.0)
+    cover_section.right_margin = Cm(3.0)
 
     # Proactive search in multiple pockets (c, data, values)
     def _find_val(key: str, default: str) -> str:
@@ -172,4 +183,7 @@ def render_caratula_unac_maestria(doc: Document, block: Block) -> None:
     add_p_centered(doc, lugar_completo, bold=True, size=12, space_before=60)
     add_p_centered(doc, pais, bold=True, size=12)
 
-    doc.add_page_break()
+    # Nueva seccion (no solo un salto de pagina) para restaurar los margenes
+    # asimetricos de encuadernado del cuerpo del documento -- la portada ya
+    # termino y usaba margenes simetricos propios (ver inicio de la funcion).
+    switch_to_portrait(doc)

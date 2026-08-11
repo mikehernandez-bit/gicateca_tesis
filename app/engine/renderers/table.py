@@ -399,6 +399,14 @@ def _render_tabla_impl(doc: Document, tabla_data: dict) -> None:
         col_width = available / num_cols
         for i in range(num_cols):
             table.columns[i].width = Cm(col_width)
+        # Sin esto, ``table.columns[i].width`` es solo una sugerencia que
+        # Word no respeta de forma confiable -- sobre todo con celdas
+        # combinadas verticalmente (celdas_fusionadas) -- y termina
+        # autoajustando cada columna al contenido, dejando la tabla mas
+        # angosta que el ancho horizontal disponible real. Igual que en la
+        # rama de ancho_columnas explicito, hay que fijar el ancho en cada
+        # celda (tcW) para que ocupe todo el ancho de la pagina horizontal.
+        _apply_table_geometry(table, [col_width] * num_cols)
 
     # 5. Headers
     for i, header_text in enumerate(encabezados):

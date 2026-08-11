@@ -8,24 +8,24 @@
     "documentType": "cuant",
     "title": "Informe de Tesis UNAC - Enfoque Cuantitativo",
     "descripcion": "Plantilla Oficial Informe de Tesis UNAC - Enfoque Cuantitativo (Directiva 004-2022-R)",
-    "version": "2.0.0"
+    "version": "2.6.0"
   },
   "configuracion": {
     "ruta_logo": "app/static/assets/LogoUNAC.png"
   },
   "caratula": {
     "universidad": "UNIVERSIDAD NACIONAL DEL CALLAO",
-    "facultad": "FACULTAD DE [NOMBRE DE LA FACULTAD]",
-    "escuela": "ESCUELA PROFESIONAL DE [NOMBRE DE LA ESCUELA]",
+    "facultad": "FACULTAD DE INGENIERÍA MECÁNICA Y DE ENERGÍA",
+    "escuela": "ESCUELA PROFESIONAL DE INGENIERÍA MECÁNICA",
     "tipo_documento": "INFORME DE TESIS",
     "titulo_placeholder": "\"[ESCRIBA AQUÍ EL TÍTULO DE LA TESIS]\"",
     "frase_grado": "PARA OPTAR EL TÍTULO PROFESIONAL DE:",
-    "grado_objetivo": "[INGENIERO DE ...]",
-    "label_autor": "AUTOR: [NOMBRES Y APELLIDOS]",
-    "label_asesor": "ASESOR: [NOMBRES Y APELLIDOS]",
-    "label_linea": "LÍNEA DE INVESTIGACIÓN: [NOMBRE DE LA LÍNEA]",
-    "lugar": "Callao, [AÑO]",
-    "anio": "PERÚ"
+    "label_autor": "AUTOR:",
+    "label_asesor": "ASESOR:",
+    "label_linea": "LÍNEA DE INVESTIGACIÓN:",
+    "lugar": "Callao",
+    "anio": "",
+    "pais": "PERÚ"
   },
   "preliminares": {
     "dedicatoria": {
@@ -68,19 +68,51 @@
         },
         {
           "texto": "1.2 Formulación del problema",
-          "instruccion_detallada": "Estructura formalmente la idea de investigación mediante preguntas claras y precisas que relacionen las variables de estudio.\n\n- Problema General: Es la interrogante principal que engloba la relación entre la Variable Independiente y la Dependiente (o la variable única en estudios descriptivos). Debe formularse de manera que invite a la medición o prueba estadística.\n  * Ejemplo: ¿De qué manera la implementación de X influye en Y?\n- Problemas Específicos: Son sub-preguntas que desglosan el análisis. Generalmente relacionan las Dimensiones de la Variable Independiente con la Variable Dependiente o sus dimensiones. Deben ser medibles y concretas."
+          "instruccion_detallada": "Redacta un párrafo breve (2-3 líneas) que introduzca la formulación del problema de investigación, antes de presentar el problema general y los problemas específicos en los apartados siguientes."
+        },
+        {
+          "texto": "1.2.1 Problema General",
+          "instruccion_detallada": "Formula la interrogante principal que engloba la relación entre la Variable Independiente y la Dependiente (o la variable única en estudios descriptivos). Debe formularse de manera que invite a la medición o prueba estadística.\n\nEjemplo: ¿De qué manera la implementación de X influye en Y?"
+        },
+        {
+          "texto": "1.2.2 Problemas Específicos",
+          "instruccion_detallada": "Formula las sub-preguntas que desglosan el análisis del problema general. Generalmente relacionan las Dimensiones de la Variable Independiente con la Variable Dependiente o sus dimensiones. Deben ser medibles, concretas y guardar correspondencia directa con los objetivos específicos e hipótesis específicas del estudio."
         },
         {
           "texto": "1.3 Objetivos",
-          "instruccion_detallada": "Expresan el fin medible y verificable que se pretende lograr con la investigación. Deben iniciar con un verbo en infinitivo fuerte (Determinar, Evaluar, Diseñar, Establecer) y ser congruentes con los problemas formulados.\n\n- Objetivo General: El logro final del estudio que responde directamente al problema general.\n- Objetivos Específicos: Los pasos intermedios, operativos o secuenciales necesarios para alcanzar el objetivo general (responden a los problemas específicos)."
+          "instruccion_detallada": "Redacta un párrafo breve (2-3 líneas) que introduzca los objetivos de la investigación, antes de presentar el objetivo general y los objetivos específicos en los apartados siguientes."
+        },
+        {
+          "texto": "1.3.1 Objetivo General",
+          "instruccion_detallada": "Formula el logro final del estudio que responde directamente al problema general. Debe iniciar con un verbo en infinitivo fuerte (Determinar, Evaluar, Diseñar, Establecer) y ser congruente con el problema general planteado."
+        },
+        {
+          "texto": "1.3.2 Objetivos Específicos",
+          "instruccion_detallada": "Formula los pasos intermedios, operativos o secuenciales necesarios para alcanzar el objetivo general. Cada objetivo específico debe iniciar con un verbo en infinitivo fuerte y responder directamente a cada uno de los problemas específicos formulados."
         },
         {
           "texto": "1.4 Justificación",
           "instruccion_detallada": "Explica las razones por las cuales es necesario y útil realizar el estudio. Debes redactar los siguientes enfoques:\n\n- Justificación Técnica/Práctica: ¿Qué problema real resuelve? ¿Cómo mejora la eficiencia, productividad, seguridad o costos en la entidad de estudio?\n- Justificación Teórica: ¿Cómo aplica, valida o contrasta conocimientos de ingeniería existentes? ¿Llena algún vacío de conocimiento?\n- Justificación Metodológica: ¿Utiliza algún instrumento, software, algoritmo o método de análisis novedoso o riguroso que sirva de modelo para futuras investigaciones?\n- Justificación Económica/Social: ¿Cuál es el beneficio costo-beneficio para la empresa? ¿Cuál es el impacto positivo en la sociedad, trabajadores o medio ambiente?"
         },
         {
-          "texto": "1.5 Delimitantes de la investigación",
-          "instruccion_detallada": "Define las fronteras y alcances del estudio para asegurar su viabilidad técnica y operativa:\n\n- Delimitación Temática: Línea de investigación de la escuela o área específica de la ingeniería (ej. Mantenimiento, Telecomunicaciones, Control, Software).\n- Delimitación Espacial: Lugar exacto donde se tomarán los datos o se realizará la implementación (Nombre de la Empresa, Área específica, Ciudad).\n- Delimitación Temporal: Periodo de tiempo que abarca la recolección y análisis de datos (ej. Datos históricos de 2023 o mediciones de campo de Enero a Junio 2024)."
+          "texto": "1.5 Limitantes de la investigación",
+          "instruccion_detallada": "Describe las restricciones o dificultades externas al investigador que condicionaron el desarrollo del estudio y que deben declararse por transparencia metodológica (no confundir con las Delimitantes, que son fronteras definidas voluntariamente).\n\nDebes considerar, según aplique:\n- Limitantes de acceso a la información: Restricciones para obtener datos históricos, confidencialidad empresarial o falta de registros completos en el periodo de estudio.\n- Limitantes de tiempo y recursos: Plazos acotados para la recolección de datos, presupuesto limitado para instrumentación o pruebas adicionales.\n- Limitantes técnicas u operativas: Condiciones de operación de la entidad que impidieron pruebas controladas, paradas programadas o acceso irrestricto a los equipos/áreas de estudio.\n- Limitantes de generalización: Alcance de los resultados, explicando por qué las conclusiones aplican al caso de estudio y las condiciones bajo las cuales podrían replicarse."
+        },
+        {
+          "texto": "1.6 Delimitantes de la investigación",
+          "instruccion_detallada": "Redacta un párrafo breve (2-3 líneas) que introduzca las fronteras y alcances definidos para el estudio, antes de precisar la delimitación teórica, temporal y espacial en los apartados siguientes."
+        },
+        {
+          "texto": "1.6.1 Delimitante Teórica",
+          "instruccion_detallada": "Define la línea de investigación de la escuela o el área específica de la ingeniería en la que se enmarca el estudio (ej. Mantenimiento, Telecomunicaciones, Control, Software), precisando el cuerpo teórico y las variables sobre las que se delimita el análisis."
+        },
+        {
+          "texto": "1.6.2 Delimitante Temporal",
+          "instruccion_detallada": "Define el periodo de tiempo que abarca la recolección y el análisis de datos (ej. Datos históricos de 2023 o mediciones de campo de Enero a Junio 2024)."
+        },
+        {
+          "texto": "1.6.3 Delimitante Espacial",
+          "instruccion_detallada": "Define el lugar exacto donde se tomarán los datos o se realizará la implementación (Nombre de la Empresa, área específica, Ciudad)."
         }
       ]
     },
@@ -90,8 +122,16 @@
       "tipo_vista": "pdf_capitulo",
       "contenido": [
         {
-          "texto": "2.1 Antecedentes (Internacional y nacional)",
-          "instruccion_detallada": "Presenta el 'estado del arte' revisando investigaciones previas. Debes buscar tesis o artículos científicos (papers) indexados, preferiblemente de los últimos 5 a 10 años.\n\nEstructura de cada antecedente: Debes redactar en forma de párrafo fluido (no viñetas aisladas) incluyendo obligatoriamente:\n- Apellido del autor y Año.\n- Título de la investigación.\n- Objetivo principal del estudio.\n- Metodología empleada (Diseño, muestra, instrumentos).\n- Resultados numéricos más relevantes (datos estadísticos, mejoras porcentuales, correlaciones).\n- Conclusiones principales.\n\nCantidad: Se recomienda un promedio de 5 antecedentes internacionales y 5 nacionales para pregrado (o 20-30 referencias totales para posgrado).",
+          "texto": "2.1 Antecedentes",
+          "instruccion_detallada": "Redacta un párrafo breve (2-3 líneas) que introduzca la revisión del estado del arte, antes de presentar los antecedentes internacionales y nacionales en los apartados siguientes."
+        },
+        {
+          "texto": "2.1.1 Antecedentes Internacionales",
+          "instruccion_detallada": "Presenta el 'estado del arte' revisando investigaciones previas realizadas fuera del Perú. Debes buscar tesis o artículos científicos (papers) indexados, preferiblemente de los últimos 5 a 10 años.\n\nEstructura de cada antecedente: Debes redactar en forma de párrafo fluido (no viñetas aisladas) incluyendo obligatoriamente:\n- Apellido del autor y Año.\n- Título de la investigación.\n- Objetivo principal del estudio.\n- Metodología empleada (Diseño, muestra, instrumentos).\n- Resultados numéricos más relevantes (datos estadísticos, mejoras porcentuales, correlaciones).\n- Conclusiones principales.\n\nCantidad: Se recomienda un promedio de 5 antecedentes internacionales para pregrado (o hasta 15 para posgrado)."
+        },
+        {
+          "texto": "2.1.2 Antecedentes Nacionales",
+          "instruccion_detallada": "Presenta el 'estado del arte' revisando investigaciones previas realizadas en el Perú. Debes buscar tesis o artículos científicos (papers) indexados, preferiblemente de los últimos 5 a 10 años.\n\nEstructura de cada antecedente: Debes redactar en forma de párrafo fluido (no viñetas aisladas) incluyendo obligatoriamente:\n- Apellido del autor y Año.\n- Título de la investigación.\n- Objetivo principal del estudio.\n- Metodología empleada (Diseño, muestra, instrumentos).\n- Resultados numéricos más relevantes (datos estadísticos, mejoras porcentuales, correlaciones).\n- Conclusiones principales.\n\nCantidad: Se recomienda un promedio de 5 antecedentes nacionales para pregrado (o hasta 15 para posgrado).",
           "imagenes": [
             {
               "titulo": "Marco conceptual de la investigación",
@@ -120,8 +160,12 @@
       "tipo_vista": "pdf_capitulo",
       "contenido": [
         {
-          "texto": "3.1 Hipótesis (General y específicas)",
-          "instruccion_detallada": "Son las respuestas tentativas y probables a los problemas formulados.\n\n- Requisito: Deben ser proposiciones afirmativas que establezcan una relación clara (causa-efecto, correlación, diferencia de grupos) entre las variables.\n- Comprobación: Deben estar formuladas de tal manera que puedan ser aceptadas o rechazadas mediante pruebas estadísticas (Hipótesis Nula vs. Alterna).\n- Alineación: Debe existir una Hipótesis General para el Problema General y Hipótesis Específicas para cada Problema Específico.",
+          "texto": "3.1 Hipótesis",
+          "instruccion_detallada": "Redacta un párrafo breve (2-3 líneas) que introduzca las hipótesis de la investigación, antes de presentar la hipótesis general y las hipótesis específicas en los apartados siguientes."
+        },
+        {
+          "texto": "3.1.1 Hipótesis General",
+          "instruccion_detallada": "Formula la respuesta tentativa y probable al problema general. Debe ser una proposición afirmativa que establezca una relación clara (causa-efecto, correlación, diferencia de grupos) entre las variables, y estar formulada de tal manera que pueda ser aceptada o rechazada mediante pruebas estadísticas (Hipótesis Nula vs. Alterna).",
           "imagenes": [
             {
               "titulo": "Modelo de relación entre variables",
@@ -131,92 +175,12 @@
           ]
         },
         {
-          "texto": "3.1.1 Operacionalización de variables",
-          "instruccion_detallada": "Es el proceso técnico fundamental de convertir conceptos abstractos en datos medibles. Se suele presentar en una matriz (tabla) que contiene:\n\n- Definición Conceptual: Qué es la variable teóricamente según un autor.\n- Definición Operacional: Cómo se medirá, calculará o manipulará en este estudio específico.\n- Dimensiones: Factores, componentes o grandes aspectos de la variable.\n- Indicadores: La unidad de medida exacta y observable (ej. %, kg, horas, grados, puntaje).\n- Escala de medición: Nominal, Ordinal, de Intervalo o de Razón."
+          "texto": "3.1.2 Hipótesis Específica",
+          "instruccion_detallada": "Formula una hipótesis específica por cada problema específico planteado. Cada una debe ser una proposición afirmativa que establezca una relación clara entre las dimensiones o indicadores de las variables involucradas, y debe poder ser aceptada o rechazada mediante pruebas estadísticas."
         },
         {
-          "tipo": "tabla",
-          "titulo": "Tabla 1: Operacionalización de Variables",
-          "orientacion": "landscape",
-          "encabezados": [
-            "Variable",
-            "Def. Conceptual",
-            "Def. Operacional",
-            "Dimensiones",
-            "Indicadores",
-            "Escala"
-          ],
-          "filas": [
-            [
-              "V.I: [nombre]",
-              "[Definición según autor, año]",
-              "[Cómo se mide en este estudio]",
-              "[Dimensión 1]",
-              "[Indicador 1]",
-              "[Razón/Ordinal]"
-            ],
-            [
-              "",
-              "",
-              "",
-              "[Dimensión 2]",
-              "[Indicador 2]",
-              "[Razón/Ordinal]"
-            ],
-            [
-              "V.D: [nombre]",
-              "[Definición según autor, año]",
-              "[Cómo se mide en este estudio]",
-              "[Dimensión 1]",
-              "[Indicador 1]",
-              "[Razón/Ordinal]"
-            ],
-            [
-              "",
-              "",
-              "",
-              "[Dimensión 2]",
-              "[Indicador 2]",
-              "[Razón/Ordinal]"
-            ]
-          ],
-          "celdas_fusionadas": [
-            {
-              "fila": 0,
-              "col": 0,
-              "filas_span": 2
-            },
-            {
-              "fila": 0,
-              "col": 1,
-              "filas_span": 2
-            },
-            {
-              "fila": 0,
-              "col": 2,
-              "filas_span": 2
-            },
-            {
-              "fila": 2,
-              "col": 0,
-              "filas_span": 2
-            },
-            {
-              "fila": 2,
-              "col": 1,
-              "filas_span": 2
-            },
-            {
-              "fila": 2,
-              "col": 2,
-              "filas_span": 2
-            }
-          ],
-          "nota_pie": "Fuente: Elaboración propia",
-          "estilo": {
-            "encabezado_color": "D9E2F3",
-            "fuente_size": 9
-          }
+          "texto": "3.2 Operacionalización de variables",
+          "instruccion_detallada": "Es el proceso técnico fundamental de convertir conceptos abstractos en datos medibles. Se suele presentar en una matriz (tabla) que contiene:\n\n- Definición Conceptual: Qué es la variable teóricamente según un autor.\n- Definición Operacional: Cómo se medirá, calculará o manipulará en este estudio específico.\n- Dimensiones: Factores, componentes o grandes aspectos de la variable.\n- Indicadores: La unidad de medida exacta y observable (ej. %, kg, horas, grados, puntaje).\n- Escala de medición: Nominal, Ordinal, de Intervalo o de Razón."
         }
       ]
     },
@@ -238,7 +202,7 @@
         },
         {
           "texto": "4.2 Método de investigación",
-          "instruccion_detallada": "Describe el razonamiento lógico utilizado para la obtención de conocimiento.\n\nInstrucción: Generalmente en ingeniería se usa el Método Hipotético-Deductivo (parte de una teoría general, plantea hipótesis y las deduce/prueba en la realidad particular) o el Método Cuantitativo (basado en la medición numérica y el análisis estadístico objetivo)."
+          "instruccion_detallada": "Describe el razonamiento lógico y el paradigma que orientan la investigación.\n\n- Paradigma: Indica el paradigma de investigación en el que se ubica el estudio (p. ej. positivista, orientado a explicar, controlar y predecir variables de manera objetiva y medible).\n- Enfoque: Sustenta por qué el estudio es cuantitativo, es decir, porque recolecta y analiza datos numéricos para probar hipótesis mediante análisis estadístico.\n- Método: En ingeniería se usa habitualmente el método Hipotético-Deductivo (parte de una teoría general, plantea hipótesis y las deduce/prueba en la realidad particular).\n- Sustento: Respalda cada elección metodológica citando al menos un autor de referencia en metodología de la investigación."
         },
         {
           "texto": "4.3 Población y muestra",
@@ -246,7 +210,7 @@
         },
         {
           "texto": "4.4 Lugar de estudio",
-          "instruccion_detallada": "Describe el entorno físico.\n\nInstrucción: Ubicación geográfica e institucional exacta donde se recolectan los datos (Dirección, Ciudad, Departamento, País)."
+          "instruccion_detallada": "Describe el entorno físico e institucional donde se ejecutó la investigación, así como el periodo en que se desarrolló.\n\n- Ubicación: Dirección, ciudad, departamento y país donde se recolectaron los datos o se implementó la propuesta.\n- Periodo de desarrollo: Rango de fechas o año en que se llevó a cabo la recolección de datos y el desarrollo del estudio, alineado con el cronograma de la institución."
         },
         {
           "texto": "4.5 Técnicas e instrumentos de recolección",
@@ -430,7 +394,7 @@
         },
         {
           "texto": "6.3 Responsabilidad ética",
-          "instruccion_detallada": "Declaración final de integridad sobre los resultados.\n\nInstrucción: El autor asume la responsabilidad por la veracidad, autenticidad y el rigor científico de los datos presentados, asegurando que no han sido manipulados ni fabricados."
+          "instruccion_detallada": "Declaración final de integridad sobre los resultados obtenidos.\n\n- Confidencialidad: Explica cómo se garantizó el anonimato y la confidencialidad de los datos y participantes involucrados.\n- Consentimiento informado: Menciona que los participantes conocieron los objetivos del estudio y el uso de sus datos, y aceptaron participar de manera voluntaria.\n- Veracidad: El autor asume la responsabilidad por la autenticidad y el rigor científico de los datos presentados, asegurando que no han sido manipulados ni fabricados, y que cumplen con la normativa vigente de ética en investigación."
         }
       ]
     },
@@ -444,15 +408,15 @@
       "contenido": [
         {
           "texto": "8.1 Recomendaciones metodológicas",
-          "nota": "Para futuros investigadores: ampliar muestra, incluir nuevas variables, usar otro diseño."
+          "nota": "Sugiere mejoras aplicables al diseño metodológico de futuras investigaciones sobre el mismo objeto de estudio.\n\n- Ampliación de muestra: Recomienda incrementar el tamaño o alcance de la muestra para mejorar la representatividad y la potencia estadística.\n- Nuevas variables o dimensiones: Sugiere incorporar variables, dimensiones o indicadores adicionales no abordados en este estudio.\n- Otros diseños o instrumentos: Propone explorar diseños de investigación complementarios (longitudinal, cuasi-experimental) o instrumentos de medición alternativos."
         },
         {
           "texto": "8.2 Recomendaciones académicas",
-          "nota": "Para la universidad o línea de investigación."
+          "nota": "Dirige sugerencias a la universidad, facultad o línea de investigación relacionada con el estudio.\n\n- Fortalecimiento curricular: Recomienda ajustes en los planes de estudio, cursos o programas académicos a partir de los hallazgos obtenidos.\n- Nuevas líneas de investigación: Propone temas o problemas derivados de este estudio que ameriten futuras tesis o proyectos de investigación.\n- Difusión del conocimiento: Sugiere la publicación o socialización de los resultados en revistas, congresos o repositorios institucionales."
         },
         {
           "texto": "8.3 Recomendaciones prácticas",
-          "nota": "Dirigidas a la empresa o institución estudiada: implementar el plan diseñado, realizar mantenimientos periódicos, capacitar al personal. Deben ser acciones concretas y realizables."
+          "nota": "Dirige sugerencias de acción concretas y viables a la empresa, institución o entidad donde se realizó el estudio.\n\n- Implementación: Recomienda ejecutar o consolidar la propuesta, plan o solución validada por la investigación.\n- Seguimiento y control: Sugiere mecanismos de monitoreo periódico (indicadores, auditorías, mantenimientos) para sostener las mejoras logradas en el tiempo.\n- Capacitación: Propone programas de capacitación o sensibilización del personal involucrado para asegurar la correcta apropiación de la mejora implementada."
         }
       ]
     }
@@ -478,55 +442,55 @@
   },
   "matriz_consistencia": {
     "problemas": {
-      "general": "¿De qué manera la implementación de un plan de mantenimiento reduce el tiempo perdido en el área de trapiche?",
+      "general": "[Problema general del proyecto]",
       "especificos": [
-        "¿Cuál es el diagnóstico inicial midiendo el tiempo perdido?",
-        "¿De qué manera realizar un análisis de criticidad?",
-        "¿Cómo desarrollar un análisis de modos y efectos de fallas?"
+        "[Problema especifico 1]",
+        "[Problema especifico 2]",
+        "[Problema especifico 3]"
       ]
     },
     "objetivos": {
-      "general": "Determinar cómo la implementación de un plan de mantenimiento reduce el tiempo perdido.",
+      "general": "[Objetivo general del proyecto]",
       "especificos": [
-        "Realizar un diagnóstico inicial.",
-        "Realizar un análisis de criticidad.",
-        "Desarrollar un análisis AMEF."
+        "[Objetivo especifico 1]",
+        "[Objetivo especifico 2]",
+        "[Objetivo especifico 3]"
       ]
     },
     "hipotesis": {
-      "general": "La implementación de un plan de mantenimiento reduce significativamente el tiempo perdido.",
+      "general": "[Hipotesis general del proyecto]",
       "especificos": [
-        "El diagnóstico permite identificar causas raíz.",
-        "El análisis de criticidad prioriza equipos clave."
+        "[Hipotesis especifica 1]",
+        "[Hipotesis especifica 2]"
       ]
     },
     "variables": {
       "independiente": {
-        "nombre": "PLAN DE MANTENIMIENTO",
+        "nombre": "[Variable independiente]",
         "dimensiones": [
-          "Criticidad",
-          "AMEF",
-          "Programación"
+          "[Dimension 1]",
+          "[Dimension 2]",
+          "[Dimension 3]"
         ]
       },
       "dependiente": {
-        "nombre": "TIEMPO PERDIDO",
+        "nombre": "[Variable dependiente]",
         "dimensiones": [
-          "Disponibilidad",
-          "Confiabilidad"
+          "[Dimension 1]",
+          "[Dimension 2]"
         ]
       }
     },
     "metodologia": {
-      "tipo": "Aplicada",
-      "enfoque": "Cuantitativo",
-      "nivel": "Explicativo",
-      "diseno": "Pre Experimental",
-      "poblacion": "32 equipos",
-      "muestra": "24 equipos críticos",
-      "tecnicas": "Observación",
-      "instrumentos": "Ficha de datos",
-      "procesamiento": "SPSS v25"
+      "tipo": "[Tipo de investigacion]",
+      "enfoque": "[Enfoque]",
+      "nivel": "[Nivel de investigacion]",
+      "diseno": "[Diseno de investigacion]",
+      "poblacion": "[Poblacion]",
+      "muestra": "[Muestra]",
+      "tecnicas": "[Tecnicas]",
+      "instrumentos": "[Instrumentos]",
+      "procesamiento": "[Procesamiento de datos]"
     }
   },
   "pagina_respeto": {}
