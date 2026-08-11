@@ -1728,44 +1728,39 @@ def _normalize_content_item(
         texto = item.get("texto", "")
         if texto:
             normalized_text = texto.replace("\r\n", "\n").replace("\r", "\n")
-            lines = normalized_text.split("\n")
+            lines = [line.strip() for line in normalized_text.split("\n") if line.strip()]
+            if not lines:
+                return blocks
             
-            # Buscar la primera línea no vacía para ver si es un encabezado
-            first_line_idx = -1
-            for idx, line in enumerate(lines):
-                if line.strip():
-                    first_line_idx = idx
-                    break
+            if parent_item and "texto" in parent_item:
+                parent_title = _norm_upper(_MARKDOWN_BOLD_RE.sub(r"\2", str(parent_item["texto"])).strip())
+                first_line_norm = _norm_upper(_MARKDOWN_BOLD_RE.sub(r"\2", lines[0]).strip()).lstrip("# ").strip()
+                if first_line_norm == parent_title or first_line_norm.startswith(parent_title + " "):
+                    lines = lines[1:]
+                    if not lines:
+                        return blocks
+
+            first_line_clean = _MARKDOWN_BOLD_RE.sub(r"\2", lines[0]).strip()
+            if first_line_clean.startswith("###"):
+                first_line_clean = first_line_clean.lstrip("#").strip()
             
-            if first_line_idx != -1:
-                first_line = lines[first_line_idx]
-                # Limpiar marcadores Markdown antes de detectar headings de nivel 3.
-                # e.g. **2.2.1 Título** → 2.2.1 Título, ### 2.2.1 Título → 2.2.1 Título
-                first_line_clean = _MARKDOWN_BOLD_RE.sub(r"\2", first_line.strip()).strip()
-                if first_line_clean.startswith("###"):
-                    first_line_clean = first_line_clean.lstrip("#").strip()
-                
-                heading_match = _AI_LEVEL3_HEADING_RE.match(first_line_clean)
-                # Excluir fórmulas matemáticas: no tratarlas como headings de nivel 3
-                # (evita que aparezcan en el índice de contenidos).
-                if heading_match and not _MATH_FORMULA_RE.search(heading_match.group(2)):
-                    blocks.append(
-                        {
-                            "type": "heading",
-                            "text": f"{heading_match.group(1)} {heading_match.group(2)}".strip(),
-                            "level": 3,
-                            "centered": False,
-                            "space_before": 8,
-                            "space_after": 8,
-                        }
-                    )
-                    remainder = "\n".join(lines[first_line_idx + 1:]).strip()
-                    if remainder:
-                        blocks.append({"type": "paragraph", "text": remainder})
-                else:
-                    blocks.append({"type": "paragraph", "text": texto})
+            heading_match = _AI_LEVEL3_HEADING_RE.match(first_line_clean)
+            if heading_match and not _MATH_FORMULA_RE.search(heading_match.group(2)):
+                blocks.append(
+                    {
+                        "type": "heading",
+                        "text": f"{heading_match.group(1)} {heading_match.group(2)}".strip(),
+                        "level": 3,
+                        "centered": False,
+                        "space_before": 8,
+                        "space_after": 8,
+                    }
+                )
+                remainder = " ".join(lines[1:]).strip()
+                if remainder:
+                    blocks.append({"type": "paragraph", "text": remainder})
             else:
-                blocks.append({"type": "paragraph", "text": texto})
+                blocks.append({"type": "paragraph", "text": " ".join(lines)})
         return blocks
 
     # Figura sugerida por IA (tipo == "figura")
@@ -1947,12 +1942,12 @@ def _normalize_ai_content(
                         "space_after": 8,
                     }
                 )
-                remainder = "\n".join(lines[1:]).strip()
+                remainder = " ".join(lines[1:]).strip()
                 if remainder:
                     blocks.append({"type": "paragraph", "text": remainder})
                 continue
 
-            blocks.append({"type": "paragraph", "text": part})
+            blocks.append({"type": "paragraph", "text": " ".join(lines)})
         return blocks
 
     if isinstance(content, dict):

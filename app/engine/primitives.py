@@ -147,7 +147,7 @@ def configure_styles(
     font.name = font_name
     font.size = Pt(font_size)
     style.paragraph_format.line_spacing = 1.5
-    style.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    style.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
     # Evita páginas en blanco por "page break before" heredado en estilos heading.
     for heading_name in ("Heading 1", "Heading 2", "Heading 3"):
         try:
