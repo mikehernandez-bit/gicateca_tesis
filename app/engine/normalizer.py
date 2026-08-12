@@ -1096,10 +1096,10 @@ def _normalize_preliminares(data: dict) -> List[Block]:
     # Nueva sección
     blocks.append({"type": "section_break"})
 
-    optional_preliminary_keys = {"dedicatoria", "agradecimiento", "agradecimientos", "abstract"}
+    optional_preliminary_keys = {"dedicatoria", "agradecimiento", "agradecimientos"}
 
-    # Secciones de texto simples
-    for key in ["dedicatoria", "agradecimiento", "agradecimientos", "resumen", "abstract"]:
+    # Secciones de texto simples (dedicatorias, agradecimientos) antes del indice
+    for key in ["dedicatoria", "agradecimiento", "agradecimientos"]:
         if key not in pre:
             continue
         item = pre[key]
@@ -1161,6 +1161,31 @@ def _normalize_preliminares(data: dict) -> List[Block]:
     for item in pre.get("contenido", []):
         if isinstance(item, dict) and item.get("tipo") == "tabla":
             blocks.append({"type": "table", **item})
+
+    # Resumen y Abstract van DESPUÉS de los índices y ANTES de la introducción
+    for key in ["resumen", "abstract"]:
+        if key not in pre:
+            continue
+        item = pre[key]
+        heading_text = item if isinstance(item, str) else item.get("titulo", key.upper())
+        content_blocks: List[Block] = []
+
+        if isinstance(item, dict):
+            if item.get("_ai_content"):
+                content_blocks = _normalize_ai_content(item["_ai_content"])
+            elif item.get("texto") and not _looks_like_template_placeholder_text(item["texto"]):
+                content_blocks = [{"type": "paragraph", "text": item["texto"]}]
+
+        blocks.append(
+            {
+                "type": "heading",
+                "text": heading_text,
+                "level": 1,
+                "centered": True,
+            }
+        )
+        blocks.extend(content_blocks)
+        blocks.append({"type": "page_break"})
 
     # Introducción
     if "introduccion" in pre:
@@ -1629,33 +1654,36 @@ def _normalize_project_structured_section(data: dict | None, item: dict) -> list
 
     if "PROBLEMA GENERAL" in title:
         general = _matrix_value(data, "problema_general", "problemas", "general")
-        if general:
+        if general and not _looks_like_template_placeholder_text(general):
             return [{"type": "paragraph", "text": general}]
     
     if "PROBLEMA ESPEC" in title or "PROBLEMAS ESPEC" in title:
         specific = _matrix_list(data, "problemas_especificos", "problemas", "especificos")
-        if specific:
-            return _make_bullet_paragraphs(specific)
+        filtered_specific = [s for s in specific if not _looks_like_template_placeholder_text(s)]
+        if filtered_specific:
+            return _make_bullet_paragraphs(filtered_specific)
 
     if "OBJETIVO GENERAL" in title:
         general = _matrix_value(data, "objetivo_general", "objetivos", "general")
-        if general:
+        if general and not _looks_like_template_placeholder_text(general):
             return [{"type": "paragraph", "text": general}]
             
     if "OBJETIVO ESPEC" in title or "OBJETIVOS ESPEC" in title:
         specific = _matrix_list(data, "objetivos_especificos", "objetivos", "especificos")
-        if specific:
-            return _make_bullet_paragraphs(specific)
+        filtered_specific = [s for s in specific if not _looks_like_template_placeholder_text(s)]
+        if filtered_specific:
+            return _make_bullet_paragraphs(filtered_specific)
             
     if "HIPÓTESIS GENERAL" in title or "HIPOTESIS GENERAL" in title:
         general = _matrix_value(data, "hipotesis_general", "hipotesis", "general")
-        if general:
+        if general and not _looks_like_template_placeholder_text(general):
             return [{"type": "paragraph", "text": general}]
             
     if "HIPÓTESIS ESPEC" in title or "HIPOTESIS ESPEC" in title:
         specific = _matrix_list(data, "hipotesis_especificas", "hipotesis", "especificos")
-        if specific:
-            return _make_bullet_paragraphs(specific)
+        filtered_specific = [s for s in specific if not _looks_like_template_placeholder_text(s)]
+        if filtered_specific:
+            return _make_bullet_paragraphs(filtered_specific)
 
     return []
 

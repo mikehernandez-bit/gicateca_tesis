@@ -76,11 +76,11 @@
         },
         {
           "texto": "1.2.1 Problema General",
-          "instruccion_detallada": "Formula la interrogante principal que engloba la relación entre la Variable Independiente y la Dependiente (o la variable única en estudios descriptivos). Debe formularse de manera que invite a la medición o prueba estadística.\n\nEjemplo: ¿De qué manera la implementación de X influye en Y?"
+          "instruccion_detallada": "Formula una sola pregunta que represente el problema central de toda la investigación.\n\nDebe:\n- Estar directamente relacionada con la situación problemática.\n- Plantear claramente qué se quiere solucionar, mejorar, determinar, analizar o desarrollar.\n- Incluir las variables principales del proyecto cuando corresponda.\n- Indicar el contexto o población de estudio.\n- Ser coherente con el objetivo general.\n- No plantear todavía la solución como si ya estuviera implementada.\n- Redactarse como una pregunta de investigación.\n\nEjemplo de estructura:\n\"¿De qué manera [variable/propuesta] influye/mejora/contribuye a [problema o variable afectada] en [población/contexto]?\""
         },
         {
           "texto": "1.2.2 Problemas Específicos",
-          "instruccion_detallada": "Formula las sub-preguntas que desglosan el análisis del problema general. Generalmente relacionan las Dimensiones de la Variable Independiente con la Variable Dependiente o sus dimensiones. Deben ser medibles, concretas y guardar correspondencia directa con los objetivos específicos e hipótesis específicas del estudio."
+          "instruccion_detallada": "Formula 3 problemas específicos como preguntas de investigación.\n\nCada problema específico debe abordar un aspecto concreto del problema general y estar relacionado directamente con uno de los objetivos específicos.\n\nLos problemas específicos deben:\n- Ser más concretos que el problema general.\n- Descomponer el problema general en partes.\n- Mantener relación lógica entre ellos.\n- Evitar repetir exactamente la misma pregunta.\n- Ser medibles o investigables.\n- Ser coherentes con las variables, dimensiones y objetivos del proyecto.\n\nUtiliza una estructura como:\n1. ¿Cuál es el estado actual de [aspecto/problema] en [contexto]?\n2. ¿De qué manera [propuesta/variable] puede mejorar [aspecto específico]?\n3. ¿En qué medida [propuesta/variable] contribuye a [resultado esperado]?"
         },
         {
           "texto": "1.3 Objetivos"
