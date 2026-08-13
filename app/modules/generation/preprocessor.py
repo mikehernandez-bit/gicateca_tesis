@@ -871,6 +871,7 @@ def apply_ai_content(
             ("agradecimiento", "AGRADECIMIENTO"),
             ("agradecimientos", "AGRADECIMIENTOS"),
             ("resumen", "RESUMEN"),
+            ("abstract", "ABSTRACT"),
             ("introduccion", "INTRODUCCION"),
         ):
             _inject_text_preliminary(prelim_key, default_title)

@@ -17,12 +17,22 @@ def render_paragraph(doc: Document, block: Block) -> None:
     Block keys:
         text (str): Texto del párrafo.
     """
-    p = doc.add_paragraph()
-    p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-    p.paragraph_format.line_spacing = 1.5
-    run = p.add_run(block.get("text", ""))
-    run.font.name = "Arial"
-    run.font.size = Pt(12)
+    raw_text = block.get("text", "")
+    if not raw_text:
+        return
+
+    paragraphs = str(raw_text).replace("\r\n", "\n").replace("\r", "\n").split("\n\n")
+    for para_str in paragraphs:
+        lines = [l.strip() for l in para_str.split("\n") if l.strip()]
+        if not lines:
+            continue
+        clean_text = " ".join(lines)
+        p = doc.add_paragraph()
+        p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p.paragraph_format.line_spacing = 1.5
+        run = p.add_run(clean_text)
+        run.font.name = "Arial"
+        run.font.size = Pt(12)
 
 
 @register("paragraph_bold")

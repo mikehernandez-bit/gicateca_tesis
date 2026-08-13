@@ -95,6 +95,21 @@ def _last_content_has_page_break(doc: Document) -> bool:
     return False
 
 
+def _remove_trailing_page_break(doc: Document) -> bool:
+    """Remove trailing page break run (<w:br w:type='page'/>) from body to prevent double page breaks."""
+    body = doc.element.body
+    for child in reversed(list(body)):
+        if child.tag == qn("w:sectPr"):
+            continue
+        if child.tag == qn("w:p"):
+            for run in list(child.findall(f".//{qn('w:r')}")):
+                for br in list(run.findall(f".//{qn('w:br')}")):
+                    if br.get(qn("w:type")) == "page":
+                        run.remove(br)
+                        return True
+        return False
+
+
 @register("page_break")
 def render_page_break(doc: Document, block: Block) -> None:
     """Inserta un salto de página.
@@ -103,29 +118,38 @@ def render_page_break(doc: Document, block: Block) -> None:
     (ej: después de ``switch_to_portrait`` al final de una tabla landscape),
     se omite el page_break porque el section break ya inició una nueva página.
     Esto evita hojas en blanco entre tablas landscape y el contenido siguiente.
+    Si force=True, el salto se aplica de forma garantizada (ej: hoja de respeto).
     """
     force = bool(block.get("force", False))
-    if _last_content_is_section_break(doc):
+    if not force and _last_content_is_section_break(doc):
         return
     # Evita doble page break consecutivo (otra fuente típica de hoja en blanco).
     if not force and _last_content_has_page_break(doc):
         return
+
+    # Limpiar space_after del último párrafo para evitar desbordes antes del salto.
+    if doc.paragraphs:
+        last_p = doc.paragraphs[-1]
+        if last_p.paragraph_format.space_after:
+            last_p.paragraph_format.space_after = 0
 
     # Si el body ya termina en un parrafo vacio (el spacer que OOXML exige
     # despues de una tabla, p.ej. tras una nota en caja azul), reutilizalo
     # para el salto de pagina en vez de crear otro parrafo nuevo justo al
     # lado -- ver docstring de _last_empty_trailing_paragraph.
     trailing = _last_empty_trailing_paragraph(doc)
-    if trailing is not None:
+    if trailing is not None and not trailing.text.strip():
         trailing.add_run().add_break(WD_BREAK.PAGE)
-        return
-
-    doc.add_page_break()
+    else:
+        doc.add_page_break()
 
 
 @register("section_break")
 def render_section_break(doc: Document, block: Block) -> None:
-    """Inserta un salto de sección (nueva página)."""
+    """Inserta un salto de sección (nueva página). Preserva la hoja de respeto inicial e investiga saltos institucionales."""
+    force = bool(block.get("force", False))
+    if not force and _last_content_is_section_break(doc):
+        return
     doc.add_section(WD_SECTION.NEW_PAGE)
 
 

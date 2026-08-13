@@ -112,7 +112,7 @@
         {
           "texto": "2.2 Bases teóricas",
           "nota": "Análisis sistemático de las principales teorías existentes.",
-          "instruccion_detallada": "Es el sustento científico de la tesis.\n\nDesarrollo: Analiza sistemáticamente las teorías, leyes, principios y modelos matemáticos/físicos que explican tus variables (Variable Independiente y Dependiente).\nRigor: No es un copiado y pegado; debes interpretar la teoría y citar fuentes confiables (Libros de especialidad, IEEE, normas técnicas).\nFundamentación: Incluir brevemente el enfoque epistemológico (positivista/cuantitativo) que guía el estudio."
+          "instruccion_detallada": "Es el sustento científico de la tesis.\n\nDesarrollo Teórico Amplio: Analiza sistemáticamente las teorías, leyes, principios y modelos matemáticos/físicos que explican tus variables (Variable Independiente y Dependiente). Desarrolla cada subtema con amplitud analítica (mínimo 3 a 5 párrafos rigurosos por subcapítulo).\nRequisito de Figuras: Toda figura o diagrama que se inserte en esta sección DEBE estar obligatoriamente precedido por un desarrollo teórico sustancial y bien fundamentado (mínimo 120 a 150 palabras explicativas del modelo o concepto teórico ANTES de la figura) y seguido por una interpretación analítica de su aplicación al estudio. Evitar introducciones breves o de una sola frase antes de una figura.\nRigor: No es un copiado y pegado; debes interpretar la teoría y citar fuentes confiables (Libros de especialidad, IEEE, normas técnicas, papers indexados).\nFundamentación: Incluir el enfoque epistemológico (positivista/cuantitativo) que guía el estudio."
         },
         {
           "texto": "2.3 Marco conceptual",

@@ -106,7 +106,8 @@
           ]
         },
         {
-          "texto": "2.2. Bases Teóricas"
+          "texto": "2.2. Bases Teóricas",
+          "instruccion_detallada": "Desarrolle exhaustivamente las teorías, leyes, modelos y conceptos que sustentan las variables (mínimo 3 a 5 párrafos profundos por subcapítulo).\n\nRequisito de Figuras: Toda figura o diagrama que se inserte en esta sección DEBE estar obligatoriamente precedido por un desarrollo teórico amplio y sustancial (mínimo 120 a 150 palabras explicativas del modelo o concepto teórico ANTES de la figura) y seguido de una explicación analítica. Evitar párrafos introductorios breves de una sola frase antes de una figura."
         },
         {
           "texto": "2.3. Definición de Términos"

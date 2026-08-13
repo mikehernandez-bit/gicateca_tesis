@@ -292,6 +292,7 @@ def _render_exact_or_seq_caption(doc: Document, titulo: str, style: dict) -> Non
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
         p.paragraph_format.space_before = Pt(float(style.get("titulo_space_before_pt", 0)))
         p.paragraph_format.space_after = Pt(float(style.get("titulo_space_after_pt", 6)))
+        p.paragraph_format.keep_with_next = True
         run = p.add_run(str(titulo))
         run.bold = bool(style.get("titulo_negrita", False))
         run.font.size = Pt(float(style.get("titulo_tamano_pt", 10)))
@@ -303,6 +304,7 @@ def _render_exact_or_seq_caption(doc: Document, titulo: str, style: dict) -> Non
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p.paragraph_format.space_after = Pt(6)
+    p.paragraph_format.keep_with_next = True
     prefix = f"Tabla {chapter_number}." if chapter_number is not None else "Tabla "
     run_label = p.add_run(prefix)
     run_label.bold = True
@@ -409,6 +411,8 @@ def _render_tabla_impl(doc: Document, tabla_data: dict) -> None:
         _apply_table_geometry(table, [col_width] * num_cols)
 
     # 5. Headers
+    if table.rows:
+        _mark_row_as_table_header(table.rows[0])
     for i, header_text in enumerate(encabezados):
         cell = table.rows[0].cells[i]
         format_cell_text(
@@ -418,6 +422,8 @@ def _render_tabla_impl(doc: Document, tabla_data: dict) -> None:
             bold=True,
             alignment=WD_ALIGN_PARAGRAPH.CENTER,
         )
+        for p in cell.paragraphs:
+            p.paragraph_format.keep_with_next = True
         if _is_schedule_table(tabla_data):
             _compact_cell_after_format(cell, estilo)
         if header_color:
@@ -441,13 +447,11 @@ def _render_tabla_impl(doc: Document, tabla_data: dict) -> None:
                 _compact_cell_after_format(cell, estilo)
             set_cell_vertical_alignment(cell)
 
-    if _is_schedule_table(tabla_data):
-        if table.rows:
-            _mark_row_as_table_header(table.rows[0])
-        if len(table.rows) > 1:
-            _mark_row_as_table_header(table.rows[1])
-        for row in table.rows:
-            _prevent_row_split(row)
+    if _is_schedule_table(tabla_data) and len(table.rows) > 1:
+        _mark_row_as_table_header(table.rows[1])
+
+    for row in table.rows:
+        _prevent_row_split(row)
 
     # 7. Cell merges
     for merge in merges:

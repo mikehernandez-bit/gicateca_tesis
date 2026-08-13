@@ -205,13 +205,13 @@ def add_heading_formal(
     space_before: int = 12,
     space_after: int = 12,
     centered: bool = False,
+    page_break_before: bool = False,
 ) -> None:
     """Agrega un encabezado formal con fuente Arial negra."""
     if not text:
         return
     h = doc.add_heading(level=level)
-    # Hardening: nunca permitir salto de página implícito en títulos.
-    h.paragraph_format.page_break_before = False
+    h.paragraph_format.page_break_before = page_break_before
     h.paragraph_format.space_before = Pt(space_before)
     h.paragraph_format.space_after = Pt(space_after)
     h.alignment = WD_ALIGN_PARAGRAPH.CENTER if centered else WD_ALIGN_PARAGRAPH.LEFT

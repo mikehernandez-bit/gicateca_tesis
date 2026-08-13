@@ -183,7 +183,5 @@ def render_caratula_unac_maestria(doc: Document, block: Block) -> None:
     add_p_centered(doc, lugar_completo, bold=True, size=12, space_before=60)
     add_p_centered(doc, pais, bold=True, size=12)
 
-    # Nueva seccion (no solo un salto de pagina) para restaurar los margenes
-    # asimetricos de encuadernado del cuerpo del documento -- la portada ya
-    # termino y usaba margenes simetricos propios (ver inicio de la funcion).
+    # Nueva seccion para la pagina en blanco tras la caratula (Hoja de Respeto vacia)
     switch_to_portrait(doc)

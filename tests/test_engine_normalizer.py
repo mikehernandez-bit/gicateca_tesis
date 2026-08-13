@@ -533,7 +533,7 @@ class TestNormalizePreliminares:
         assert any("Dedico este trabajo" in t for t in texts)
         assert not any("[Escriba aqui" in t for t in texts)
 
-    def test_optional_preliminary_placeholder_is_omitted(self):
+    def test_optional_preliminary_renders_dedicatoria(self):
         data = _minimal_json()
         data["preliminares"] = {
             "dedicatoria": {
@@ -543,7 +543,43 @@ class TestNormalizePreliminares:
         }
         blocks = normalize(data)
         headings = [b["text"] for b in _blocks_of_type(blocks, "heading")]
-        assert "DEDICATORIA" not in headings
+        assert "DEDICATORIA" in headings
+
+    def test_parent_level2_heading_omits_content_when_level3_subheadings_exist(self):
+        """Verifica que un título de nivel 2 (ej: 1.2 Formulación del problema) quede vacío de contenido cuando le siguen subtítulos de nivel 3 (1.2.1, 1.2.2)."""
+        data = _minimal_json()
+        data["cuerpo"] = [
+            {
+                "titulo": "CAPÍTULO I: PLANTEAMIENTO DEL PROBLEMA",
+                "contenido": [
+                    {
+                        "texto": "1.2 Formulación del problema",
+                        "parrafos": ["Texto introductorio de 1.2 que debe omitirse por tener subtítulos 1.2.1 y 1.2.2"],
+                        "instruccion_detallada": "Nota guía que debe omitirse",
+                    },
+                    {
+                        "texto": "1.2.1 Problema General",
+                        "parrafos": ["¿Cuál es la relación entre las variables?"],
+                    },
+                    {
+                        "texto": "1.2.2 Problemas Específicos",
+                        "parrafos": ["¿Cuál es la relación específica?"],
+                    },
+                ],
+            }
+        ]
+        blocks = normalize(data)
+        
+        # Extraer secuencia de headings y párrafos
+        text_sequence = [b.get("text") for b in blocks if b.get("type") in {"heading", "black_heading", "paragraph"}]
+        
+        # 1.2 Formulación del problema debe estar seguido inmediatamente por 1.2.1 Problema General sin párrafos intermedios
+        pos_1_2 = text_sequence.index("1.2 Formulación del problema")
+        pos_1_2_1 = text_sequence.index("1.2.1 Problema General")
+        
+        assert pos_1_2_1 == pos_1_2 + 1
+        assert "Texto introductorio de 1.2 que debe omitirse por tener subtítulos 1.2.1 y 1.2.2" not in text_sequence
+
 
     def test_indices_as_dict(self):
         """Indices como dict genera toc_field blocks."""
@@ -710,8 +746,7 @@ class TestNormalizeCuerpo:
         assert len(headings_positions) == 2
 
         cap_i_pos, cap_ii_pos = headings_positions
-        between = blocks[cap_i_pos + 1:cap_ii_pos]
-        assert any(block["type"] == "page_break" for block in between)
+        assert blocks[cap_ii_pos].get("page_break_before") is True
 
     def test_chapter_nota_capitulo(self):
         """nota_capitulo genera block note."""

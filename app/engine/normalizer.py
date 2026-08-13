@@ -1010,10 +1010,10 @@ def _normalize_caratula(data: dict) -> List[Block]:
 
 
 def _normalize_pagina_respeto(data: dict) -> List[Block]:
-    if "pagina_respeto" not in data:
+    p = data.get("pagina_respeto", {})
+    if not p:
         return []
 
-    p = data["pagina_respeto"]
     blocks: List[Block] = []
 
     if isinstance(p, dict):
@@ -1033,9 +1033,8 @@ def _normalize_pagina_respeto(data: dict) -> List[Block]:
                 if isinstance(nota, dict) and nota.get("texto"):
                     blocks.append({"type": "note", "text": nota["texto"]})
 
-    # Siempre generar el salto de página de respeto.
-    # Va forzado para que no sea colapsado por la lógica anti-duplicados.
-    blocks.append({"type": "page_break", "force": True})
+    if blocks:
+        blocks.append({"type": "page_break", "force": True})
     return blocks
 
 
@@ -1094,7 +1093,7 @@ def _normalize_preliminares(data: dict) -> List[Block]:
     blocks: List[Block] = []
 
     # Nueva sección
-    blocks.append({"type": "section_break"})
+    blocks.append({"type": "section_break", "force": True})
 
     optional_preliminary_keys = {"dedicatoria", "agradecimiento", "agradecimientos"}
 
@@ -1109,7 +1108,7 @@ def _normalize_preliminares(data: dict) -> List[Block]:
         if isinstance(item, dict):
             if item.get("_ai_content"):
                 content_blocks = _normalize_ai_content(item["_ai_content"])
-            elif item.get("texto") and not _looks_like_template_placeholder_text(item["texto"]):
+            elif item.get("texto"):
                 content_blocks = [{"type": "paragraph", "text": item["texto"]}]
 
         if key in optional_preliminary_keys and not content_blocks:
@@ -1173,8 +1172,18 @@ def _normalize_preliminares(data: dict) -> List[Block]:
         if isinstance(item, dict):
             if item.get("_ai_content"):
                 content_blocks = _normalize_ai_content(item["_ai_content"])
-            elif item.get("texto") and not _looks_like_template_placeholder_text(item["texto"]):
+            elif item.get("texto"):
                 content_blocks = [{"type": "paragraph", "text": item["texto"]}]
+
+        if key == "abstract":
+            filtered: List[Block] = []
+            for b in content_blocks:
+                if isinstance(b, dict) and b.get("type") == "paragraph":
+                    t = str(b.get("text") or "").strip()
+                    if t.startswith(("Nota:", "(Nota:", "Note:", "(Note:", "[Nota:", "[Note:")):
+                        continue
+                filtered.append(b)
+            content_blocks = filtered
 
         blocks.append(
             {
@@ -1696,11 +1705,7 @@ def _normalize_cuerpo(data: dict) -> List[Block]:
     blocks: List[Block] = []
 
     for index, cap in enumerate(cuerpo):
-        # Salto de pagina antes de cada capitulo (excepto el primero).
-        # Evita insertar un salto justo despues del titulo.
         chapter_title = str(cap.get("titulo", "") or "")
-        if index > 0:
-            blocks.append({"type": "page_break"})
 
         chapter_items = cap.get("contenido", []) if isinstance(cap.get("contenido"), list) else []
         has_landscape_table = any(
@@ -1714,7 +1719,7 @@ def _normalize_cuerpo(data: dict) -> List[Block]:
             # landscape section to avoid blank portrait pages before the table.
             blocks.append({"type": "section_switch", "orientation": "landscape"})
 
-        # Título del capítulo
+        # Título del capítulo (inicia en nueva página mediante propiedad de párrafo page_break_before)
         blocks.append(
             {
                 "type": "heading",
@@ -1722,6 +1727,7 @@ def _normalize_cuerpo(data: dict) -> List[Block]:
                 "level": 1,
                 "centered": False,
                 "space_after": 12,
+                "page_break_before": index > 0 and not has_landscape_table,
             }
         )
 
@@ -1734,7 +1740,8 @@ def _normalize_cuerpo(data: dict) -> List[Block]:
             isinstance(item, dict) and item.get("_ai_content")
             for item in cap.get("contenido", [])
         )
-        for item in cap.get("contenido", []):
+        contenido_list = cap.get("contenido", []) if isinstance(cap.get("contenido"), list) else []
+        for i, item in enumerate(contenido_list):
             if (
                 chapter_has_ai
                 and isinstance(item, dict)
@@ -1742,7 +1749,19 @@ def _normalize_cuerpo(data: dict) -> List[Block]:
                 and not item.get("_ai_generated")
             ):
                 continue
-            blocks.extend(_normalize_content_item(item, data))
+                
+            is_parent = False
+            if i + 1 < len(contenido_list):
+                next_item = contenido_list[i+1]
+                if isinstance(item, dict) and isinstance(next_item, dict):
+                    curr_text = str(item.get("texto") or "").strip()
+                    next_text = str(next_item.get("texto") or "").strip()
+                    prefix = curr_text.split(" ")[0]
+                    next_prefix = next_text.split(" ")[0]
+                    if prefix and next_prefix.startswith(f"{prefix}."):
+                        is_parent = True
+                        
+            blocks.extend(_normalize_content_item(item, data, is_parent=is_parent))
 
         # Ejemplos APA a nivel de capítulo
         if "ejemplos_apa" in cap:
@@ -1760,6 +1779,7 @@ def _normalize_content_item(
     item,
     document_data: dict | None = None,
     parent_item: dict | None = None,
+    is_parent: bool = False
 ) -> List[Block]:
     """Normaliza un item de contenido (dentro de cuerpo o anexos).
 
@@ -1943,13 +1963,14 @@ def _normalize_content_item(
         blocks.extend(special_blocks)
         return blocks
 
-    ai_content = item.get("_ai_content")
-    if ai_content:
-        blocks.extend(_normalize_ai_content(ai_content, parent_item=item))
-        return blocks
+    if not is_parent:
+        ai_content = item.get("_ai_content")
+        if ai_content:
+            blocks.extend(_normalize_ai_content(ai_content, parent_item=item))
+            return blocks
 
-    # Content block compartido (notas, párrafos, tablas, imágenes)
-    blocks.extend(_normalize_content_block(item))
+        # Content block compartido (notas, párrafos, tablas, imágenes)
+        blocks.extend(_normalize_content_block(item))
 
     return blocks
 

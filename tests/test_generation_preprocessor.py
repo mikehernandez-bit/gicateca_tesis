@@ -145,6 +145,44 @@ def test_apply_ai_content_injects_preliminares_sections_beyond_introduccion() ->
     )
 
 
+def test_apply_ai_content_injects_abstract_preliminary() -> None:
+    data = {
+        "preliminares": {
+            "resumen": {
+                "titulo": "RESUMEN",
+                "texto": "[Escriba aqui el resumen...]",
+            },
+            "abstract": {
+                "titulo": "ABSTRACT",
+                "texto": "[Write here the abstract body...]",
+            },
+        }
+    }
+    ai_sections = [
+        {
+            "path": "RESUMEN",
+            "content": "La presente investigacion tuvo como objetivo...",
+        },
+        {
+            "path": "ABSTRACT",
+            "content": "The aim of this research was to determine...",
+        },
+    ]
+
+    result = apply_ai_content(data, ai_sections)
+
+    assert result["preliminares"]["resumen"]["_ai_content"].startswith(
+        "La presente investigacion"
+    )
+    assert result["preliminares"]["abstract"]["_ai_content"].startswith(
+        "The aim of this research"
+    )
+    assert result["preliminares"]["abstract"]["texto"].startswith(
+        "The aim of this research"
+    )
+
+
+
 def test_apply_ai_content_injects_abbreviations_preliminary() -> None:
     data = {
         "preliminares": {
