@@ -33,6 +33,18 @@ Luego abre:
 - Referencias: http://127.0.0.1:8000/referencias
 - API docs: http://127.0.0.1:8000/docs
 
+### Docker local
+
+La ejecucion conjunta se controla desde la carpeta hermana `Gicagen`:
+
+```powershell
+docker compose -f compose.local.yml up --build
+```
+
+Este flujo es exclusivamente local y no incluye despliegue. Dentro del
+contenedor Linux, la conversion PDF usa LibreOffice; al ejecutar el proyecto
+directamente en Windows conserva Microsoft Word COM.
+
 ---
 
 ## Variables de Entorno
@@ -44,7 +56,8 @@ Luego abre:
 | `GICA_DEFAULT_UNI` | No | `unac` | Codigo de universidad por defecto |
 | `PDF_CACHE_MAX_AGE` | No | `3600` | Segundos de cache para PDFs |
 | `PDF_PREWARM_ON_STARTUP` | No | `false` | Si es `true`, genera PDFs al iniciar |
-| `PDF_CONVERSION_TIMEOUT` | No | `120` | Timeout en segundos para Word COM |
+| `PDF_CONVERSION_TIMEOUT` | No | `120` | Timeout para Word COM o LibreOffice |
+| `GICATESIS_LIBREOFFICE_BIN` | No | autodetectado | Ruta de LibreOffice en Linux/Docker |
 
 ---
 

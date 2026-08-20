@@ -27,19 +27,28 @@ from __future__ import annotations
 
 import atexit
 import logging
+import os
 import queue
+import shutil
 import subprocess
+import tempfile
 import threading
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Optional
 
-import pythoncom
-import win32com.client
-import pywintypes
+if os.name == "nt":
+    import pythoncom
+    import win32com.client
+    import pywintypes
 
-try:
-    import win32process  # type: ignore
-except Exception:  # pragma: no cover
+    try:
+        import win32process  # type: ignore
+    except Exception:  # pragma: no cover
+        win32process = None
+else:  # Linux/Docker uses LibreOffice instead of Microsoft Word COM.
+    pythoncom = None  # type: ignore[assignment]
+    pywintypes = None  # type: ignore[assignment]
     win32process = None
 
 
@@ -95,6 +104,8 @@ class PdfConversionManager:
         self._force_restart_word(reason="shutdown")
 
     def _worker(self) -> None:
+        if pythoncom is None:  # pragma: no cover - manager is Windows-only
+            return
         pythoncom.CoInitialize()
         logger.info("PDF conversion worker iniciado (STA).")
         try:
@@ -160,6 +171,8 @@ class PdfConversionManager:
                     doc.Close(False)
 
     def _get_word_app(self):
+        if os.name != "nt":  # pragma: no cover - guarded by public API
+            raise RuntimeError("Microsoft Word COM solo esta disponible en Windows")
         if self._word_app is None:
             self._word_app = win32com.client.DispatchEx("Word.Application")
             self._word_app.Visible = False
@@ -207,6 +220,8 @@ _MANAGER_LOCK = threading.Lock()
 
 
 def get_pdf_converter() -> PdfConversionManager:
+    if os.name != "nt":
+        raise RuntimeError("El conversor Word COM solo esta disponible en Windows")
     global _MANAGER
     if _MANAGER is None:
         with _MANAGER_LOCK:
@@ -217,5 +232,47 @@ def get_pdf_converter() -> PdfConversionManager:
 
 
 def convert_docx_to_pdf(docx_path: str, pdf_path: str, timeout: float = 120.0) -> None:
-    """API publico: convierte docx a pdf usando el manager."""
-    return get_pdf_converter().convert(docx_path, pdf_path, timeout=timeout)
+    """Convierte con Word COM en Windows y LibreOffice en Linux/Docker."""
+    if os.name == "nt":
+        return get_pdf_converter().convert(docx_path, pdf_path, timeout=timeout)
+    return _convert_with_libreoffice(docx_path, pdf_path, timeout)
+
+
+def _convert_with_libreoffice(docx_path: str, pdf_path: str, timeout: float) -> None:
+    """Convierte DOCX a PDF con LibreOffice en Linux/Docker."""
+    source = Path(docx_path).resolve()
+    target = Path(pdf_path).resolve()
+    if not source.is_file():
+        raise FileNotFoundError(f"DOCX no encontrado: {source}")
+
+    configured_bin = os.getenv("GICATESIS_LIBREOFFICE_BIN", "").strip()
+    executable = configured_bin or shutil.which("libreoffice") or shutil.which("soffice")
+    if not executable:
+        raise RuntimeError("LibreOffice no esta instalado o no se encontro en PATH")
+
+    target.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="gicatesis-libreoffice-") as profile_dir:
+        profile_uri = Path(profile_dir).resolve().as_uri()
+        result = subprocess.run(
+            [
+                executable,
+                "--headless",
+                f"-env:UserInstallation={profile_uri}",
+                "--convert-to",
+                "pdf",
+                "--outdir",
+                str(target.parent),
+                str(source),
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+        )
+
+    generated = target.parent / f"{source.stem}.pdf"
+    if result.returncode != 0 or not generated.is_file():
+        detail = (result.stderr or result.stdout or "sin detalle").strip()
+        raise RuntimeError(f"LibreOffice no pudo generar el PDF: {detail}")
+    if generated != target:
+        generated.replace(target)

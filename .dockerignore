@@ -1,0 +1,13 @@
+.git
+.venv
+.cca
+__pycache__
+*.py[cod]
+.pytest_cache
+pytest-cache-files-*
+outputs
+scratch
+*.docx
+*.pdf
+*.zip
+*.log
