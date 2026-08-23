@@ -107,11 +107,84 @@ def test_abbreviation_extraction_rejects_authors_years_and_common_words() -> Non
     assert mapping["SAE"] == "Society of Automotive Engineers"
     assert mapping["UNAC"] == "Universidad Nacional del Callao"
     assert mapping["FMEA"] == "Failure Mode and Effects Analysis"
-    assert mapping["MTBF"] == "Mean Time Between Failures"
+    assert mapping["MTBF"] == "Tiempo Medio Entre Fallas"
     assert mapping["SPSS"] == "Statistical Package for the Social Sciences"
 
     forbidden = {"COSAS", "MOBLEY", "MENDOZA", "CHEN", "FALLOS", "DATOS", "2021", "2002", "2019"}
     assert forbidden.isdisjoint({sigla.upper() for sigla in mapping})
+
+
+def test_maintenance_abbreviations_scan_tables_captions_and_are_sorted_in_spanish() -> None:
+    data = {
+        "_meta": {"id": "unac-proyecto-cuant", "university": "unac"},
+        "caratula": {
+            "universidad": "UNIVERSIDAD NACIONAL DEL CALLAO",
+            "titulo": "PLAN RCM PARA MOTONIVELADORAS CAT 24M",
+        },
+        "preliminares": {
+            "indices": {"abreviaturas": "INDICE DE ABREVIATURAS"},
+        },
+        "cuerpo": [
+            {
+                "titulo": "II. MARCO TEORICO",
+                "contenido": [
+                    {
+                        "texto": "2.2 Bases teoricas",
+                        "_ai_content": "El RCM se evalua mediante MTBF y MTTR.",
+                    },
+                    {
+                        "tipo": "tabla",
+                        "titulo": "Tabla 3.1 Indicadores AMEF de la flota CAT 24M",
+                        "encabezados": ["AMEF", "MTBF", "MTTR"],
+                        "filas": [["RCM", "12", "3"]],
+                    },
+                ],
+            }
+        ],
+    }
+
+    rows = next(block["rows"] for block in normalize(data) if block["type"] == "abbreviations_table")
+    mapping = {row["sigla"]: row["meaning"] for row in rows}
+
+    assert list(mapping) == sorted(mapping)
+    assert mapping["AMEF"] == "Análisis de Modo y Efecto de Falla"
+    assert mapping["CAT"] == "Caterpillar"
+    assert mapping["MTBF"] == "Tiempo Medio Entre Fallas"
+    assert mapping["MTTR"] == "Tiempo Medio Para Reparar"
+    assert mapping["RCM"] == "Mantenimiento Centrado en Confiabilidad"
+
+
+def test_cited_corporate_author_is_added_to_abbreviation_index() -> None:
+    data = {
+        "_meta": {"id": "unac-proyecto-cuant", "university": "unac"},
+        "preliminares": {
+            "indices": {"abreviaturas": "INDICE DE ABREVIATURAS"},
+        },
+        "cuerpo": [
+            {
+                "titulo": "I. PLANTEAMIENTO DEL PROBLEMA",
+                "contenido": [
+                    {
+                        "texto": "1.1 Realidad problemática",
+                        "_ai_content": "La guía sustenta el análisis [[CITE:SRC_GMG_2020]].",
+                    }
+                ],
+            }
+        ],
+        "finales": {
+            "referencias": {
+                "_ai_content": (
+                    "[[SOURCE:SRC_GMG_2020]] GMG. (2020). Guía técnica de "
+                    "mantenimiento de equipos. Technical Maintenance Review, 8(2), 1-20."
+                )
+            }
+        },
+    }
+
+    rows = next(block["rows"] for block in normalize(data) if block["type"] == "abbreviations_table")
+
+    assert {row["sigla"] for row in rows} == {"GMG"}
+    assert rows[0]["meaning"] == "Global Mining Guidelines Group"
 
 
 def test_annex_image_uses_annex_heading_without_figure_caption() -> None:

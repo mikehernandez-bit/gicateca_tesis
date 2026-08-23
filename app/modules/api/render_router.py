@@ -31,6 +31,8 @@ from app.modules.formats import service as formats_service
 from app.modules.formats.router import _ensure_pdf_cached, _get_source_mtime
 from app.core.loaders import find_format_index
 from app.core.document_generator import cleanup_temp_file
+from app.engine.field_stabilizer import FieldStabilizationError, stabilize_docx_fields
+from app.engine.document_validation import validate_docx_field_safety
 from app.modules.api.ai_content_contract import AIResult, serialize_ai_sections
 from app.modules.generation.preprocessor import (
     exclude_instruction_keys,
@@ -185,6 +187,13 @@ def render_docx(request: RenderRequest, background_tasks: BackgroundTasks):
     except RuntimeError as exc:
         raise HTTPException(status_code=500, detail=str(exc))
 
+    if request.formatId.lower().startswith("unac-proyecto"):
+        try:
+            stabilize_docx_fields(output_path, max_cycles=3)
+            validate_docx_field_safety(output_path)
+        except FieldStabilizationError as exc:
+            raise HTTPException(status_code=500, detail=f"Field stabilization failed: {exc}")
+
     # Clean up temp file after response is sent
     background_tasks.add_task(cleanup_temp_file, output_path)
 
@@ -222,6 +231,10 @@ def render_pdf(request: RenderRequest, background_tasks: BackgroundTasks):
 
             if not docx_path.exists():
                 raise RuntimeError("DOCX generation returned path but file is missing")
+
+            if request.formatId.lower().startswith("unac-proyecto"):
+                stabilize_docx_fields(docx_path, max_cycles=3)
+                validate_docx_field_safety(docx_path)
 
             # Convert to PDF using same Word COM pipeline
             from app.core.pdf_converter import convert_docx_to_pdf

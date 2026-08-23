@@ -36,9 +36,19 @@ from docx import Document
 # Trigger registration of all 19 block-type renderers
 import app.engine.renderers  # noqa: F401
 
+from app.engine.document_validation import validate_docx_field_safety, validate_unac_project_document
 from app.engine.normalizer import normalize
-from app.engine.primitives import configure_styles, configure_margins
+from app.engine.primitives import (
+    configure_margins,
+    configure_styles,
+    disable_update_fields,
+)
 from app.engine.registry import render_blocks
+from app.engine.word_bibliography import (
+    embed_word_sources,
+    extract_word_sources,
+    validate_native_bibliography_docx,
+)
 
 
 # ─────────────────────────────────────────────────────────────
@@ -70,6 +80,7 @@ def generate_document_unified(json_path: str, output_path: str):
         5. doc.save(output_path)
     """
     data = load_json(json_path)
+    word_sources = extract_word_sources(data)
     doc = Document()
 
     # 1. Setup
@@ -82,8 +93,24 @@ def generate_document_unified(json_path: str, output_path: str):
     # 3. Render all blocks
     render_blocks(doc, blocks)
 
-    # 4. Save
+    # 4. Preserve native fields but do not force an automatic refresh on open;
+    # Word's updateFields flag causes the warning dialog reported by users.
+    disable_update_fields(doc)
+    format_id = str(data.get("_meta", {}).get("id") or "").strip().lower()
+    if format_id.startswith("unac-proyecto"):
+        validate_unac_project_document(doc, blocks)
+
+    # 5. Save
     doc.save(output_path)
+    if word_sources:
+        embed_word_sources(output_path, word_sources)
+        report = validate_native_bibliography_docx(output_path, word_sources)
+        print(
+            "[OK] Native Word bibliography: "
+            f"{report['sources']} sources, "
+            f"{report['citation_fields']} citation fields"
+        )
+    validate_docx_field_safety(output_path)
     print(f"[OK] Generated: {output_path}")
 
 

@@ -30,6 +30,8 @@ def render_toc_field(doc: Document, block: Block) -> None:
         block.get("field_code", ""),
         block.get("heading_text", ""),
         exclude_from_toc=block.get("exclude_from_toc", False),
+        page_label=block.get("page_label", ""),
+        cached_entries=block.get("cached_entries") or [],
     )
 
 

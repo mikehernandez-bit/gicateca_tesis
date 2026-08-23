@@ -37,6 +37,23 @@ import unicodedata
 from typing import Any, Dict, List
 
 from app.engine.types import Block
+from app.engine.word_bibliography import (
+    CITATION_MARKER_RE,
+    extract_reference_preamble,
+    extract_word_sources,
+    extract_word_sources_from_finales,
+    strip_source_markers,
+)
+
+
+def _contains_citation_marker(value: Any) -> bool:
+    if isinstance(value, str):
+        return bool(CITATION_MARKER_RE.search(value))
+    if isinstance(value, list):
+        return any(_contains_citation_marker(item) for item in value)
+    if isinstance(value, dict):
+        return any(_contains_citation_marker(item) for item in value.values())
+    return False
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -65,7 +82,8 @@ _ABBR_PAREN_RE = re.compile(r"^\s*(.+?)\s*\(([^()]{2,20})\)\s*$")
 
 _ABBR_IN_TEXT_RE = re.compile(r"([A-Za-z][^()\n]{3,120}?)\s*\(([A-Za-z][A-Za-z0-9./-]{1,19})\)")
 _ABBR_REVERSED_IN_TEXT_RE = re.compile(r"\b([A-Za-z][A-Za-z0-9./-]{1,19})\s*\(([^()]{3,120})\)")
-_ABBR_MEANING_TOKEN_RE = re.compile(r"[A-Za-zÃÃ‰ÃÃ“ÃšÃœÃ‘Ã¡Ã©Ã­Ã³ÃºÃ¼Ã±]+")
+_ABBR_MEANING_TOKEN_RE = re.compile(r"[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+")
+_ABBR_USED_TOKEN_RE = re.compile(r"(?<![A-Za-z0-9])([A-Z][A-Z0-9./-]{1,7}|IoT)(?![A-Za-z0-9])")
 _ABBR_REFERENCE_RE = re.compile(r"\b(?:19|20)\d{2}\b")
 _AI_LEVEL3_HEADING_RE = re.compile(r"^\s*(\d+\.\d+\.\d+\.?)\s+(.+?)\s*$")
 # Detecta caracteres típicos de fórmulas matemáticas para evitar que sean
@@ -80,7 +98,7 @@ _MATH_FORMULA_RE = re.compile(
 # Elimina marcadores Markdown de negrita/cursiva (**texto**, __texto__, *texto*)
 _MARKDOWN_BOLD_RE = re.compile(r"(\*{1,3}|_{1,3})(.+?)\1")
 _ABBR_AUTHOR_LIKE_RE = re.compile(
-    r"^[A-ZÃÃ‰ÃÃ“ÃšÃ‘][a-zÃ¡Ã©Ã­Ã³ÃºÃ±]+(?:\s+[A-ZÃÃ‰ÃÃ“ÃšÃ‘][a-zÃ¡Ã©Ã­Ã³ÃºÃ±]+){0,3}(?:\s+et al\.?)?(?:,\s*(?:19|20)\d{2})?$",
+    r"^[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+){0,3}(?:\s+et al\.?)?(?:,\s*(?:19|20)\d{2})?$",
     re.IGNORECASE,
 )
 _ABBR_STOPWORDS = {
@@ -113,9 +131,17 @@ _COMMON_ABBREVIATIONS: Dict[str, tuple[str, str]] = {
     "ODS": ("ODS", "Objetivos de Desarrollo Sostenible"),
     "SAE": ("SAE", "Society of Automotive Engineers"),
     "SPSS": ("SPSS", "Statistical Package for the Social Sciences"),
-    "KPI": ("KPI", "Key Performance Indicator"),
+    "KPI": ("KPI", "Indicador Clave de Desempeño"),
     "FMEA": ("FMEA", "Failure Mode and Effects Analysis"),
-    "MTBF": ("MTBF", "Mean Time Between Failures"),
+    "AMEF": ("AMEF", "Análisis de Modo y Efecto de Falla"),
+    "CAT": ("CAT", "Caterpillar"),
+    "CBM": ("CBM", "Mantenimiento Basado en Condición"),
+    "CMMS": ("CMMS", "Sistema Computarizado de Gestión del Mantenimiento"),
+    "GMG": ("GMG", "Global Mining Guidelines Group"),
+    "ISO": ("ISO", "Organización Internacional de Normalización"),
+    "MTBF": ("MTBF", "Tiempo Medio Entre Fallas"),
+    "MTTR": ("MTTR", "Tiempo Medio Para Reparar"),
+    "RCM": ("RCM", "Mantenimiento Centrado en Confiabilidad"),
     "UNAC": ("UNAC", "Universidad Nacional del Callao"),
     "ERP": ("ERP", "Enterprise Resource Planning"),
     "API": ("API", "Application Programming Interface"),
@@ -504,6 +530,24 @@ def _append_abbreviation_row(
 def _extract_generated_text_fragments(data: dict) -> List[str]:
     fragments: List[str] = []
 
+    excluded_keys = {
+        "_meta",
+        "abreviaturas",
+        "configuracion",
+        "ejemplo",
+        "ejemplos",
+        "estilo",
+        "estilos",
+        "indices",
+        "instruccion_detallada",
+        "referencias",
+        "referencias_bibliograficas",
+        "ruta",
+        "ruta_logo",
+        "ruta_placeholder",
+        "values",
+    }
+
     def add_content(value: Any) -> None:
         if value is None:
             return
@@ -519,46 +563,18 @@ def _extract_generated_text_fragments(data: dict) -> List[str]:
         if not isinstance(value, dict):
             return
 
-        block_type = _norm_upper(value.get("tipo", ""))
-        if block_type == "PARRAFO":
-            add_content(value.get("texto"))
-            return
-        if block_type == "FIGURA":
-            add_content(value.get("titulo") or value.get("caption"))
-            return
-        if block_type == "TABLA":
-            add_content(value.get("titulo"))
-            return
-
-        for key in ("_ai_content", "parrafos"):
-            add_content(value.get(key))
-
-    preliminares = data.get("preliminares", {})
-    if isinstance(preliminares, dict):
-        for key, item in preliminares.items():
-            if key in {"indices", "abreviaturas"}:
+        for key, item in value.items():
+            normalized_key = str(key or "").strip().lower()
+            if normalized_key.startswith("_") and normalized_key != "_ai_content":
                 continue
-            if isinstance(item, dict):
-                add_content(item.get("_ai_content"))
-                add_content(item.get("parrafos"))
-
-    for chapter in data.get("cuerpo", []) if isinstance(data.get("cuerpo"), list) else []:
-        if not isinstance(chapter, dict):
-            continue
-        add_content(chapter.get("_ai_content"))
-        for item in chapter.get("contenido", []) if isinstance(chapter.get("contenido"), list) else []:
-            if not isinstance(item, dict):
+            if normalized_key in excluded_keys:
                 continue
-            add_content(item.get("_ai_content"))
-            add_content(item.get("parrafos"))
+            add_content(item)
 
-    finales = data.get("finales", {})
-    if isinstance(finales, dict):
-        anexos = finales.get("anexos")
-        if isinstance(anexos, dict):
-            for item in anexos.get("lista", []) if isinstance(anexos.get("lista"), list) else []:
-                if isinstance(item, dict):
-                    add_content(item.get("_ai_content"))
+    # Recorre todo el contenido potencialmente renderizable: capítulos, tablas,
+    # captions, matrices, anexos y notas técnicas. Las ramas de plantilla,
+    # referencias e índices se excluyen para no introducir siglas no utilizadas.
+    add_content(data)
 
     return fragments
 
@@ -602,6 +618,28 @@ def _derive_document_abbreviation_rows(data: dict | None) -> List[Dict[str, str]
         for key, (display, meaning) in _COMMON_ABBREVIATIONS.items():
             if re.search(rf"(?<![A-Z0-9]){re.escape(key)}(?![A-Z0-9])", normalized_fragment):
                 _append_abbreviation_row(rows, seen, display, meaning)
+
+    # Corporate authors such as GMG are not visible until a [[CITE:...]] marker
+    # becomes a native Word field. Resolve only the tags actually cited so the
+    # abbreviation index mirrors the final rendered document without importing
+    # acronyms from unused bibliography records.
+    cited_tags = {
+        tag
+        for fragment in _extract_generated_text_fragments(data)
+        for marker in CITATION_MARKER_RE.findall(fragment)
+        for tag in marker.split(";")
+    }
+    if cited_tags:
+        for source in extract_word_sources(data):
+            if str(source.get("tag") or "").strip() not in cited_tags:
+                continue
+            for author in source.get("authors") or []:
+                if not isinstance(author, dict):
+                    continue
+                author_name = str(author.get("last") or "").strip()
+                canonical = _COMMON_ABBREVIATIONS.get(_norm_upper(author_name))
+                if canonical:
+                    _append_abbreviation_row(rows, seen, *canonical)
 
     return rows
 
@@ -657,12 +695,17 @@ def _collect_abbreviation_rows(source: Any, *, document_source: dict | None = No
             sigla, meaning = canonical
         _append_abbreviation_row(source_rows, source_seen, sigla, meaning)
 
+    document_fragments = _extract_generated_text_fragments(document_source or {})
+    used_siglas = {
+        _norm_upper(match)
+        for fragment in document_fragments
+        for match in _ABBR_USED_TOKEN_RE.findall(fragment)
+    }
+    source_rows = [
+        row for row in source_rows if _norm_upper(row["sigla"]) in used_siglas
+    ]
+
     derived_rows = _derive_document_abbreviation_rows(document_source)
-    if derived_rows:
-        derived_siglas = {_norm_upper(row["sigla"]) for row in derived_rows}
-        source_rows = [
-            row for row in source_rows if _norm_upper(row["sigla"]) in derived_siglas
-        ]
 
     rows: List[Dict[str, str]] = []
     seen: set[str] = set()
@@ -671,6 +714,7 @@ def _collect_abbreviation_rows(source: Any, *, document_source: dict | None = No
     for row in derived_rows:
         _append_abbreviation_row(rows, seen, row["sigla"], row["meaning"])
 
+    rows.sort(key=lambda row: _norm_upper(row["sigla"]))
     return rows
 
 
@@ -742,7 +786,92 @@ def normalize(data: dict) -> List[Block]:
     blocks.extend(_normalize_finales(data))
     blocks.append({"type": "page_footer"})
 
+    # A citation field needs the document's complete source metadata at render
+    # time. Propagate it to paragraphs, tables and the bibliography block.
+    word_sources = extract_word_sources(data)
+    if word_sources:
+        for block in blocks:
+            if block.get("type") == "bibliography" or _contains_citation_marker(block):
+                block["word_sources"] = word_sources
+
+    _attach_cached_index_entries(blocks)
     return _apply_consecutive_landscape_table_policy(blocks)
+
+
+def _attach_cached_index_entries(blocks: List[Block]) -> None:
+    """Seed TOC fields with complete visible entries before Word opens them.
+
+    Page numbers start at 1 and are replaced by the field-stabilization pass.
+    Keeping the complete entry set here prevents placeholder text from leaking
+    into DOCX/PDF when the renderer runs under LibreOffice in Docker.
+    """
+    heading_entries = [
+        {"text": str(block.get("text") or "").strip(), "page": 1}
+        for block in blocks
+        if str(block.get("type") or "").lower() in {"heading", "black_heading"}
+        and str(block.get("text") or "").strip()
+        and 1 <= int(block.get("level") or 1) <= 3
+    ]
+    table_entries = [
+        {"text": str(block.get("titulo") or "").strip(), "page": 1}
+        for block in blocks
+        if str(block.get("type") or "").lower() == "table"
+        and str(block.get("titulo") or "").strip()
+        and block.get("encabezados")
+    ]
+    # The cached result must contain the same complete caption that Word's
+    # ``TOC \\c \"Figura\"`` field will produce.  Keeping only the title made
+    # page stabilization match ordinary body text (for example the heading
+    # "Disponibilidad inherente") and could assign the annex page instead of
+    # the real caption page.
+    figure_entries: List[dict[str, Any]] = []
+    current_chapter: int | None = None
+    chapter_figure_number = 0
+    roman_values = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100}
+
+    def _roman_to_int(value: str) -> int:
+        total = 0
+        previous = 0
+        for char in reversed(value.upper()):
+            current = roman_values.get(char, 0)
+            total += -current if current < previous else current
+            previous = max(previous, current)
+        return total
+
+    for candidate in blocks:
+        candidate_type = str(candidate.get("type") or "").lower()
+        if candidate_type in {"heading", "black_heading"} and int(candidate.get("level") or 1) == 1:
+            match = re.match(r"^\s*([IVXLC]+|\d+)\s*[.)-]\s+", str(candidate.get("text") or ""), re.I)
+            if match:
+                token = match.group(1).upper()
+                current_chapter = int(token) if token.isdigit() else _roman_to_int(token)
+                chapter_figure_number = 0
+            continue
+        if (
+            candidate_type != "image"
+            or not str(candidate.get("titulo") or "").strip()
+            or not str(candidate.get("ruta") or "").strip()
+            or bool(candidate.get("omit_caption"))
+        ):
+            continue
+        chapter_figure_number += 1
+        number = (
+            f"{current_chapter}.{chapter_figure_number}"
+            if current_chapter is not None and current_chapter > 0
+            else str(chapter_figure_number)
+        )
+        title = _strip_figure_caption_prefix(candidate.get("titulo"))
+        figure_entries.append({"text": f"Figura {number} {title}", "page": 1})
+    for block in blocks:
+        if str(block.get("type") or "").lower() != "toc_field":
+            continue
+        code = str(block.get("field_code") or "").lower()
+        if "\\c \"tabla\"" in code:
+            block["cached_entries"] = table_entries
+        elif "\\c \"figura\"" in code:
+            block["cached_entries"] = figure_entries
+        else:
+            block["cached_entries"] = heading_entries
 
 
 def _is_landscape_table_block(block: Any) -> bool:
@@ -1242,6 +1371,7 @@ def _normalize_indices(
                             "field_code": field_code,
                             "heading_text": title,
                             "exclude_from_toc": exclude,
+                            "page_label": "Pág." if "\\c" in field_code else "",
                         }
                     )
                 else:
@@ -1295,6 +1425,7 @@ def _normalize_indices(
                             "field_code": field_code,
                             "heading_text": titulo,
                             "exclude_from_toc": exclude,
+                            "page_label": "Pág." if "\\c" in field_code else "",
                         }
                     )
                 else:
@@ -1486,7 +1617,25 @@ def _has_project_matrix_content(data: dict, *keys: str) -> bool:
 
 
 def _make_bullet_paragraphs(items: list[str]) -> list[Block]:
-    return [{"type": "paragraph", "text": f"• {item}"} for item in items if item]
+    """Return one semantic list block instead of painted bullet characters.
+
+    Keeping the items structured lets the renderer create real ``w:numPr``
+    numbering so Word can edit/reflow the list without treating the bullet as
+    ordinary paragraph text.
+    """
+    clean_items = [str(item).strip() for item in items if str(item).strip()]
+    if not clean_items:
+        return []
+    return [
+        {
+            "type": "list",
+            "items": clean_items,
+            "ordered": False,
+            "style": "institutional-bullet",
+            "left_twips": 720,
+            "hanging_twips": 360,
+        }
+    ]
 
 
 def _normalize_problem_formulation(data: dict) -> list[Block]:
@@ -1643,6 +1792,17 @@ def _normalize_project_structured_section(data: dict | None, item: dict) -> list
         return []
 
     title = _norm_upper(item.get("texto", ""))
+    # When the template exposes the semantic section as a single item, render
+    # the complete matrix-backed structure here.  This keeps the labels on
+    # independent bold paragraphs and the specific items as native Word lists,
+    # regardless of how the AI happened to format its prose.
+    if "FORMULACION DEL PROBLEMA" in title:
+        return _normalize_problem_formulation(data or {})
+    if re.search(r"(?:^|\s)\d+(?:\.\d+)*\s+OBJETIVOS?\b", title) or title == "OBJETIVOS":
+        return _normalize_objectives(data or {})
+    if re.search(r"(?:^|\s)\d+(?:\.\d+)*\s+HIPOTESIS\b", title) or title == "HIPOTESIS":
+        return _normalize_hypotheses(data or {})
+
     if "OPERACIONALIZACION" in title:
         ai_content = item.get("_ai_content")
         if isinstance(ai_content, list) and any(
@@ -1818,6 +1978,24 @@ def _normalize_content_item(
                     blocks.append({"type": "paragraph", "text": remainder})
             else:
                 blocks.append({"type": "paragraph", "text": " ".join(lines)})
+        return blocks
+
+    # Ecuacion estructurada desde IA. Debe conservarse como bloque semantico
+    # para que el renderer la materialice como OMML editable de Word.
+    if item.get("tipo") == "formula":
+        latex = str(item.get("latex") or "").strip()
+        text = str(item.get("texto") or item.get("text") or "").strip()
+        if latex or text:
+            blocks.append(
+                {
+                    "type": "formula",
+                    "latex": latex,
+                    "text": text,
+                    "number": str(item.get("numero") or item.get("number") or "").strip(),
+                    "alignment": str(item.get("alineacion") or item.get("alignment") or "center").strip(),
+                    "id": str(item.get("id") or "").strip(),
+                }
+            )
         return blocks
 
     # Figura sugerida por IA (tipo == "figura")
@@ -2127,6 +2305,7 @@ def _normalize_referencias(fin: dict) -> List[Block]:
         return []
 
     blocks: List[Block] = [{"type": "page_break"}]
+    needs_following_break = bool(fin.get("contenido") or fin.get("anexos"))
     ref = fin["referencias"]
 
     if isinstance(ref, str):
@@ -2149,8 +2328,20 @@ def _normalize_referencias(fin: dict) -> List[Block]:
         )
         ai_content = ref.get("_ai_content")
         if ai_content:
-            blocks.extend(_normalize_ai_content(ai_content))
-            blocks.append({"type": "page_break"})
+            word_sources = extract_word_sources_from_finales(fin)
+            if word_sources:
+                for paragraph in extract_reference_preamble(ai_content):
+                    blocks.append(
+                        {
+                            "type": "paragraph",
+                            "text": strip_source_markers(paragraph),
+                        }
+                    )
+                blocks.append({"type": "bibliography", "word_sources": word_sources})
+            else:
+                blocks.extend(_normalize_ai_content(strip_source_markers(ai_content)))
+            if needs_following_break:
+                blocks.append({"type": "page_break"})
             return blocks
         if "nota" in ref:
             blocks.append({"type": "note", "text": ref["nota"]})
@@ -2158,7 +2349,8 @@ def _normalize_referencias(fin: dict) -> List[Block]:
         if ejemplos:
             blocks.append({"type": "apa_examples", "ejemplos": ejemplos})
 
-    blocks.append({"type": "page_break"})
+    if needs_following_break:
+        blocks.append({"type": "page_break"})
     return blocks
 
 

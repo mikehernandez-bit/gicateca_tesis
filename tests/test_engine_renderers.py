@@ -30,9 +30,64 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 import app.engine.renderers  # noqa: F401
 from app.engine.registry import render_block, render_blocks, list_registered, _RENDERERS
 from app.engine.normalizer import normalize
+from app.engine.renderers.formula import FormulaConversionError
 
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def test_native_list_uses_word_numbering_not_painted_bullet() -> None:
+    doc = Document()
+    render_block(
+        doc,
+        {
+            "type": "list",
+            "items": ["Primer problema específico", "Segundo problema específico"],
+            "ordered": False,
+        },
+    )
+
+    assert [paragraph.text for paragraph in doc.paragraphs] == [
+        "Primer problema específico",
+        "Segundo problema específico",
+    ]
+    assert all(paragraph._p.xpath("./w:pPr/w:numPr/w:numId") for paragraph in doc.paragraphs)
+    assert all(not paragraph.text.startswith("•") for paragraph in doc.paragraphs)
+
+
+def test_formula_renders_editable_omml_fraction_and_scripts() -> None:
+    doc = Document()
+    render_block(
+        doc,
+        {
+            "type": "formula",
+            "latex": r"A_i = \frac{MTBF}{MTBF + MTTR}",
+            "text": "Ai = MTBF / (MTBF + MTTR)",
+            "alignment": "center",
+        },
+    )
+
+    assert len(doc.element.body.xpath(".//m:oMath")) == 1
+    assert len(doc.element.body.xpath(".//m:f")) == 1
+    assert len(doc.element.body.xpath(".//m:sSub")) == 1
+
+
+def test_unsupported_formula_fails_instead_of_degrading_to_text() -> None:
+    doc = Document()
+    with pytest.raises(FormulaConversionError, match="no soportado"):
+        render_blocks(doc, [{"type": "formula", "latex": r"x = \unsupported{y}"}])
+
+
+def test_formula_supports_root_sum_greek_and_relational_operators() -> None:
+    doc = Document()
+    render_blocks(
+        doc,
+        [{"type": "formula", "latex": r"\sigma = \sqrt{\sum_{i=1}^{n} x_i} \ge 0"}],
+    )
+
+    assert len(doc.element.body.xpath(".//m:rad")) == 1
+    assert len(doc.element.body.xpath(".//m:sSubSup")) >= 1
+    assert "σ" in "".join(doc.element.body.itertext())
 
 
 # ─────────────────────────────────────────────────────────────
@@ -84,19 +139,19 @@ def _render_many(blocks: list) -> Document:
 
 class TestAllRegistered:
     EXPECTED_TYPES = {
-        "abbreviations_table", "apa_examples", "black_heading", "caratula_unac_maestria",
-        "centered_text", "heading", "image", "index_items", "info_basica_unac_maestria",
-        "info_table", "legacy_table", "logo", "matriz", "note",
+        "abbreviations_table", "apa_examples", "bibliography", "black_heading", "caratula_unac_maestria",
+        "centered_text", "formula", "heading", "image", "index_items", "info_basica_unac_maestria",
+        "info_table", "legacy_table", "list", "logo", "matriz", "note",
         "page_break", "page_footer", "paragraph", "paragraph_bold", "paragraph_centered",
         "section_break", "section_switch", "table", "toc_field",
     }
 
-    def test_all_20_registered(self):
+    def test_all_registered(self):
         registered = set(list_registered())
         assert registered == self.EXPECTED_TYPES
 
     def test_count(self):
-        assert len(list_registered()) == 23
+        assert len(list_registered()) == 26
 
 
 # ─────────────────────────────────────────────────────────────
@@ -495,6 +550,18 @@ class TestLegacyTable:
 # ─────────────────────────────────────────────────────────────
 
 class TestImage:
+    def test_long_uppercase_caption_is_shortened_without_project_suffix(self):
+        from app.engine.renderers.image import _clean_figure_title
+
+        title = (
+            "FIGURA 2.1 PROCESO DEL RCM APLICADO A PLAN DE MANTENIMIENTO CENTRADO EN "
+            "CONFIABILIDAD PARA MEJORAR LA DISPONIBILIDAD DE LA FLOTA CAT 24M"
+        )
+        normalized = _clean_figure_title(title)
+
+        assert normalized == "Proceso del RCM"
+        assert len(normalized) <= 120
+
     def test_image_placeholder_is_omitted(self):
         """Image placeholder route is omitted completely."""
         doc = _render({
@@ -616,6 +683,10 @@ def test_table_accepts_gicagen_schedule_aliases_and_merges():
     )
 
     assert [p.text for p in doc.paragraphs if p.text.strip()][0] == "Tabla 5.1 Cronograma de actividades"
+    caption = next(p for p in doc.paragraphs if p.text.strip().startswith("Tabla 5.1"))
+    instructions = [str(node.text or "") for node in caption._p.xpath(".//w:instrText")]
+    assert any("SEQ Tabla" in instruction and "\\r 1" in instruction for instruction in instructions)
+    assert all(run.bold is not True for run in caption.runs)
     table = doc.tables[0]
     assert len(table.rows) == 4
     assert table.rows[0].cells[0].text == "FASES Y ACTIVIDADES"
@@ -624,6 +695,28 @@ def test_table_accepts_gicagen_schedule_aliases_and_merges():
     assert len(table._tbl.xpath(".//w:vMerge")) >= 1
     assert len(table._tbl.xpath(".//w:tblHeader")) >= 2
     assert len(table._tbl.xpath(".//w:cantSplit")) == len(table.rows)
+
+
+def test_table_cell_renders_native_word_citation_field():
+    source = {
+        "tag": "SIM_01_GMG_2020",
+        "authors": [{"last": "GMG", "first": ""}],
+        "year": "2020",
+    }
+    doc = _render(
+        {
+            "type": "table",
+            "titulo": "Tabla 3.2 Operacionalización de variable dependiente",
+            "encabezados": ["DEFINICIÓN CONCEPTUAL"],
+            "filas": [["Definición técnica [[CITE:SIM_01_GMG_2020]]."]],
+            "word_sources": [source],
+        }
+    )
+
+    cell = doc.tables[0].rows[1].cells[0]
+    instructions = [str(node.text or "") for node in cell._tc.xpath(".//w:instrText")]
+    assert any("CITATION SIM_01_GMG_2020" in instruction for instruction in instructions)
+    assert "[[CITE:" not in cell.text
 
 
 def test_table_accepts_gicagen_budget_aliases_and_merges():
@@ -656,6 +749,10 @@ def test_table_accepts_gicagen_budget_aliases_and_merges():
     )
 
     assert [p.text for p in doc.paragraphs if p.text.strip()][0] == "Tabla 6.1 Presupuesto de investigación"
+    caption = next(p for p in doc.paragraphs if p.text.strip().startswith("Tabla 6.1"))
+    instructions = [str(node.text or "") for node in caption._p.xpath(".//w:instrText")]
+    assert any("SEQ Tabla" in instruction and "\\r 1" in instruction for instruction in instructions)
+    assert all(run.bold is not True for run in caption.runs)
     table = doc.tables[0]
     assert len(table.rows) == 4
     assert table.rows[1].cells[0].text == "1. RECURSOS HUMANOS"
@@ -677,14 +774,26 @@ class TestTocField:
         found = any("ÍNDICE" in p.text for p in doc.paragraphs)
         assert found
 
-    def test_toc_has_placeholder(self):
+    def test_toc_never_exposes_update_placeholder(self):
         doc = _render({
             "type": "toc_field",
             "field_code": ' TOC \\o "1-3" ',
             "heading_text": "ÍNDICE",
         })
         texts = " ".join(p.text for p in doc.paragraphs)
-        assert "Actualice" in texts
+        assert "Actualice" not in texts
+        assert "Sin entradas aplicables" in texts
+
+    def test_toc_has_visible_cached_entries(self):
+        doc = _render({
+            "type": "toc_field",
+            "field_code": ' TOC \\c "Tabla" \\h \\z ',
+            "heading_text": "ÍNDICE DE TABLAS",
+            "cached_entries": [{"text": "Tabla 3.1 Operacionalización", "page": 24}],
+        })
+        texts = " ".join(p.text for p in doc.paragraphs)
+        assert "Tabla 3.1 Operacionalización" in texts
+        assert "24" in texts
 
     def test_toc_enforces_page_break_after_block(self):
         from docx.oxml.ns import qn as _qn
@@ -704,6 +813,18 @@ class TestTocField:
                 if br.get(_qn("w:type")) == "page":
                     page_breaks += 1
         assert page_breaks >= 1
+
+    def test_table_index_has_right_aligned_page_header(self):
+        doc = _render({
+            "type": "toc_field",
+            "field_code": ' TOC \\c "Tabla" \\h \\z ',
+            "heading_text": "ÍNDICE DE TABLAS",
+            "page_label": "Pág.",
+        })
+
+        page_header = next(paragraph for paragraph in doc.paragraphs if paragraph.text == "Pág.")
+        assert page_header.alignment == WD_ALIGN_PARAGRAPH.RIGHT
+        assert all(run.bold is not True for run in page_header.runs)
 
 
 # ─────────────────────────────────────────────────────────────

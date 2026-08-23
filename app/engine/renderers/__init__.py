@@ -15,10 +15,13 @@ Donde tocar si falla:
 
 from app.engine.renderers import (  # noqa: F401
     apa_examples,
+    bibliography,
     centered_text,
      headings,
     image,
+    formula,
     info_table,
+    lists,
     logo,
     matriz,
     note,

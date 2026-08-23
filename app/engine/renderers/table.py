@@ -290,22 +290,58 @@ def _render_exact_or_seq_caption(doc: Document, titulo: str, style: dict) -> Non
     if style.get("titulo_exacto"):
         p = doc.add_paragraph()
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p.paragraph_format.keep_with_next = True
         p.paragraph_format.space_before = Pt(float(style.get("titulo_space_before_pt", 0)))
         p.paragraph_format.space_after = Pt(float(style.get("titulo_space_after_pt", 6)))
-        run = p.add_run(str(titulo))
-        run.bold = bool(style.get("titulo_negrita", False))
-        run.font.size = Pt(float(style.get("titulo_tamano_pt", 10)))
-        run.font.name = "Arial"
+        font_size = float(style.get("titulo_tamano_pt", 10))
+        exact_match = re.match(
+            r"^\s*Tabla\s+(\d+)\.(\d+)\s*([.:]?)\s*(.*?)\s*$",
+            str(titulo),
+            flags=re.IGNORECASE,
+        )
+        if exact_match:
+            chapter_number = int(exact_match.group(1))
+            table_number = int(exact_match.group(2))
+            punctuation = exact_match.group(3)
+            clean_title = exact_match.group(4)
+
+            run_label = p.add_run(f"Tabla {chapter_number}.")
+            run_label.bold = False
+            run_label.font.size = Pt(font_size)
+            run_label.font.name = "Arial"
+            add_seq_field(
+                p,
+                "Tabla",
+                reset_to=table_number,
+                display_value=table_number,
+                font_name="Arial",
+                font_size_pt=font_size,
+                bold=False,
+            )
+            suffix = f"{punctuation} " if punctuation else " "
+            run_title = p.add_run(f"{suffix}{clean_title}" if clean_title else punctuation)
+            run_title.bold = False
+            run_title.font.size = Pt(font_size)
+            run_title.font.name = "Arial"
+        else:
+            # Compatibilidad con títulos institucionales no numerados. Se
+            # conserva el texto, pero estos casos serán marcados por la
+            # validación porque un índice automático requiere SEQ Tabla.
+            run = p.add_run(str(titulo))
+            run.bold = False
+            run.font.size = Pt(font_size)
+            run.font.name = "Arial"
         return
 
     clean_title = re.sub(r"^Tabla\s*[\d.]+\s*[:.]*\s*", "", titulo).strip() or titulo
     chapter_number, table_number, is_first_in_chapter = next_table_number()
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p.paragraph_format.keep_with_next = True
     p.paragraph_format.space_after = Pt(6)
     prefix = f"Tabla {chapter_number}." if chapter_number is not None else "Tabla "
     run_label = p.add_run(prefix)
-    run_label.bold = True
+    run_label.bold = False
     run_label.font.size = Pt(11)
     run_label.font.name = "Arial"
     add_seq_field(
@@ -315,11 +351,11 @@ def _render_exact_or_seq_caption(doc: Document, titulo: str, style: dict) -> Non
         display_value=table_number,
         font_name="Arial",
         font_size_pt=11,
-        bold=True,
+        bold=False,
     )
     separator = " " if chapter_number is not None else ". "
     run_title = p.add_run(f"{separator}{clean_title}")
-    run_title.bold = True
+    run_title.bold = False
     run_title.font.size = Pt(11)
     run_title.font.name = "Arial"
 
@@ -417,6 +453,7 @@ def _render_tabla_impl(doc: Document, tabla_data: dict) -> None:
             _cell_font_size(tabla_data, -1, i, header_text, estilo, font_size),
             bold=True,
             alignment=WD_ALIGN_PARAGRAPH.CENTER,
+            word_sources=tabla_data.get("word_sources") or [],
         )
         if _is_schedule_table(tabla_data):
             _compact_cell_after_format(cell, estilo)
@@ -436,6 +473,7 @@ def _render_tabla_impl(doc: Document, tabla_data: dict) -> None:
                 _cell_font_size(tabla_data, row_idx, col_idx, cell_text or "", estilo, font_size),
                 bold=_cell_bold(tabla_data, row_idx),
                 alignment=_cell_alignment(tabla_data, row_idx, col_idx, estilo),
+                word_sources=tabla_data.get("word_sources") or [],
             )
             if _is_schedule_table(tabla_data):
                 _compact_cell_after_format(cell, estilo)
@@ -469,6 +507,7 @@ def _render_tabla_impl(doc: Document, tabla_data: dict) -> None:
                     _cell_font_size(tabla_data, int(merge.get("fila", 0) or 0), start_col, str(merge.get("texto") or ""), estilo, font_size),
                     bold=bool(merge.get("bold", True)),
                     alignment=_alignment_from_value(str(merge.get("alignment") or "center"), WD_ALIGN_PARAGRAPH.CENTER),
+                    word_sources=tabla_data.get("word_sources") or [],
                 )
                 if _is_schedule_table(tabla_data):
                     _compact_cell_after_format(merged_cell, estilo)
