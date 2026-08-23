@@ -85,6 +85,18 @@ def test_sanitize_ai_text_removes_markdown_and_placeholder_lines() -> None:
     assert "Parrafo final valido." in cleaned
 
 
+def test_sanitize_ai_text_preserves_native_word_bibliography_markers() -> None:
+    raw = (
+        "Texto académico [[CITE:SIM_01_MORALES_2025]].\n\n"
+        "[[SOURCE:SIM_01_MORALES_2025]] Morales, J. (2025). Título. Editorial."
+    )
+
+    cleaned = sanitize_ai_text(raw)
+
+    assert "[[CITE:SIM_01_MORALES_2025]]" in cleaned
+    assert "[[SOURCE:SIM_01_MORALES_2025]]" in cleaned
+
+
 def test_apply_ai_content_injects_sanitized_text_in_target_section() -> None:
     data = {
         "preliminares": {

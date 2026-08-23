@@ -108,6 +108,8 @@ def render_blocks(doc: Document, blocks: List[Block]) -> None:
         except Exception:
             block_type = block.get("type", "???") if isinstance(block, dict) else "???"
             logger.exception("Error renderizando block #%d (tipo='%s')", i, block_type)
+            if block_type in {"formula", "list"}:
+                raise
 
 
 def list_registered() -> List[str]:

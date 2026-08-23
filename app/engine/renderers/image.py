@@ -18,14 +18,51 @@ logger = logging.getLogger(__name__)
 
 # Regex defensivas para limpiar títulos de figuras
 _RE_CHAPTER_SUFFIX = re.compile(r"\s*[–—-]\s*[IVXLC]+\.\s*.+$")
-_RE_FIGURA_PREFIX = re.compile(r"^Figura\s*[\d.]+\s*[:.]*\s*")
+_RE_FIGURA_PREFIX = re.compile(r"^Figura\s*[\d.]+\s*[:.]*\s*", re.IGNORECASE)
+_RE_PROJECT_SUFFIX = re.compile(
+    r"\s+(?:aplicad[oa]s?|orientad[oa]s?)\s+(?:a|al)\s+.+$",
+    re.IGNORECASE,
+)
+_CAPTION_MAX_CHARS = 120
+_CAPTION_ACRONYMS = (
+    "AMEF",
+    "CAT",
+    "CBM",
+    "CMMS",
+    "FMEA",
+    "GMG",
+    "ISO",
+    "IoT",
+    "MTBF",
+    "MTTR",
+    "RCM",
+    "SAE",
+)
 
 
 def _clean_figure_title(titulo: str) -> str:
-    """Remove redundant prefixes and chapter-name suffixes from figure titles."""
+    """Normalize a brief academic caption and remove the thesis-title suffix."""
+    titulo = re.sub(r"\s+", " ", str(titulo or "").strip())
     titulo = _RE_FIGURA_PREFIX.sub("", titulo)
     titulo = _RE_CHAPTER_SUFFIX.sub("", titulo)
-    return titulo.strip()
+    titulo = _RE_PROJECT_SUFFIX.sub("", titulo).strip(" .;:-")
+
+    if titulo.isupper():
+        titulo = titulo.lower()
+        titulo = titulo[:1].upper() + titulo[1:]
+
+    for acronym in _CAPTION_ACRONYMS:
+        titulo = re.sub(
+            rf"(?<![A-Za-z0-9]){re.escape(acronym)}(?![A-Za-z0-9])",
+            acronym,
+            titulo,
+            flags=re.IGNORECASE,
+        )
+
+    if len(titulo) > _CAPTION_MAX_CHARS:
+        shortened = titulo[: _CAPTION_MAX_CHARS + 1].rsplit(" ", 1)[0].rstrip(" ,;:-")
+        titulo = shortened or titulo[:_CAPTION_MAX_CHARS].rstrip(" ,;:-")
+    return titulo
 
 
 def _rgb_from_hex(value: str) -> RGBColor | None:
@@ -77,6 +114,7 @@ def render_image(doc: Document, block: Block) -> None:
             chapter_number, figure_number, is_first_in_chapter = next_figure_number()
             pc = doc.add_paragraph()
             pc.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            pc.paragraph_format.keep_with_next = True
             pc.paragraph_format.space_after = Pt(4)
             prefix = (
                 f"Figura {chapter_number}." if chapter_number is not None else "Figura "

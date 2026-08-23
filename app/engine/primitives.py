@@ -36,9 +36,12 @@ from typing import Optional
 
 from docx.document import Document
 from docx.enum.section import WD_ORIENT, WD_SECTION
+from docx.enum.style import WD_STYLE_TYPE
 from docx.enum.table import WD_CELL_VERTICAL_ALIGNMENT
 from docx.enum.text import (
     WD_ALIGN_PARAGRAPH,
+    WD_TAB_ALIGNMENT,
+    WD_TAB_LEADER,
 )
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
@@ -155,6 +158,48 @@ def configure_styles(
             heading_style.paragraph_format.page_break_before = False
         except KeyError:
             continue
+
+    # Word usa este estilo para las entradas generadas por TOC \c (índices
+    # de tablas y figuras). Definirlo explícitamente evita que el formato
+    # directo de un caption convierta algunas entradas en negrita.
+    try:
+        index_style = doc.styles["Table of Figures"]
+    except KeyError:
+        index_style = doc.styles.add_style("Table of Figures", WD_STYLE_TYPE.PARAGRAPH)
+    index_style.font.name = "Arial"
+    index_style.font.size = Pt(10)
+    index_style.font.bold = False
+    index_style.paragraph_format.space_before = Pt(0)
+    index_style.paragraph_format.space_after = Pt(0)
+    index_r_pr = index_style.element.get_or_add_rPr()
+    index_fonts = index_r_pr.find(qn("w:rFonts"))
+    if index_fonts is None:
+        index_fonts = OxmlElement("w:rFonts")
+        index_r_pr.append(index_fonts)
+    for attr in ("ascii", "hAnsi", "cs", "eastAsia"):
+        index_fonts.set(qn(f"w:{attr}"), "Arial")
+
+
+def enable_update_fields(doc: Document) -> None:
+    """Ask Microsoft Word to refresh TOC/SEQ/PAGE fields when opening."""
+    settings = doc.settings.element
+    update = settings.find(qn("w:updateFields"))
+    if update is None:
+        update = OxmlElement("w:updateFields")
+        settings.append(update)
+    update.set(qn("w:val"), "true")
+
+
+def disable_update_fields(doc: Document) -> None:
+    """Prevent Word from prompting to refresh fields when the DOCX opens.
+
+    The native fields remain editable and can still be refreshed explicitly
+    with Ctrl+A/F9; only the automatic-on-open flag is removed.
+    """
+    settings = doc.settings.element
+    update = settings.find(qn("w:updateFields"))
+    if update is not None:
+        settings.remove(update)
 
 
 def configure_margins(doc: Document) -> None:
@@ -346,6 +391,8 @@ def add_toc_field(
     field_code: str,
     heading_text: str,
     exclude_from_toc: bool = False,
+    page_label: str = "",
+    cached_entries: list[dict] | None = None,
 ) -> None:
     """Inserta un campo Word real (TOC, lista de tablas/figuras).
 
@@ -367,8 +414,25 @@ def add_toc_field(
     else:
         # Heading 1 — aparece en el TOC
         add_heading_formal(doc, heading_text, centered=True)
+
+    if page_label:
+        page_heading = doc.add_paragraph()
+        page_heading.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        page_heading.paragraph_format.space_before = Pt(0)
+        page_heading.paragraph_format.space_after = Pt(2)
+        page_heading.paragraph_format.keep_with_next = True
+        page_run = page_heading.add_run(str(page_label))
+        page_run.font.name = "Arial"
+        page_run.font.size = Pt(10)
+        page_run.bold = False
+
     paragraph = doc.add_paragraph()
     paragraph.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    if page_label:
+        try:
+            paragraph.style = doc.styles["Table of Figures"]
+        except KeyError:
+            pass
 
     run = paragraph.add_run()
     fld_begin = OxmlElement("w:fldChar")
@@ -388,12 +452,28 @@ def add_toc_field(
     run._r.append(instr)
     run._r.append(fld_separate)
 
-    placeholder_run = paragraph.add_run(
-        "Actualice este campo: clic derecho → Actualizar campo"
+    entries = cached_entries or []
+    paragraph.paragraph_format.tab_stops.add_tab_stop(
+        Cm(15.0), WD_TAB_ALIGNMENT.RIGHT, WD_TAB_LEADER.DOTS
     )
-    placeholder_run.font.size = Pt(9)
-    placeholder_run.font.color.rgb = RGBColor(128, 128, 128)
-    placeholder_run.italic = True
+    if entries:
+        for index, entry in enumerate(entries):
+            cached_run = paragraph.add_run(str(entry.get("text") or "").strip())
+            cached_run.font.name = "Arial"
+            cached_run.font.size = Pt(10)
+            cached_run.bold = False
+            cached_run.add_tab()
+            page_run = paragraph.add_run(str(entry.get("page") or 1))
+            page_run.font.name = "Arial"
+            page_run.font.size = Pt(10)
+            page_run.bold = False
+            if index < len(entries) - 1:
+                page_run.add_break()
+    else:
+        empty_run = paragraph.add_run("Sin entradas aplicables")
+        empty_run.font.name = "Arial"
+        empty_run.font.size = Pt(10)
+        empty_run.italic = True
 
     end_run = paragraph.add_run()
     end_run._r.append(fld_end)
@@ -487,8 +567,11 @@ def format_cell_text(
     font_size: int,
     bold: bool = False,
     alignment=WD_ALIGN_PARAGRAPH.LEFT,
+    word_sources: list[dict] | None = None,
 ) -> None:
     """Escribe texto formateado en una celda, soportando multi-línea."""
+    from app.engine.word_bibliography import CITATION_MARKER_RE, render_text_with_citations
+
     cell.text = ""
     lines = str(text).split("\n")
     for i, line in enumerate(lines):
@@ -500,10 +583,21 @@ def format_cell_text(
         p.paragraph_format.space_before = Pt(1)
         p.paragraph_format.space_after = Pt(1)
         p.paragraph_format.line_spacing = 1.0
-        run = p.add_run(line)
-        run.font.size = Pt(font_size)
-        run.font.name = "Arial"
-        run.bold = bold
+        if CITATION_MARKER_RE.search(line):
+            render_text_with_citations(
+                p,
+                line,
+                word_sources or [],
+                font_name="Arial",
+                font_size_pt=font_size,
+            )
+            for run in p.runs:
+                run.bold = bold
+        else:
+            run = p.add_run(line)
+            run.font.size = Pt(font_size)
+            run.font.name = "Arial"
+            run.bold = bold
 
 
 # ═══════════════════════════════════════════════════════════════

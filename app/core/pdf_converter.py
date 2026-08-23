@@ -165,6 +165,9 @@ class PdfConversionManager:
                     toc.Update()
                 for tof in doc.TablesOfFigures:
                     tof.Update()
+                # Persistir en el DOCX los campos actualizados antes de crear
+                # el PDF; así Word y el PDF reflejan los mismos índices.
+                doc.Save()
                 doc.SaveAs(pdf_path, FileFormat=17)
             finally:
                 if doc is not None:

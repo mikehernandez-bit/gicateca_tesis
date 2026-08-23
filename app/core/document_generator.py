@@ -84,6 +84,24 @@ def resolve_generator_command(
 # ─────────────────────────────────────────────────────────────────────────────
 
 
+def _generator_failure_detail(stdout: str, stderr: str) -> str:
+    """Extract the actionable generator error from captured subprocess output."""
+    streams = [str(stdout or "").strip(), str(stderr or "").strip()]
+    lines = [
+        line.strip()
+        for stream in streams
+        for line in stream.splitlines()
+        if line.strip()
+    ]
+    explicit_errors = [
+        line.split("[ERROR]", 1)[1].strip()
+        for line in lines
+        if "[ERROR]" in line and line.split("[ERROR]", 1)[1].strip()
+    ]
+    detail = explicit_errors[-1] if explicit_errors else (lines[-1] if lines else "")
+    return detail[:2000]
+
+
 def generate_document_by_id(
     format_id: str,
     section_filter: Optional[str] = None,
@@ -179,8 +197,11 @@ def generate_document_by_id(
             pass
 
     if result.returncode != 0:
-        print("[ERROR]", result.stderr)
-        raise RuntimeError("Document generation failed. Check console for details.")
+        detail = _generator_failure_detail(result.stdout, result.stderr)
+        print("[ERROR]", detail or "Generator subprocess failed without diagnostic output.")
+        if detail:
+            raise RuntimeError(f"Document generation failed: {detail}")
+        raise RuntimeError("Document generation failed without diagnostic output.")
 
     if not output_path.exists():
         raise RuntimeError("Generator script executed but did not create DOCX file.")
