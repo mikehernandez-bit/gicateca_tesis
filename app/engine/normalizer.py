@@ -626,8 +626,8 @@ def _derive_document_abbreviation_rows(data: dict | None) -> List[Dict[str, str]
     cited_tags = {
         tag
         for fragment in _extract_generated_text_fragments(data)
-        for marker in CITATION_MARKER_RE.findall(fragment)
-        for tag in marker.split(";")
+        for match in CITATION_MARKER_RE.finditer(fragment)
+        for tag in match.group("tags").split(";")
     }
     if cited_tags:
         for source in extract_word_sources(data):
@@ -2015,7 +2015,8 @@ def _normalize_content_item(
         caption = str(item.get("caption") or "").strip()
         title = str(item.get("titulo") or "").strip() or _strip_figure_caption_prefix(caption)
         ruta = item.get("ruta_placeholder") or item.get("ruta", "")
-        if ruta and ruta.lower() != "placeholder":
+        diagram_type = str(item.get("diagram_type") or "").strip()
+        if (ruta and str(ruta).lower() != "placeholder") or diagram_type:
             # Heredar nota de instrucción detallada del padre si la figura no tiene una propia
             nota_actual = item.get("nota") or item.get("note")
             if not nota_actual and parent_item:
@@ -2025,34 +2026,9 @@ def _normalize_content_item(
                     or parent_item.get("instruccion_detallada")
                 )
 
-            # Si aún no hay nota, generar una genérica azul para guiar al estudiante.
-            # Esto garantiza que todas las figuras (incluidas las de 2.2 Bases Teóricas)
-            # siempre tengan una instrucción visible debajo de la imagen.
-            if not nota_actual:
-                figure_label = title or caption or "la figura"
-                nota_actual = (
-                    f"Guía para elaborar la figura: Diseña un esquema gráfico profesional titulado \"{figure_label}\" "
-                    "que sirva como soporte visual y académico del desarrollo de esta sección. El diagrama debe "
-                    "estructurarse mediante bloques relacionales, diagramas de flujo o mapas conceptuales según "
-                    "corresponda a la naturaleza del subtema. Define con claridad las variables clave, los procesos "
-                    "involucrados o la arquitectura del sistema. Conecta los elementos conceptuales con líneas "
-                    "y flechas direccionales que muestren la secuencia lógica y el sentido de las relaciones. "
-                    "Utiliza formas geométricas consistentes (rectángulos, óvalos o círculos) y un esquema de colores "
-                    "sobrio y contrastante para mejorar la legibilidad. Asegura que todos los textos, variables y "
-                    "rótulos de la figura utilicen una fuente Arial de 10 puntos sin negritas ni marcadores adicionales. "
-                    "En la parte inferior de la figura, incluye siempre la fuente correspondiente en formato APA "
-                    "estándar (por ejemplo, 'Fuente: Elaboración propia' o la cita del autor correspondiente) "
-                    "y una nota técnica descriptiva que explique brevemente el contenido de la figura y su "
-                    "vinculación directa con el sustento analítico del proyecto."
-                )
-
-            # Heredar color o forzar azul si se heredó una nota
             color_actual = item.get("nota_color") or item.get("note_color")
             if not color_actual and parent_item:
                 color_actual = parent_item.get("nota_color") or parent_item.get("note_color")
-            if nota_actual and not color_actual:
-                color_actual = "0000FF"  # Azul institucional para notas
-
             blocks.append(
                 {
                     "type": "image",
@@ -2060,10 +2036,13 @@ def _normalize_content_item(
                     "ruta": ruta,
                     "fuente": item.get("fuente", "Elaboración propia"),
                     "ancho_cm": item.get("ancho_cm"),
-                    "placeholder": True,
+                    "placeholder": False,
                     "nota": nota_actual,
                     "nota_color": color_actual,
                     "placeholder_text": item.get("placeholder_text") or item.get("texto_placeholder"),
+                    "diagram_type": diagram_type,
+                    "diagram_data": item.get("diagram_data") if isinstance(item.get("diagram_data"), dict) else {},
+                    "omit_caption": not bool(item.get("numbered", True)),
                 }
             )
         elif caption:

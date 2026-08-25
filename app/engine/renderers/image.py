@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import re
 
 from docx.document import Document
@@ -10,6 +11,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Cm, Pt, RGBColor
 
 from app.engine.render_state import next_figure_number
+from app.engine.diagram_image import generate_diagram_png
 from app.engine.registry import register
 from app.engine.primitives import resolve_asset, add_seq_field
 from app.engine.types import Block
@@ -101,12 +103,17 @@ def render_image(doc: Document, block: Block) -> None:
         block.get("placeholder_text") or block.get("texto_placeholder") or ""
     ).strip()
 
-    # Omit placeholders or missing files: never inject fake "example" figures.
-    if not ruta or ruta.lower() == "placeholder":
-        return
-    path = resolve_asset(ruta)
+    generated_path = ""
+    diagram_type = str(block.get("diagram_type") or "").strip()
+    if diagram_type:
+        generated_path = generate_diagram_png(diagram_type, block.get("diagram_data"), titulo)
+        path = generated_path
+    else:
+        if not ruta or str(ruta).lower() == "placeholder":
+            raise ValueError(f"Figure '{titulo}' has no renderable source")
+        path = resolve_asset(ruta)
     if not path:
-        return
+        raise ValueError(f"Figure asset could not be resolved: {ruta}")
 
     try:
         # Caption with SEQ field
@@ -174,4 +181,11 @@ def render_image(doc: Document, block: Block) -> None:
                 rt.font.name = "Arial"
                 rt.font.size = Pt(10)
     except Exception as e:
-        logger.warning("Image %s: %s", ruta, e)
+        logger.exception("Image %s: %s", ruta or diagram_type, e)
+        raise
+    finally:
+        if generated_path:
+            try:
+                os.unlink(generated_path)
+            except OSError:
+                pass

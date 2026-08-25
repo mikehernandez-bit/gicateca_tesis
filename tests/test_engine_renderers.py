@@ -615,24 +615,27 @@ class TestImage:
         assert normalized == "Proceso del RCM"
         assert len(normalized) <= 120
 
-    def test_image_placeholder_is_omitted(self):
-        """Image placeholder route is omitted completely."""
-        doc = _render({
-            "type": "image",
-            "titulo": "Test Figure",
-            "ruta": "placeholder",
-        })
-        assert len(doc.paragraphs) == 0
+    def test_image_placeholder_is_rejected(self):
+        """V2 nunca degrada silenciosamente una figura a placeholder."""
+        with pytest.raises(ValueError, match="no renderable source"):
+            _render({"type": "image", "titulo": "Test Figure", "ruta": "placeholder"})
 
-    def test_image_missing_file_is_omitted(self):
-        """Image with missing file is omitted."""
+    def test_image_missing_file_is_rejected(self):
+        """La exportación falla si una figura declarada no existe."""
+        with pytest.raises(ValueError, match="could not be resolved"):
+            _render({"type": "image", "titulo": "Fig", "ruta": "nonexistent_image.png"})
+
+    def test_structured_diagram_renders_real_picture_without_caption_when_unnumbered(self):
         doc = _render({
             "type": "image",
-            "titulo": "Fig",
-            "ruta": "nonexistent_image.png",
-            "fuente": "Elaboración propia",
+            "titulo": "Análisis causal propuesto",
+            "ruta": "",
+            "diagram_type": "ishikawa",
+            "diagram_data": {"labels": ["Método", "Medición", "Maquinaria"]},
+            "omit_caption": True,
         })
-        assert len(doc.paragraphs) == 0
+        assert len(doc.inline_shapes) == 1
+        assert not any("Figura" in paragraph.text for paragraph in doc.paragraphs)
 
     def test_image_caption_uses_chapter_aware_label_and_note(self):
         doc = _render_many([

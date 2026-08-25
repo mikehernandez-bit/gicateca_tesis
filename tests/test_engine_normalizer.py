@@ -827,8 +827,8 @@ class TestNormalizeCuerpo:
         hdgs = _blocks_of_type(blocks, "heading")
         assert any(b["text"] == "CAP I" and b["level"] == 1 for b in hdgs)
 
-    def test_ai_figure_inherits_parent_note_and_color_blue(self):
-        """Una figura inyectada por IA hereda la nota e instrucción del padre y se marca azul."""
+    def test_ai_figure_inherits_parent_note_without_forced_blue(self):
+        """Una figura puede heredar una nota, pero V2 no la convierte en guía azul."""
         data = _minimal_json()
         data["cuerpo"] = [
             {
@@ -853,7 +853,7 @@ class TestNormalizeCuerpo:
         assert len(images) == 1
         assert images[0]["titulo"] == "Figura de IA"
         assert images[0]["nota"] == "Instruccion de prueba de la seccion"
-        assert images[0]["nota_color"] == "0000FF"
+        assert images[0]["nota_color"] is None
 
     def test_page_break_before_second_chapter_only(self):
         """Los saltos de capitulo van antes del siguiente capitulo, no despues del titulo."""
@@ -1160,14 +1160,8 @@ class TestNormalizeCuerpo:
         assert len(rcm_pars) == 1
         assert rcm_pars[0]["text"] == "El Mantenimiento Centrado en Confiabilidad es una metodología..."
 
-    def test_figure_without_nota_gets_generic_blue_instruction(self):
-        """Figura sin nota propia ni en el parent_item debe recibir una nota genérica
-        azul para guiar al estudiante.
-
-        Regresión: las figuras generadas por IA en 2.2 Bases Teóricas no traen
-        nota ni instruccion_detallada, por lo que antes no aparecía instrucción
-        debajo de la imagen.
-        """
+    def test_figure_without_nota_does_not_create_author_instruction(self):
+        """La salida final no debe mostrar instrucciones azules al estudiante."""
         data = _minimal_json()
         data["cuerpo"][0]["contenido"] = [{
             "texto": "2.2.1 Mantenimiento Centrado en Confiabilidad",
@@ -1184,15 +1178,8 @@ class TestNormalizeCuerpo:
         blocks = normalize(data)
         images = _blocks_of_type(blocks, "image")
         assert len(images) == 1
-        # La figura debe tener una nota genérica (no vacía)
-        assert images[0]["nota"], "La figura debe tener una nota de instrucción genérica"
-        assert images[0]["nota_color"] == "0000FF", "La nota debe ser azul (0000FF)"
-        # El texto genérico debe mencionar la figura o ser una instrucción útil
-        nota_text = images[0]["nota"].lower()
-        assert any(
-            keyword in nota_text
-            for keyword in ["elaborar", "figura", "datos", "fuente", "incluir"]
-        ), f"La nota genérica debe ser instructiva, se obtuvo: {images[0]['nota']!r}"
+        assert images[0]["nota"] is None
+        assert images[0]["nota_color"] is None
 
 
 # ─────────────────────────────────────────────────────────────
