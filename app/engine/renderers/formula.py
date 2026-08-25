@@ -8,6 +8,7 @@ from docx.document import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
+from lxml import etree
 
 from app.engine.registry import register
 from app.engine.types import Block
@@ -18,13 +19,47 @@ class FormulaConversionError(ValueError):
 
 
 _GREEK = {
-    "lambda": "λ",
-    "mu": "μ",
-    "sigma": "σ",
     "alpha": "α",
     "beta": "β",
-    "Delta": "Δ",
+    "gamma": "γ",
+    "delta": "δ",
+    "epsilon": "ε",
+    "varepsilon": "ϵ",
+    "zeta": "ζ",
+    "eta": "η",
     "theta": "θ",
+    "vartheta": "ϑ",
+    "iota": "ι",
+    "kappa": "κ",
+    "lambda": "λ",
+    "mu": "μ",
+    "nu": "ν",
+    "xi": "ξ",
+    "omicron": "ο",
+    "pi": "π",
+    "varpi": "ϖ",
+    "rho": "ρ",
+    "varrho": "ϱ",
+    "sigma": "σ",
+    "varsigma": "ς",
+    "tau": "τ",
+    "upsilon": "υ",
+    "phi": "φ",
+    "varphi": "ϕ",
+    "chi": "χ",
+    "psi": "ψ",
+    "omega": "ω",
+    "Gamma": "Γ",
+    "Delta": "Δ",
+    "Theta": "Θ",
+    "Lambda": "Λ",
+    "Xi": "Ξ",
+    "Pi": "Π",
+    "Sigma": "Σ",
+    "Upsilon": "Υ",
+    "Phi": "Φ",
+    "Psi": "Ψ",
+    "Omega": "Ω",
 }
 _OPERATORS = {
     "cdot": "·",
@@ -41,11 +76,45 @@ _OPERATORS = {
 
 def _math_run(text: str):
     run = OxmlElement("m:r")
-    props = OxmlElement("m:rPr")
-    normal = OxmlElement("m:nor")
-    props.append(normal)
+    props = OxmlElement("w:rPr")
+    fonts = OxmlElement("w:rFonts")
+    for name in ("ascii", "hAnsi", "cs", "eastAsia"):
+        fonts.set(qn(f"w:{name}"), "Cambria Math")
+    props.append(fonts)
     run.append(props)
     value = OxmlElement("m:t")
+    value.text = text
+    run.append(value)
+    return run
+
+
+def _fallback_text(text: str, latex: str, number: str) -> str:
+    value = str(text or latex or "").strip()
+    replacements = {
+        "A_i": "Aᵢ",
+        "_1": "₁",
+        "_2": "₂",
+        "lambda": "λ",
+        "mu": "μ",
+        "-": "−",
+    }
+    for source, target in replacements.items():
+        value = value.replace(source, target)
+    value = value.replace("\\frac{MTBF}{MTBF + MTTR}", "MTBF / (MTBF + MTTR)")
+    value = value.replace("\\lambda", "λ").replace("\\mu", "μ")
+    return f"{value}  {number}".rstrip()
+
+
+def _word_fallback_run(text: str):
+    run = OxmlElement("w:r")
+    props = OxmlElement("w:rPr")
+    fonts = OxmlElement("w:rFonts")
+    for name in ("ascii", "hAnsi", "cs", "eastAsia"):
+        fonts.set(qn(f"w:{name}"), "Cambria Math")
+    props.append(fonts)
+    run.append(props)
+    value = OxmlElement("w:t")
+    value.set(qn("xml:space"), "preserve")
     value.text = text
     run.append(value)
     return run
@@ -63,6 +132,20 @@ def _group_content(text: str, start: int) -> tuple[str, int]:
             if depth == 0:
                 return text[start + 1 : index], index + 1
     raise FormulaConversionError("grupo matematico sin cierre")
+
+
+def _parenthesized_end(text: str, start: int) -> int:
+    if start >= len(text) or text[start] != "(":
+        raise FormulaConversionError("se esperaba una expresion entre parentesis")
+    depth = 0
+    for index in range(start, len(text)):
+        if text[index] == "(":
+            depth += 1
+        elif text[index] == ")":
+            depth -= 1
+            if depth == 0:
+                return index + 1
+    raise FormulaConversionError("expresion entre parentesis sin cierre")
 
 
 def _append_fraction(parent, numerator: str, denominator: str) -> None:
@@ -133,6 +216,27 @@ def _append_expression(parent, source: str) -> None:
             buffer.clear()
 
     while index < len(text):
+        if text[index] == "(":
+            group_end = _parenthesized_end(text, index)
+            script_index = group_end
+            while script_index < len(text) and text[script_index].isspace():
+                script_index += 1
+            if script_index < len(text) and text[script_index] in "_^":
+                flush()
+                base = text[index:group_end]
+                sub = sup = None
+                while script_index < len(text) and text[script_index] in "_^":
+                    marker = text[script_index]
+                    value, script_index = _read_script(text, script_index + 1)
+                    if marker == "_":
+                        sub = value
+                    else:
+                        sup = value
+                    while script_index < len(text) and text[script_index].isspace():
+                        script_index += 1
+                _append_script(parent, base, sub, sup)
+                index = script_index
+                continue
         if text.startswith("\\frac", index):
             flush()
             index += len("\\frac")
@@ -208,7 +312,38 @@ def render_formula(doc: Document, block: Block) -> None:
         "left": WD_ALIGN_PARAGRAPH.LEFT,
         "right": WD_ALIGN_PARAGRAPH.RIGHT,
     }.get(str(block.get("alignment") or "center").lower(), WD_ALIGN_PARAGRAPH.CENTER)
-    paragraph._p.append(build_omml(str(block.get("latex") or ""), str(block.get("text") or "")))
+    # Word stores display equations inside m:oMathPara.  Keeping m:oMath as a
+    # direct child of w:p works in Word's object model but LibreOffice drops it
+    # while converting to PDF, leaving only the equation number visible.
+    math_para = OxmlElement("m:oMathPara")
+    math_para_props = OxmlElement("m:oMathParaPr")
+    justification = OxmlElement("m:jc")
+    justification.set(qn("m:val"), "center")
+    math_para_props.append(justification)
+    math_para.append(math_para_props)
+    math = build_omml(str(block.get("latex") or ""), str(block.get("text") or ""))
     number = str(block.get("number") or "").strip()
     if number:
-        paragraph.add_run(f"  {number}")
+        math.append(_math_run(f"  {number}"))
+    math_para.append(math)
+
+    # LibreOffice currently drops OfficeMath when converting DOCX to PDF.
+    # Markup Compatibility lets Word retain the native equation while readers
+    # without OfficeMath support display a centered textual fallback.
+    mc_namespace = "http://schemas.openxmlformats.org/markup-compatibility/2006"
+    alternate = etree.Element(f"{{{mc_namespace}}}AlternateContent")
+    choice = etree.Element(f"{{{mc_namespace}}}Choice")
+    choice.set("Requires", "m")
+    choice.append(math_para)
+    fallback = etree.Element(f"{{{mc_namespace}}}Fallback")
+    fallback.append(
+        _word_fallback_run(
+            _fallback_text(
+                str(block.get("text") or ""),
+                str(block.get("latex") or ""),
+                number,
+            )
+        )
+    )
+    alternate.extend([choice, fallback])
+    paragraph._p.append(alternate)

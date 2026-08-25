@@ -68,8 +68,31 @@ def test_formula_renders_editable_omml_fraction_and_scripts() -> None:
     )
 
     assert len(doc.element.body.xpath(".//m:oMath")) == 1
+    assert len(doc.element.body.xpath(".//m:oMathPara")) == 1
+    assert len(doc.element.body.xpath(".//*[local-name()='AlternateContent']")) == 1
+    assert len(doc.element.body.xpath(".//*[local-name()='Fallback']/w:r")) == 1
     assert len(doc.element.body.xpath(".//m:f")) == 1
     assert len(doc.element.body.xpath(".//m:sSub")) == 1
+
+
+def test_formula_number_is_inside_math_paragraph_for_pdf_compatibility() -> None:
+    doc = Document()
+    render_block(
+        doc,
+        {
+            "type": "formula",
+            "latex": r"A_i = \frac{MTBF}{MTBF + MTTR}",
+            "number": "(1)",
+            "alignment": "center",
+        },
+    )
+
+    math_para = doc.element.body.xpath(".//m:oMathPara")[0]
+    assert "(1)" in "".join(math_para.itertext())
+    assert len(doc.paragraphs[0]._p.xpath("./w:r")) == 0
+    assert "Aᵢ = MTBF / (MTBF + MTTR)  (1)" in "".join(
+        doc.element.body.xpath(".//*[local-name()='Fallback']//w:t/text()")
+    )
 
 
 def test_unsupported_formula_fails_instead_of_degrading_to_text() -> None:
@@ -88,6 +111,36 @@ def test_formula_supports_root_sum_greek_and_relational_operators() -> None:
     assert len(doc.element.body.xpath(".//m:rad")) == 1
     assert len(doc.element.body.xpath(".//m:sSubSup")) >= 1
     assert "σ" in "".join(doc.element.body.itertext())
+
+
+def test_formula_supports_eta_and_common_greek_commands() -> None:
+    doc = Document()
+    render_blocks(
+        doc,
+        [{"type": "formula", "latex": r"\eta = \alpha + \beta + \lambda + \mu + \Omega"}],
+    )
+
+    equation_text = "".join(doc.element.body.itertext())
+    assert "η" in equation_text
+    assert "α" in equation_text
+    assert "β" in equation_text
+    assert "λ" in equation_text
+    assert "μ" in equation_text
+    assert "Ω" in equation_text
+
+
+def test_formula_supports_script_on_parenthesized_fraction() -> None:
+    doc = Document()
+    render_blocks(
+        doc,
+        [{"type": "formula", "latex": r"R(t) = e^{-\left(\frac{t}{\eta}\right)^\beta}"}],
+    )
+
+    assert len(doc.element.body.xpath(".//m:f")) == 1
+    assert len(doc.element.body.xpath(".//m:sSup")) >= 2
+    equation_text = "".join(doc.element.body.itertext())
+    assert "η" in equation_text
+    assert "β" in equation_text
 
 
 # ─────────────────────────────────────────────────────────────
@@ -710,12 +763,15 @@ def test_table_cell_renders_native_word_citation_field():
             "encabezados": ["DEFINICIÓN CONCEPTUAL"],
             "filas": [["Definición técnica [[CITE:SIM_01_GMG_2020]]."]],
             "word_sources": [source],
+            "estilo": {"fuente_size": 7.5},
         }
     )
 
     cell = doc.tables[0].rows[1].cells[0]
     instructions = [str(node.text or "") for node in cell._tc.xpath(".//w:instrText")]
     assert any("CITATION SIM_01_GMG_2020" in instruction for instruction in instructions)
+    assert any("CHARFORMAT" in instruction for instruction in instructions)
+    assert set(cell._tc.xpath(".//w:rPr/w:sz/@w:val")) == {"15"}
     assert "[[CITE:" not in cell.text
 
 
@@ -961,6 +1017,9 @@ class TestMatriz:
         assert len(doc.tables) == 1
         t = doc.tables[0]
         assert len(t.columns) == 5  # PROBLEMAS, OBJETIVOS, HIPÓTESIS, VARIABLES, METODOLOGÍA
+        methodology_cell = t.rows[2].cells[4]
+        assert all(paragraph.text.strip() for paragraph in methodology_cell.paragraphs)
+        assert set(methodology_cell._tc.xpath(".//w:tcMar/*/@w:w")) == {"35"}
 
     def test_matriz_landscape_true(self):
         doc = _render({
@@ -968,8 +1027,10 @@ class TestMatriz:
             "data": self._sample_matriz(),
             "landscape": True,
         })
-        # Landscape=True → render_tabla handles section switch internally
-        assert len(doc.sections) >= 3
+        # La matriz es el último anexo: cambia a horizontal y no agrega una
+        # sección vertical vacía después de la tabla.
+        assert len(doc.sections) == 2
+        assert doc.sections[-1].page_width > doc.sections[-1].page_height
 
     def test_matriz_empty_data(self):
         doc = _render({"type": "matriz", "data": {}})

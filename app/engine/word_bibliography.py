@@ -293,7 +293,10 @@ def render_text_with_citations(
             # one entry, even when the years differ.  The native \t switch
             # suppresses only that title and preserves the expected APA form:
             # (Autor, año) or (Autor, año; Autor, año).
-            instruction += " \\t "
+            # CHARFORMAT makes Word preserve the formatting of the first
+            # field run when F9 refreshes a citation.  This is essential in
+            # operationalization tables, whose text is smaller than body text.
+            instruction += " \\t \\* CHARFORMAT "
             _append_field(
                 paragraph,
                 instruction,

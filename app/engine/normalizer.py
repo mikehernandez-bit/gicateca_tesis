@@ -1327,10 +1327,22 @@ def _normalize_preliminares(data: dict) -> List[Block]:
                 "centered": True,
             }
         )
+        intro_content: List[Block] = []
         if intro.get("_ai_content"):
-            blocks.extend(_normalize_ai_content(intro["_ai_content"]))
+            intro_parent = dict(intro)
+            intro_parent["titulo"] = intro.get("titulo") or "INTRODUCCIÓN"
+            intro_content = _normalize_ai_content(intro["_ai_content"], parent_item=intro_parent)
         elif intro.get("texto") and not _looks_like_template_placeholder_text(intro.get("texto", "")):
-            blocks.append({"type": "paragraph", "text": intro.get("texto", "")})
+            intro_content = [{"type": "paragraph", "text": intro.get("texto", "")}]
+        expected_intro_title = _norm_upper(str(intro.get("titulo") or "INTRODUCCIÓN"))
+        while intro_content:
+            first = intro_content[0]
+            if first.get("type") not in {"paragraph", "heading"}:
+                break
+            if _norm_upper(str(first.get("text") or "")) != expected_intro_title:
+                break
+            intro_content.pop(0)
+        blocks.extend(intro_content)
         blocks.append({"type": "page_break"})
 
     return blocks
@@ -2153,13 +2165,44 @@ def _normalize_ai_content(
             if not lines:
                 continue
 
-            if parent_item and "texto" in parent_item:
-                parent_title = _norm_upper(_MARKDOWN_BOLD_RE.sub(r"\2", str(parent_item["texto"])).strip())
+            if parent_item and (parent_item.get("texto") or parent_item.get("titulo")):
+                parent_label = parent_item.get("texto") or parent_item.get("titulo")
+                parent_title = _norm_upper(_MARKDOWN_BOLD_RE.sub(r"\2", str(parent_label)).strip())
                 first_line_norm = _norm_upper(_MARKDOWN_BOLD_RE.sub(r"\2", lines[0]).strip()).lstrip("# ").strip()
                 if first_line_norm == parent_title or first_line_norm.startswith(parent_title + " "):
                     lines = lines[1:]
                     if not lines:
                         continue
+
+            # Methodological design schemes are equations, not prose.  Mistral
+            # commonly returns the scheme on its own line within a paragraph;
+            # split it into an editable, centered OMML block deterministically.
+            scheme_index = next(
+                (
+                    index
+                    for index, line in enumerate(lines)
+                    if re.fullmatch(r"M\s+O(?:₁|_?1)\s+X\s+O(?:₂|_?2)", line, flags=re.IGNORECASE)
+                ),
+                None,
+            )
+            if scheme_index is not None:
+                before = " ".join(lines[:scheme_index]).strip()
+                after = " ".join(lines[scheme_index + 1 :]).strip()
+                if before:
+                    blocks.append({"type": "paragraph", "text": before})
+                blocks.append(
+                    {
+                        "type": "formula",
+                        "latex": "M   O_1   X   O_2",
+                        "text": "M O₁ X O₂",
+                        "number": "",
+                        "alignment": "center",
+                        "id": "methodological-design-scheme",
+                    }
+                )
+                if after:
+                    blocks.append({"type": "paragraph", "text": after})
+                continue
 
             # Limpiar marcadores Markdown (e.g. **2.2.1 Título** → 2.2.1 Título)
             first_line_clean = _MARKDOWN_BOLD_RE.sub(r"\2", lines[0]).strip()
@@ -2194,6 +2237,15 @@ def _normalize_ai_content(
     blocks: List[Block] = []
     for item in content:
         blocks.extend(_normalize_content_item(item, parent_item=parent_item))
+    if parent_item and blocks and (parent_item.get("texto") or parent_item.get("titulo")):
+        parent_label = parent_item.get("texto") or parent_item.get("titulo")
+        parent_title = _norm_upper(_MARKDOWN_BOLD_RE.sub(r"\2", str(parent_label)).strip()).lstrip("# ").strip()
+        while blocks:
+            first = blocks[0]
+            first_text = _norm_upper(_MARKDOWN_BOLD_RE.sub(r"\2", str(first.get("text") or "")).strip()).lstrip("# ").strip()
+            if first.get("type") not in {"paragraph", "heading"} or first_text != parent_title:
+                break
+            blocks.pop(0)
     return blocks
 
 
@@ -2452,9 +2504,9 @@ def _normalize_anexos(data: dict, fin: dict) -> List[Block]:
             # Content block normal del anexo
             blocks.extend(_normalize_annex_blocks(_normalize_content_block(item)))
 
-    # Restore portrait
-    if first_is_matriz:
-        blocks.append({"type": "section_switch", "orientation": "portrait"})
+    # Annexes are the final document section.  Restoring portrait here creates
+    # a trailing blank page after a landscape matrix, so the document keeps its
+    # final landscape section instead.
 
     # Fallback: matriz como último anexo si no estaba en la lista
     if "matriz_consistencia" in data and not rendered_matriz:
@@ -2481,6 +2533,5 @@ def _normalize_anexos(data: dict, fin: dict) -> List[Block]:
                 "landscape": False,
             }
         )
-        blocks.append({"type": "section_switch", "orientation": "portrait"})
 
     return blocks
