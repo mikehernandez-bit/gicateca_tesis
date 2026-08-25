@@ -162,7 +162,11 @@ def _compact_cell_after_format(cell, style: dict) -> None:
     for paragraph in cell.paragraphs:
         paragraph.paragraph_format.space_before = Pt(0)
         paragraph.paragraph_format.space_after = Pt(0)
-        paragraph.paragraph_format.line_spacing = 0.95
+        paragraph.paragraph_format.line_spacing = float(style.get("interlineado_celda", 0.95))
+
+
+def _should_compact_cells(tabla_data: dict, style: dict) -> bool:
+    return _is_schedule_table(tabla_data) or bool(style.get("compactar_celdas"))
 
 
 def _apply_table_geometry(table, widths_cm: list[float] | None) -> None:
@@ -455,7 +459,7 @@ def _render_tabla_impl(doc: Document, tabla_data: dict) -> None:
             alignment=WD_ALIGN_PARAGRAPH.CENTER,
             word_sources=tabla_data.get("word_sources") or [],
         )
-        if _is_schedule_table(tabla_data):
+        if _should_compact_cells(tabla_data, estilo):
             _compact_cell_after_format(cell, estilo)
         if header_color:
             apply_cell_shading(cell, header_color)
@@ -475,7 +479,7 @@ def _render_tabla_impl(doc: Document, tabla_data: dict) -> None:
                 alignment=_cell_alignment(tabla_data, row_idx, col_idx, estilo),
                 word_sources=tabla_data.get("word_sources") or [],
             )
-            if _is_schedule_table(tabla_data):
+            if _should_compact_cells(tabla_data, estilo):
                 _compact_cell_after_format(cell, estilo)
             set_cell_vertical_alignment(cell)
 
@@ -509,7 +513,7 @@ def _render_tabla_impl(doc: Document, tabla_data: dict) -> None:
                     alignment=_alignment_from_value(str(merge.get("alignment") or "center"), WD_ALIGN_PARAGRAPH.CENTER),
                     word_sources=tabla_data.get("word_sources") or [],
                 )
-                if _is_schedule_table(tabla_data):
+                if _should_compact_cells(tabla_data, estilo):
                     _compact_cell_after_format(merged_cell, estilo)
                 set_cell_vertical_alignment(merged_cell)
 

@@ -87,7 +87,6 @@ def _build_metodologia_block(met: dict) -> str:
         label = key.replace("_", " ").capitalize() + ":"
         lines.append(label)
         lines.append(_clean_text(value))
-        lines.append("")
 
     for key, value in met.items():
         if key in used or value in (None, "", []):
@@ -95,7 +94,6 @@ def _build_metodologia_block(met: dict) -> str:
         label = str(key).replace("_", " ").capitalize() + ":"
         lines.append(label)
         lines.append(_clean_text(value))
-        lines.append("")
 
     return "\n".join(lines).strip()
 
@@ -143,6 +141,7 @@ def render_matriz(doc: Document, block: Block) -> None:
     tabla_data = {
         "tipo": "tabla",
         "orientacion": "landscape" if landscape else "portrait",
+        "restore_portrait": False,
         "encabezados": [str(titulo_investigacion), "", "", "", ""],
         "filas": filas,
         "filas_fase": [0, 1, 3],
@@ -176,11 +175,12 @@ def render_matriz(doc: Document, block: Block) -> None:
         ],
         "estilo": {
             "encabezado_color": "D9D9D9",
-            "fuente_size": 7.5,
+            "fuente_size": 7.0,
             "ancho_columnas": [5.2, 5.2, 5.2, 4.4, 4.7],
             "titulo_exacto": False,
             "bordes": True,
-            "celda_margen_twips": 70,
+            "celda_margen_twips": 35,
+            "compactar_celdas": True,
         },
     }
 

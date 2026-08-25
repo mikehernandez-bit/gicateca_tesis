@@ -747,6 +747,74 @@ class TestNormalizePreliminares:
         hdgs = _blocks_of_type(blocks, "heading")
         assert any(b["text"] == "INTRODUCCIÓN" for b in hdgs)
 
+    def test_introduccion_does_not_repeat_ai_leading_title(self):
+        data = _minimal_json()
+        data["preliminares"] = {
+            "introduccion": {
+                "titulo": "INTRODUCCIÓN",
+                "_ai_content": "Introducción\n\nPrimer párrafo académico.",
+            },
+        }
+
+        blocks = normalize(data)
+        rendered_text = [block.get("text") for block in blocks if block.get("text")]
+
+        assert rendered_text.count("INTRODUCCIÓN") == 1
+        assert "Introducción" not in rendered_text
+        assert "Primer párrafo académico." in rendered_text
+
+    def test_introduccion_does_not_repeat_structured_ai_leading_title(self):
+        data = _minimal_json()
+        data["preliminares"] = {
+            "introduccion": {
+                "titulo": "INTRODUCCION",
+                "_ai_content": [
+                    {"tipo": "parrafo", "texto": "Introducción"},
+                    {"tipo": "parrafo", "texto": "Primer párrafo académico."},
+                ],
+            },
+        }
+
+        blocks = normalize(data)
+        rendered_text = [block.get("text") for block in blocks if block.get("text")]
+
+        assert "Introducción" not in rendered_text
+        assert "Primer párrafo académico." in rendered_text
+
+    def test_introduccion_without_template_title_does_not_repeat_ai_title(self):
+        data = _minimal_json()
+        data["preliminares"] = {
+            "introduccion": {
+                "_ai_content": "Introducción\n\nPrimer párrafo académico.",
+            },
+        }
+
+        rendered_text = [
+            block.get("text") for block in normalize(data) if block.get("text")
+        ]
+
+        assert rendered_text.count("INTRODUCCIÓN") == 1
+        assert "Introducción" not in rendered_text
+
+    def test_methodological_design_scheme_becomes_centered_formula(self):
+        data = _minimal_json()
+        data["preliminares"] = {
+            "introduccion": {
+                "titulo": "INTRODUCCIÓN",
+                "_ai_content": (
+                    "El esquema metodológico se representa como:\n"
+                    "M O₁ X O₂\n\n"
+                    "Donde M representa la muestra."
+                ),
+            },
+        }
+
+        formulas = _blocks_of_type(normalize(data), "formula")
+
+        assert len(formulas) == 1
+        assert formulas[0]["latex"] == "M   O_1   X   O_2"
+        assert formulas[0]["alignment"] == "center"
+
 
 # ─────────────────────────────────────────────────────────────
 # CUERPO
@@ -1280,7 +1348,7 @@ class TestNormalizeFinales:
         assert all("[[SOURCE:" not in text for text in reference_paragraphs)
 
     def test_anexos_with_matriz_landscape(self):
-        """Anexo con matriz genera section_switch landscape → heading → matriz → portrait."""
+        """Anexo final con matriz cambia a landscape sin página vertical vacía."""
         data = _minimal_json()
         data["finales"] = {
             "anexos": {
@@ -1297,11 +1365,10 @@ class TestNormalizeFinales:
         }
         blocks = normalize(data)
 
-        # Verificar secuencia: section_switch(landscape) → heading → black_heading → matriz → section_switch(portrait)
+        # Verificar secuencia: section_switch(landscape) → heading → black_heading → matriz.
         ss = _blocks_of_type(blocks, "section_switch")
-        assert len(ss) == 2
+        assert len(ss) == 1
         assert ss[0]["orientation"] == "landscape"
-        assert ss[1]["orientation"] == "portrait"
 
         mat = _blocks_of_type(blocks, "matriz")
         assert len(mat) == 1
@@ -1589,9 +1656,9 @@ class TestNormalizeFinales:
         assert len(mat) == 1  # fallback lo agrega
 
         ss = _blocks_of_type(blocks, "section_switch")
-        # Fallback genera landscape + portrait
+        # El fallback final conserva landscape para no crear una hoja vacía.
         assert any(b["orientation"] == "landscape" for b in ss)
-        assert any(b["orientation"] == "portrait" for b in ss)
+        assert not any(b["orientation"] == "portrait" for b in ss)
 
     def test_no_finales(self):
         """Sin finales no genera blocks de esa sección."""
