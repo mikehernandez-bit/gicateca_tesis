@@ -850,8 +850,12 @@ def _attach_cached_index_entries(blocks: List[Block]) -> None:
         if (
             candidate_type != "image"
             or not str(candidate.get("titulo") or "").strip()
-            or not str(candidate.get("ruta") or "").strip()
+            or not (
+                str(candidate.get("ruta") or "").strip()
+                or str(candidate.get("diagram_type") or "").strip()
+            )
             or bool(candidate.get("omit_caption"))
+            or bool(candidate.get("exclude_from_figure_index"))
         ):
             continue
         chapter_figure_number += 1
@@ -2029,6 +2033,9 @@ def _normalize_content_item(
             color_actual = item.get("nota_color") or item.get("note_color")
             if not color_actual and parent_item:
                 color_actual = parent_item.get("nota_color") or parent_item.get("note_color")
+            numbered = bool(item.get("numbered", True))
+            show_caption = bool(item.get("show_caption", numbered))
+            include_in_index = bool(item.get("include_in_index", numbered)) and numbered
             blocks.append(
                 {
                     "type": "image",
@@ -2042,7 +2049,9 @@ def _normalize_content_item(
                     "placeholder_text": item.get("placeholder_text") or item.get("texto_placeholder"),
                     "diagram_type": diagram_type,
                     "diagram_data": item.get("diagram_data") if isinstance(item.get("diagram_data"), dict) else {},
-                    "omit_caption": not bool(item.get("numbered", True)),
+                    "omit_caption": not show_caption,
+                    "static_caption": caption if show_caption and not numbered else "",
+                    "exclude_from_figure_index": not include_in_index,
                 }
             )
         elif caption:

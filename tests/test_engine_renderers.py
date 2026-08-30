@@ -637,6 +637,27 @@ class TestImage:
         assert len(doc.inline_shapes) == 1
         assert not any("Figura" in paragraph.text for paragraph in doc.paragraphs)
 
+    def test_structured_diagram_renders_static_caption_without_seq_field(self):
+        caption = "Figura 1.1 Diagrama de Pareto de modos de falla en flota CAT 24M"
+        doc = _render({
+            "type": "image",
+            "titulo": "Diagrama de Pareto de modos de falla en flota CAT 24M",
+            "ruta": "",
+            "diagram_type": "pareto_qualitative",
+            "diagram_data": {"labels": ["Modo", "Frecuencia", "Acumulado"]},
+            "omit_caption": False,
+            "static_caption": caption,
+            "exclude_from_figure_index": True,
+        })
+
+        assert any(paragraph.text == caption for paragraph in doc.paragraphs)
+        instructions = [
+            str(node.text or "")
+            for paragraph in doc.paragraphs
+            for node in paragraph._p.xpath(".//w:instrText")
+        ]
+        assert not any("SEQ Figura" in instruction for instruction in instructions)
+
     def test_image_caption_uses_chapter_aware_label_and_note(self):
         doc = _render_many([
             {"type": "heading", "text": "I. PLANTEAMIENTO DEL PROBLEMA", "level": 1},

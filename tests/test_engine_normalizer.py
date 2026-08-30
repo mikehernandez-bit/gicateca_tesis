@@ -665,6 +665,35 @@ class TestNormalizePreliminares:
             {"text": "Figura 2.1 Disponibilidad inherente", "page": 1}
         ]
 
+    def test_figure_index_cache_includes_generated_diagram_and_skips_diagnostic_support(self):
+        from app.engine.normalizer import _attach_cached_index_entries
+
+        blocks = [
+            {"type": "toc_field", "field_code": ' TOC \\c "Figura" \\h \\z '},
+            {"type": "heading", "level": 1, "text": "I. PLANTEAMIENTO DEL PROBLEMA"},
+            {
+                "type": "image",
+                "titulo": "Diagrama de Pareto de modos de falla en flota CAT 24M",
+                "ruta": "",
+                "diagram_type": "pareto_qualitative",
+                "static_caption": "Figura 1.1 Diagrama de Pareto de modos de falla en flota CAT 24M",
+                "exclude_from_figure_index": True,
+            },
+            {"type": "heading", "level": 1, "text": "II. MARCO TEÓRICO"},
+            {
+                "type": "image",
+                "titulo": "Proceso del RCM",
+                "ruta": "",
+                "diagram_type": "rcm_flow",
+            },
+        ]
+
+        _attach_cached_index_entries(blocks)
+
+        assert blocks[0]["cached_entries"] == [
+            {"text": "Figura 2.1 Proceso del RCM", "page": 1}
+        ]
+
     def test_indices_list_prefers_ai_abbreviations_over_base_examples(self):
         data = _minimal_json()
         data["cuerpo"][0]["contenido"] = [

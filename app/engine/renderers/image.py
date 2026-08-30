@@ -97,6 +97,7 @@ def render_image(doc: Document, block: Block) -> None:
     ruta = block.get("ruta", "")
     titulo = _clean_figure_title(block.get("titulo", ""))
     omit_caption = bool(block.get("omit_caption"))
+    static_caption = str(block.get("static_caption") or "").strip()
     nota = str(block.get("nota") or block.get("note") or "").strip()
     nota_color = _rgb_from_hex(str(block.get("nota_color") or block.get("note_color") or "").strip())
     placeholder_text = str(
@@ -118,29 +119,37 @@ def render_image(doc: Document, block: Block) -> None:
     try:
         # Caption with SEQ field
         if titulo and not omit_caption:
-            chapter_number, figure_number, is_first_in_chapter = next_figure_number()
             pc = doc.add_paragraph()
             pc.alignment = WD_ALIGN_PARAGRAPH.CENTER
             pc.paragraph_format.keep_with_next = True
             pc.paragraph_format.space_after = Pt(4)
-            prefix = (
-                f"Figura {chapter_number}." if chapter_number is not None else "Figura "
-            )
-            rl = pc.add_run(prefix)
-            rl.font.name = "Arial"
-            rl.font.size = Pt(10)
-            add_seq_field(
-                pc,
-                "Figura",
-                reset_to=1 if is_first_in_chapter else None,
-                display_value=figure_number,
-                font_name="Arial",
-                font_size_pt=10,
-                bold=False,
-            )
-            rt = pc.add_run(f" {titulo}")
-            rt.font.name = "Arial"
-            rt.font.size = Pt(10)
+            if static_caption:
+                # Diagnostic supports in section 1.1 are visibly numbered in
+                # the engineer reference but intentionally excluded from the
+                # formal figure index. Render their exact caption without SEQ.
+                rs = pc.add_run(static_caption)
+                rs.font.name = "Arial"
+                rs.font.size = Pt(10)
+            else:
+                chapter_number, figure_number, is_first_in_chapter = next_figure_number()
+                prefix = (
+                    f"Figura {chapter_number}." if chapter_number is not None else "Figura "
+                )
+                rl = pc.add_run(prefix)
+                rl.font.name = "Arial"
+                rl.font.size = Pt(10)
+                add_seq_field(
+                    pc,
+                    "Figura",
+                    reset_to=1 if is_first_in_chapter else None,
+                    display_value=figure_number,
+                    font_name="Arial",
+                    font_size_pt=10,
+                    bold=False,
+                )
+                rt = pc.add_run(f" {titulo}")
+                rt.font.name = "Arial"
+                rt.font.size = Pt(10)
 
         if placeholder_text:
             pi = doc.add_paragraph()
