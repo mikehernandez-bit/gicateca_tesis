@@ -96,11 +96,37 @@ def _expected_caption_counts(blocks: list[dict[str, Any]]) -> tuple[int, int]:
         elif block_type == "image":
             if (
                 str(block.get("titulo") or "").strip()
-                and str(block.get("ruta") or "").strip()
+                # Images may come from a physical route or from a deterministic
+                # diagram renderer. Both paths create the same SEQ Figura
+                # caption. Requiring only ``ruta`` made the validator expect
+                # zero figures while the renderer correctly produced four
+                # captions for diagram_type blocks.
+                and (
+                    str(block.get("ruta") or "").strip()
+                    or str(block.get("diagram_type") or "").strip()
+                )
                 and not bool(block.get("omit_caption"))
+                and not bool(block.get("exclude_from_figure_index"))
             ):
                 figures += 1
     return tables, figures
+
+
+def _visible_toc_entry_count(doc: Document, label: str) -> int:
+    pattern = re.compile(rf"\bTOC\b.*\\c\s+\"{re.escape(label)}\"", re.IGNORECASE)
+    prefix = re.compile(rf"^{re.escape(label)}\s+\d", re.IGNORECASE)
+    for paragraph in doc.paragraphs:
+        instruction = " ".join(
+            str(element.text or "") for element in paragraph._p.iter(qn("w:instrText"))
+        )
+        if not pattern.search(instruction):
+            continue
+        return sum(
+            1
+            for line in str(paragraph.text or "").replace("\r", "\n").split("\n")
+            if prefix.search(line.strip())
+        )
+    return 0
 
 
 def _rendered_document_fragments(doc: Document) -> list[str]:
@@ -169,6 +195,31 @@ def validate_unac_project_document(doc: Document, blocks: list[dict[str, Any]]) 
     if expected_figures and not has_figure_index:
         errors.append("faltante el índice automático TOC \\c \"Figura\"")
 
+    visible_table_entries = _visible_toc_entry_count(doc, "Tabla")
+    visible_figure_entries = _visible_toc_entry_count(doc, "Figura")
+    if expected_tables and visible_table_entries != expected_tables:
+        errors.append(
+            "índice visible de tablas incompleto: "
+            f"entradas={visible_table_entries}, captions={expected_tables}"
+        )
+    if expected_figures and visible_figure_entries != expected_figures:
+        errors.append(
+            "índice visible de figuras incompleto: "
+            f"entradas={visible_figure_entries}, captions={expected_figures}"
+        )
+
+    static_captions = [
+        str(block.get("static_caption") or "").strip()
+        for block in blocks
+        if isinstance(block, dict)
+        and str(block.get("type") or "").strip().lower() == "image"
+        and str(block.get("static_caption") or "").strip()
+    ]
+    rendered_paragraphs = {paragraph.text.strip() for paragraph in doc.paragraphs if paragraph.text.strip()}
+    missing_static = [caption for caption in static_captions if caption not in rendered_paragraphs]
+    if missing_static:
+        errors.append("captions diagnósticos visibles faltantes: " + " | ".join(missing_static))
+
     automatic_index_count = int(has_table_index) + int(has_figure_index)
     page_headers = sum(1 for paragraph in doc.paragraphs if paragraph.text.strip() == "Pág.")
     if page_headers != automatic_index_count:
@@ -197,6 +248,8 @@ def validate_unac_project_document(doc: Document, blocks: list[dict[str, Any]]) 
     return {
         "table_captions": seq_tables,
         "figure_captions": seq_figures,
+        "visible_figure_index_entries": visible_figure_entries,
+        "static_figure_captions": len(static_captions),
         "page_headers": page_headers,
         "formulas": rendered_formulas,
         "indexed_abbreviations": sum(

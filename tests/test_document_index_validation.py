@@ -11,6 +11,7 @@ from app.engine.document_validation import (
 )
 from app.engine.primitives import configure_styles, disable_update_fields, enable_update_fields
 from app.engine.registry import render_blocks
+from app.engine.normalizer import _attach_cached_index_entries
 
 
 def _five_table_blocks() -> list[dict]:
@@ -51,6 +52,7 @@ def _five_table_blocks() -> list[dict]:
                 },
             ]
         )
+    _attach_cached_index_entries(blocks)
     return blocks
 
 
@@ -78,6 +80,71 @@ def test_quality_gate_rejects_exact_table_without_seq_caption() -> None:
         instr.getparent().remove(instr)
 
     with pytest.raises(DocumentIndexValidationError, match="SEQ Tabla"):
+        validate_unac_project_document(doc, blocks)
+
+
+def test_generated_diagrams_count_as_expected_figure_captions() -> None:
+    doc = Document()
+    configure_styles(doc)
+    blocks: list[dict] = [
+        {
+            "type": "toc_field",
+            "field_code": ' TOC \\c "Figura" \\h \\z ',
+            "heading_text": "ÍNDICE DE FIGURAS",
+            "page_label": "Pág.",
+        }
+    ]
+    blocks.extend(
+        {
+            "type": "image",
+            "titulo": title,
+            "ruta": "",
+            "diagram_type": "flow",
+            "diagram_data": {"labels": ["Entrada", "Análisis", "Resultado"]},
+            "fuente": "Elaboración propia",
+            "omit_caption": False,
+        }
+        for title in (
+            "Proceso del RCM",
+            "Taxonomía ISO 14224",
+            "Flujo del AMEF",
+            "Sistemas del equipo",
+        )
+    )
+
+    _attach_cached_index_entries(blocks)
+
+    render_blocks(doc, blocks)
+    report = validate_unac_project_document(doc, blocks)
+
+    assert report["figure_captions"] == 4
+    assert report["visible_figure_index_entries"] == 4
+    assert report["page_headers"] == 1
+
+
+def test_quality_gate_rejects_empty_visible_figure_index() -> None:
+    doc = Document()
+    configure_styles(doc)
+    blocks: list[dict] = [
+        {
+            "type": "toc_field",
+            "field_code": ' TOC \\c "Figura" \\h \\z ',
+            "heading_text": "ÍNDICE DE FIGURAS",
+            "page_label": "Pág.",
+        },
+        {"type": "heading", "text": "II. MARCO TEÓRICO", "level": 1},
+        {
+            "type": "image",
+            "titulo": "Proceso del RCM",
+            "ruta": "",
+            "diagram_type": "flow",
+            "diagram_data": {"labels": ["Entrada", "Proceso", "Salida"]},
+        },
+    ]
+
+    render_blocks(doc, blocks)
+
+    with pytest.raises(DocumentIndexValidationError, match="índice visible de figuras incompleto"):
         validate_unac_project_document(doc, blocks)
 
 

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import re
 
 from docx.document import Document
@@ -10,6 +11,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Cm, Pt, RGBColor
 
 from app.engine.render_state import next_figure_number
+from app.engine.diagram_image import generate_diagram_png
 from app.engine.registry import register
 from app.engine.primitives import resolve_asset, add_seq_field
 from app.engine.types import Block
@@ -95,45 +97,59 @@ def render_image(doc: Document, block: Block) -> None:
     ruta = block.get("ruta", "")
     titulo = _clean_figure_title(block.get("titulo", ""))
     omit_caption = bool(block.get("omit_caption"))
+    static_caption = str(block.get("static_caption") or "").strip()
     nota = str(block.get("nota") or block.get("note") or "").strip()
     nota_color = _rgb_from_hex(str(block.get("nota_color") or block.get("note_color") or "").strip())
     placeholder_text = str(
         block.get("placeholder_text") or block.get("texto_placeholder") or ""
     ).strip()
 
-    # Omit placeholders or missing files: never inject fake "example" figures.
-    if not ruta or ruta.lower() == "placeholder":
-        return
-    path = resolve_asset(ruta)
+    generated_path = ""
+    diagram_type = str(block.get("diagram_type") or "").strip()
+    if diagram_type:
+        generated_path = generate_diagram_png(diagram_type, block.get("diagram_data"), titulo)
+        path = generated_path
+    else:
+        if not ruta or str(ruta).lower() == "placeholder":
+            raise ValueError(f"Figure '{titulo}' has no renderable source")
+        path = resolve_asset(ruta)
     if not path:
-        return
+        raise ValueError(f"Figure asset could not be resolved: {ruta}")
 
     try:
         # Caption with SEQ field
         if titulo and not omit_caption:
-            chapter_number, figure_number, is_first_in_chapter = next_figure_number()
             pc = doc.add_paragraph()
             pc.alignment = WD_ALIGN_PARAGRAPH.CENTER
             pc.paragraph_format.keep_with_next = True
             pc.paragraph_format.space_after = Pt(4)
-            prefix = (
-                f"Figura {chapter_number}." if chapter_number is not None else "Figura "
-            )
-            rl = pc.add_run(prefix)
-            rl.font.name = "Arial"
-            rl.font.size = Pt(10)
-            add_seq_field(
-                pc,
-                "Figura",
-                reset_to=1 if is_first_in_chapter else None,
-                display_value=figure_number,
-                font_name="Arial",
-                font_size_pt=10,
-                bold=False,
-            )
-            rt = pc.add_run(f" {titulo}")
-            rt.font.name = "Arial"
-            rt.font.size = Pt(10)
+            if static_caption:
+                # Diagnostic supports in section 1.1 are visibly numbered in
+                # the engineer reference but intentionally excluded from the
+                # formal figure index. Render their exact caption without SEQ.
+                rs = pc.add_run(static_caption)
+                rs.font.name = "Arial"
+                rs.font.size = Pt(10)
+            else:
+                chapter_number, figure_number, is_first_in_chapter = next_figure_number()
+                prefix = (
+                    f"Figura {chapter_number}." if chapter_number is not None else "Figura "
+                )
+                rl = pc.add_run(prefix)
+                rl.font.name = "Arial"
+                rl.font.size = Pt(10)
+                add_seq_field(
+                    pc,
+                    "Figura",
+                    reset_to=1 if is_first_in_chapter else None,
+                    display_value=figure_number,
+                    font_name="Arial",
+                    font_size_pt=10,
+                    bold=False,
+                )
+                rt = pc.add_run(f" {titulo}")
+                rt.font.name = "Arial"
+                rt.font.size = Pt(10)
 
         if placeholder_text:
             pi = doc.add_paragraph()
@@ -174,4 +190,11 @@ def render_image(doc: Document, block: Block) -> None:
                 rt.font.name = "Arial"
                 rt.font.size = Pt(10)
     except Exception as e:
-        logger.warning("Image %s: %s", ruta, e)
+        logger.exception("Image %s: %s", ruta or diagram_type, e)
+        raise
+    finally:
+        if generated_path:
+            try:
+                os.unlink(generated_path)
+            except OSError:
+                pass

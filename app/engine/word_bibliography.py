@@ -25,7 +25,9 @@ WORDPROCESSING_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/mai
 SPANISH_PERU_LCID = 3082
 
 SOURCE_MARKER_RE = re.compile(r"^\s*\[\[SOURCE:([A-Z0-9_-]+)\]\]\s*(.+?)\s*$", re.DOTALL)
-CITATION_MARKER_RE = re.compile(r"\[\[CITE:([A-Z0-9_-]+(?:;[A-Z0-9_-]+)*)\]\]")
+CITATION_MARKER_RE = re.compile(
+    r"\[\[(?P<kind>CITE|CITE_NARRATIVE):(?P<tags>[A-Z0-9_-]+(?:;[A-Z0-9_-]+)*)\]\]"
+)
 _AUTHOR_YEAR_RE = re.compile(r"^(.+?)\s+\(((?:19|20)\d{2})\)\.\s+(.+)$", re.DOTALL)
 _AUTHOR_RE = re.compile(
     r"(?<![A-Za-z0-9])([A-Za-zÁÉÍÓÚÜÑáéíóúüñ'-]+),\s*"
@@ -285,7 +287,7 @@ def render_text_with_citations(
         if prefix:
             run = paragraph.add_run(prefix)
             _style_run(run, font_name=font_name, font_size_pt=font_size_pt)
-        tags = [tag for tag in match.group(1).split(";") if tag]
+        tags = [tag for tag in match.group("tags").split(";") if tag]
         if tags:
             instruction = f" CITATION {tags[0]} \\l {SPANISH_PERU_LCID}"
             instruction += "".join(f" \\m {tag}" for tag in tags[1:])
@@ -296,11 +298,24 @@ def render_text_with_citations(
             # CHARFORMAT makes Word preserve the formatting of the first
             # field run when F9 refreshes a citation.  This is essential in
             # operationalization tables, whose text is smaller than body text.
-            instruction += " \\t \\* CHARFORMAT "
+            narrative = match.group("kind") == "CITE_NARRATIVE"
+            instruction += " \\t"
+            if narrative:
+                # Keep the author as ordinary text and let Word own the year.
+                # The \n switch suppresses the author in the native field.
+                instruction += " \\n"
+                author = _author_citation(source_map.get(tags[0], {}))
+                author_run = paragraph.add_run(f"{author} ")
+                _style_run(author_run, font_name=font_name, font_size_pt=font_size_pt)
+            instruction += " \\* CHARFORMAT "
             _append_field(
                 paragraph,
                 instruction,
-                citation_display(tags, source_map),
+                (
+                    "(" + "; ".join(str(source_map.get(tag, {}).get("year") or "s. f.") for tag in tags) + ")"
+                    if narrative
+                    else citation_display(tags, source_map)
+                ),
                 font_name=font_name,
                 font_size_pt=font_size_pt,
             )

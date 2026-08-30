@@ -152,6 +152,25 @@ def test_repeated_citation_fields_share_one_source_and_one_bibliography_entry(tm
     assert report["bibliography_cached_entries"] == 1
 
 
+def test_narrative_citation_keeps_author_visible_and_year_native(tmp_path) -> None:
+    sources = extract_word_sources(_data())
+    document = Document()
+    paragraph = document.add_paragraph()
+    render_text_with_citations(
+        paragraph,
+        "El planteamiento de [[CITE_NARRATIVE:SIM_01_MORALES_2025]] sustenta el análisis.",
+        sources,
+    )
+    output = tmp_path / "narrative-citation.docx"
+    document.save(output)
+    with ZipFile(output) as archive:
+        xml = archive.read("word/document.xml").decode("utf-8")
+    assert "Morales &amp; Quispe" in xml
+    assert "CITATION SIM_01_MORALES_2025" in xml
+    assert "\\n" in xml
+    assert "(2025)" in xml
+
+
 def test_legacy_mil_standard_author_renders_and_validates_without_false_missing_entry(
     tmp_path,
 ) -> None:

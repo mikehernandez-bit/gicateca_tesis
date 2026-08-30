@@ -665,6 +665,35 @@ class TestNormalizePreliminares:
             {"text": "Figura 2.1 Disponibilidad inherente", "page": 1}
         ]
 
+    def test_figure_index_cache_includes_generated_diagram_and_skips_diagnostic_support(self):
+        from app.engine.normalizer import _attach_cached_index_entries
+
+        blocks = [
+            {"type": "toc_field", "field_code": ' TOC \\c "Figura" \\h \\z '},
+            {"type": "heading", "level": 1, "text": "I. PLANTEAMIENTO DEL PROBLEMA"},
+            {
+                "type": "image",
+                "titulo": "Diagrama de Pareto de modos de falla en flota CAT 24M",
+                "ruta": "",
+                "diagram_type": "pareto_qualitative",
+                "static_caption": "Figura 1.1 Diagrama de Pareto de modos de falla en flota CAT 24M",
+                "exclude_from_figure_index": True,
+            },
+            {"type": "heading", "level": 1, "text": "II. MARCO TEÓRICO"},
+            {
+                "type": "image",
+                "titulo": "Proceso del RCM",
+                "ruta": "",
+                "diagram_type": "rcm_flow",
+            },
+        ]
+
+        _attach_cached_index_entries(blocks)
+
+        assert blocks[0]["cached_entries"] == [
+            {"text": "Figura 2.1 Proceso del RCM", "page": 1}
+        ]
+
     def test_indices_list_prefers_ai_abbreviations_over_base_examples(self):
         data = _minimal_json()
         data["cuerpo"][0]["contenido"] = [
@@ -827,8 +856,8 @@ class TestNormalizeCuerpo:
         hdgs = _blocks_of_type(blocks, "heading")
         assert any(b["text"] == "CAP I" and b["level"] == 1 for b in hdgs)
 
-    def test_ai_figure_inherits_parent_note_and_color_blue(self):
-        """Una figura inyectada por IA hereda la nota e instrucción del padre y se marca azul."""
+    def test_ai_figure_inherits_parent_note_without_forced_blue(self):
+        """Una figura puede heredar una nota, pero V2 no la convierte en guía azul."""
         data = _minimal_json()
         data["cuerpo"] = [
             {
@@ -853,7 +882,7 @@ class TestNormalizeCuerpo:
         assert len(images) == 1
         assert images[0]["titulo"] == "Figura de IA"
         assert images[0]["nota"] == "Instruccion de prueba de la seccion"
-        assert images[0]["nota_color"] == "0000FF"
+        assert images[0]["nota_color"] is None
 
     def test_page_break_before_second_chapter_only(self):
         """Los saltos de capitulo van antes del siguiente capitulo, no despues del titulo."""
@@ -1160,14 +1189,8 @@ class TestNormalizeCuerpo:
         assert len(rcm_pars) == 1
         assert rcm_pars[0]["text"] == "El Mantenimiento Centrado en Confiabilidad es una metodología..."
 
-    def test_figure_without_nota_gets_generic_blue_instruction(self):
-        """Figura sin nota propia ni en el parent_item debe recibir una nota genérica
-        azul para guiar al estudiante.
-
-        Regresión: las figuras generadas por IA en 2.2 Bases Teóricas no traen
-        nota ni instruccion_detallada, por lo que antes no aparecía instrucción
-        debajo de la imagen.
-        """
+    def test_figure_without_nota_does_not_create_author_instruction(self):
+        """La salida final no debe mostrar instrucciones azules al estudiante."""
         data = _minimal_json()
         data["cuerpo"][0]["contenido"] = [{
             "texto": "2.2.1 Mantenimiento Centrado en Confiabilidad",
@@ -1184,15 +1207,8 @@ class TestNormalizeCuerpo:
         blocks = normalize(data)
         images = _blocks_of_type(blocks, "image")
         assert len(images) == 1
-        # La figura debe tener una nota genérica (no vacía)
-        assert images[0]["nota"], "La figura debe tener una nota de instrucción genérica"
-        assert images[0]["nota_color"] == "0000FF", "La nota debe ser azul (0000FF)"
-        # El texto genérico debe mencionar la figura o ser una instrucción útil
-        nota_text = images[0]["nota"].lower()
-        assert any(
-            keyword in nota_text
-            for keyword in ["elaborar", "figura", "datos", "fuente", "incluir"]
-        ), f"La nota genérica debe ser instructiva, se obtuvo: {images[0]['nota']!r}"
+        assert images[0]["nota"] is None
+        assert images[0]["nota_color"] is None
 
 
 # ─────────────────────────────────────────────────────────────

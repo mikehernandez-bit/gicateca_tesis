@@ -58,6 +58,19 @@ def _targets(lines: Iterable[str]) -> list[str]:
     return targets
 
 
+def _caption_targets(doc: Document, label: str) -> list[str]:
+    """Recover TOC targets from native captions when the cached list is empty."""
+    pattern = re.compile(rf"\bSEQ\s+{re.escape(label)}\b", re.IGNORECASE)
+    targets: list[str] = []
+    for paragraph in doc.paragraphs:
+        if not pattern.search(_instruction(paragraph)):
+            continue
+        text = str(paragraph.text or "").strip()
+        if text:
+            targets.append(text)
+    return targets
+
+
 def _last_matching_page(pages: list[str], target: str) -> int | None:
     needle = _norm(target)
     if not needle:
@@ -127,7 +140,15 @@ def _update_cached_results(docx_path: Path, pdf_path: Path) -> tuple[tuple[str, 
     for paragraph in doc.paragraphs:
         if not re.search(r"\bTOC\b", _instruction(paragraph), re.IGNORECASE):
             continue
+        instruction = _instruction(paragraph)
         targets = _targets(_cached_lines(paragraph))
+        if not targets:
+            figure_match = re.search(r"\\c\s+\"Figura\"", instruction, re.IGNORECASE)
+            table_match = re.search(r"\\c\s+\"Tabla\"", instruction, re.IGNORECASE)
+            if figure_match:
+                targets = _caption_targets(doc, "Figura")
+            elif table_match:
+                targets = _caption_targets(doc, "Tabla")
         entries: list[tuple[str, int]] = []
         for target in targets:
             page = _last_matching_page(pages, target)
